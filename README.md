@@ -14,8 +14,8 @@ https://www.redblobgames.com/grids/hexagons/
 
 ## Pasos restantes
 
-[ ] Ver cómo se puede organizar mejor el proyecto en módulos
-[ ] Movimientos de fichas
-[ ] Jugar en consola entre personas
-[ ] IA
-[ ] UI
+- [ ] Ver cómo se puede organizar mejor el proyecto en módulos
+- [ ] Movimientos de fichas
+- [ ] Jugar en consola entre personas
+- [ ] IA
+- [ ] UI
