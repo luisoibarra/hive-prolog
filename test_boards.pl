@@ -19,28 +19,39 @@ test_boards([piece(2,2,white,[ant|_])], [piece(2,3,black,[ant|_]), piece(1,1,whi
 test_boards([piece(2,2,white,[ant|_])], [piece(2,3,black,[ant|_]), piece(1,1,white,[ant|_]), piece(2,4,black,[ant|_]), piece(1,0,white,[ant|_]), piece(2,5,black,[ant|_]), piece(1,1,white,[ant|_])], false) :- write(6).
 
 % Queen Movement
-test_boards([piece(2,2,white,[queen|_]),piece(1,1,_,_),piece(1,2,_,_)], [[piece(2,2,white,[queen|_]),piece(2,1,white,[queen|_])]], true) :- write(7).
-test_boards([piece(2,2,white,[queen|_]),piece(1,1,_,_),piece(2,1,_,_)], [[piece(2,2,white,[queen|_]),piece(2,1,white,[queen|_])]], false) :- write(8).
+test_boards([piece(2,2,white,[queen,0|_]),piece(1,1,_,[_,0|_]),piece(1,2,_,[_,0|_])], [[piece(2,2,white,[queen,0|_]),piece(2,1,white,[queen,0|_])]], true) :- write(7).
+test_boards([piece(2,2,white,[queen,0|_]),piece(1,1,_,[_,0|_]),piece(2,1,_,[_,0|_])], [[piece(2,2,white,[queen,0|_]),piece(2,1,white,[queen,0|_])]], false) :- write(8).
 
+% Cricket Movement
+test_boards([piece(2,2,_,[cricket,0|_]),piece(3,2,_,[_,0|_]),piece(4,3,_,[_,0|_])], [[piece(2,2,_,[cricket,0|_]),piece(1,2,_,[cricket,0|_])]], false) :- write(9).
+test_boards([piece(2,2,_,[cricket,0|_]),piece(3,2,_,[_,0|_]),piece(4,3,_,[_,0|_])], [[piece(2,2,_,[cricket,0|_]),piece(4,3,_,[cricket,0|_])]], false) :- write(10).
+test_boards([piece(2,2,_,[cricket,0|_]),piece(3,2,_,[_,0|_]),piece(4,3,_,[_,0|_])], [[piece(2,2,_,[cricket,0|_]),piece(4,2,_,[cricket,0|_])]], false) :- write(11).
+test_boards([piece(2,2,_,[cricket,0|_]),piece(3,2,_,[_,0|_]),piece(4,3,_,[_,0|_])], [[piece(2,2,_,[cricket,0|_]),piece(5,3,_,[cricket,0|_])]], true) :- write(12).
 
 % Simulate game
 % End Simulation
 simulate_test_boards(_, [], ExpectedResult, true) :- ExpectedResult == true.
+simulate_test_boards(_, [], ExpectedResult, false) :- ExpectedResult \= true.
 
 % Move Piece Simulation
 simulate_test_boards(InitialBoard, [[PieceToMove, PieceMoved]|_], ExpectedResult, true) :- 
     not(move(InitialBoard, PieceToMove, PieceMoved, _)),
     false == ExpectedResult, !.
+simulate_test_boards(InitialBoard, [[PieceToMove, PieceMoved]|_], ExpectedResult, false) :- 
+    not(move(InitialBoard, PieceToMove, PieceMoved, _)),
+    false \= ExpectedResult, !.
 simulate_test_boards(InitialBoard, [[PieceToMove, PieceMoved]|Pieces], ExpectedResult, Result) :- 
     move(InitialBoard, PieceToMove, PieceMoved, NewBoard),
-    simulate_test_boards(NewBoard, Pieces, ExpectedResult, Result).
+    !, simulate_test_boards(NewBoard, Pieces, ExpectedResult, Result).
 
 % Add Piece Simulation
 simulate_test_boards(InitialBoard, [Piece|_], ExpectedResult, true) :- not(add_piece(InitialBoard, Piece, _)),
-                                                                              false == ExpectedResult, !.
+                                                                         false == ExpectedResult, !.
+simulate_test_boards(InitialBoard, [Piece|_], ExpectedResult, false) :- not(add_piece(InitialBoard, Piece, _)),
+                                                                        false \= ExpectedResult, !.
 simulate_test_boards(InitialBoard, [Piece|Pieces], ExpectedResult, Result) :- add_piece(InitialBoard, Piece, NewBoard),
                                                                               simulate_test_boards(NewBoard, Pieces, ExpectedResult, Result).
 % Main Test Function
 run_board_test() :- test_boards(InitialBoard, Pieces, ExpectedResult),
-                    simulate_test_boards(InitialBoard, Pieces, ExpectedResult, _),
-                    nl, write(done).
+                    simulate_test_boards(InitialBoard, Pieces, ExpectedResult, Result),
+                    nl, write(succeed), write(Result).
