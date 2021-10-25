@@ -1,6 +1,6 @@
 :- module(move_utils, [first_empty_place_from/7]).
 :- use_module(board_utils). 
-
+:- use_module(piece_utils).
 
 % first_empty_place_from(Board, PosX, PosY, Dir, Length, NewPosX, NewPosY) 
 % Succeed if NewPosX and NewPosY are the coordinates of the first empty
@@ -21,3 +21,8 @@ first_empty_place_from(Board, PosX, PosY, Dir, CurrLength, Length, NewPosX, NewP
     Length is CurrLength+1,
     NewPosX = TempPosX,
     NewPosY = TempPosY.
+
+
+
+
+

@@ -32,17 +32,19 @@ post_move_rules(OldBoard, OldPiece, NewPiece, NewBoard) :-
     single_hive_after(OldBoard, OldPiece, NewPiece).
 
 % Queen Movement
-queen_moves_position(Board, Piece, NewPiece, [NewPiece|RemovedBoard]) :- 
+queen_moves_position(Board, Piece, NewPiece, NewBoard) :- 
     pre_move_rules(Board, Piece),
 
-    piece(PosX, PosY,Color,Extra) = Piece,
+    piece(PosX, PosY,_,_) = Piece,
+    get_piece_Height(Piece, PieceHeight),
     positions_next_to(PosX, PosY, NewPosX, NewPosY,_),
-    piece(NewPosX, NewPosY, Color, Extra) = NewPiece,
     not(is_place_taken(Board, NewPosX, NewPosY,_)),
-    can_slide_into(Board, Piece, NewPosX, NewPosY),
+    can_slide_into(Board, Piece, NewPosX, NewPosY, NewPiece),
+    get_piece_Height(NewPiece, PieceHeight),
     remove_board_piece(Board, Piece, RemovedBoard),
+    [NewPiece|RemovedBoard] = NewBoard,
 
-    post_move_rules(Board, Piece, NewPiece, [NewPiece|RemovedBoard]).
+    post_move_rules(Board, Piece, NewPiece, NewBoard).
 
 % Cricket Movement
 cricket_moves_position(Board, Piece, NewPiece, NewBoard) :-
@@ -57,6 +59,18 @@ cricket_moves_position(Board, Piece, NewPiece, NewBoard) :-
 
     post_move_rules(Board, Piece, NewPiece, NewBoard).
 
+% Beetle Movement
+beetle_moves_position(Board, Piece, NewPiece, NewBoard) :- 
+    pre_move_rules(Board, Piece),
+
+    piece(PosX, PosY,_,_) = Piece,
+    positions_next_to(PosX, PosY, NewPosX, NewPosY,_),
+    can_slide_into(Board, Piece, NewPosX, NewPosY, NewPiece),
+    remove_board_piece(Board, Piece, RemovedBoard),
+    NewBoard = [NewPiece|RemovedBoard],
+
+    post_move_rules(Board, Piece, NewPiece, NewBoard).
+
 
 % move(Board, OldPiece, NewPiece, NewBoard) Return the NewBoard after the move is made.
 move(Board, OldPiece, NewPiece, NewBoard) :- 
@@ -65,4 +79,7 @@ move(Board, OldPiece, NewPiece, NewBoard) :-
 move(Board, OldPiece, NewPiece, NewBoard) :- 
     get_piece_Type(OldPiece, cricket),
     cricket_moves_position(Board, OldPiece, NewPiece, NewBoard).
+move(Board, OldPiece, NewPiece, NewBoard) :- 
+    get_piece_Type(OldPiece, beetle),
+    beetle_moves_position(Board, OldPiece, NewPiece, NewBoard).
 

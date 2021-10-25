@@ -1,11 +1,27 @@
 :- module(board_utils, 
     [remove_board_piece/3, is_place_taken/4, connected_board/1, positions_next_to/5,
-    pieces_together/3, can_slide_into/4, get_all_pieces/3, exist_queen/1, color_played_list/3,
-    placed_around_of/3
+    pieces_together/3, can_slide_into/5, get_all_pieces/3, exist_queen/1, color_played_list/3,
+    placed_around_of/3, get_all_pieces_list/3, get_all_pieces_at/4
     ]).
 :- use_module(list_utils). 
 :- use_module(piece_utils). 
 
+
+% get_position_max_Height_or_0(Board, PosX, PosY, MaxHeight): Returns the MaxHeight of all pieces at PosX, PosY in Board
+get_position_max_Height_or_0(Board, PosX, PosY, MaxHeight) :- 
+    get_all_pieces_at(Board, PosX, PosY, PosPieces),
+    get_position_max_Height_or_0(PosPieces, 0, MaxHeight).
+
+% get_position_max_Height_or_0(PositionPieces, CurrentMax, MaxHeight): Returns in the maximun height of all PositionPieces 
+get_position_max_Height_or_0([], Current, Current).
+get_position_max_Height_or_0([Piece|Rest], CurrentMax, MaxHeight) :- 
+    get_piece_Height(Piece, Height),
+    Height > CurrentMax,
+    get_position_max_Height_or_0(Rest, Height, MaxHeight).
+get_position_max_Height_or_0([Piece|Rest], CurrentMax, MaxHeight) :- 
+    get_piece_Height(Piece, Height),
+    not(Height > CurrentMax),
+    get_position_max_Height_or_0(Rest, CurrentMax, MaxHeight).
 
 % remove_board_piece(Board, PieceToRemove, ResultBoard). Succeed if Piece is found in Board returning the ResultBoard without the Piece
 remove_board_piece([Piece|Board], Piece, Board) :- !.
@@ -108,12 +124,45 @@ exist_queen([_|Pieces]) :- exist_queen(Pieces).
 get_all_pieces([First|_], PiecePatter, First) :- PiecePatter = First.
 get_all_pieces([_|Pieces], PiecePatter, Result) :- get_all_pieces(Pieces, PiecePatter, Result).
 
+% get_all_pieces_list(Pieces, Pattern, ListResult): Succeed if ListResult is the list of all pieces that unifies with with Pattern in Pieces
+get_all_pieces_list([], _, []).
+get_all_pieces_list([Piece|Rest], Pattern, Result) :- 
+    not(Piece = Pattern),
+    get_all_pieces_list(Rest, Pattern, Result),
+    !.
+get_all_pieces_list([Piece|Rest], Pattern, [Piece|Result]) :- 
+    Piece = Pattern, 
+    get_all_pieces_list(Rest, Pattern, Result).
 
+% get_all_pieces_at(Board, PosX, PosY, List): Return all pieces in board that are in the given position
+get_all_pieces_at(Board, PosX, PosY, List) :- get_all_pieces_list(Board, piece(PosX, PosY, _, _), List).
 
-% can_slide_into(Board, PosX, PosY, NewPosX, NewPosY) Succeed if Piece can slide into NewPosX and NewPosY
-can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to UpLeft
-    piece(PosX, PosY, _, _) = Piece,
+can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece) :- 
+    piece(_, _, Color, Extra) = Piece,
     get_piece_Height(Piece, Height),
+    get_position_max_Height_or_0(Board, NewPosX, NewPosY, MaxHeight),
+    (
+        MaxHeight >= Height,
+        not((is_place_taken(Board, PosX1, PosY1, MaxHeight), 
+             is_place_taken(Board, PosX2, PosY2, MaxHeight)))
+        ;
+        MaxHeight < Height,
+        not((is_place_taken(Board, PosX1, PosY1, Height), 
+             is_place_taken(Board, PosX2, PosY2, Height)))
+    ),
+    (
+        is_place_taken(Board, NewPosX, NewPosY, MaxHeight),
+        set_piece_Height(piece(NewPosX, NewPosY, Color, Extra), MaxHeight+1, SlidedPiece)
+        ;
+        not(is_place_taken(Board, NewPosX, NewPosY, MaxHeight)),
+        set_piece_Height(piece(NewPosX, NewPosY, Color, Extra), MaxHeight, SlidedPiece)
+    ).
+
+% can_slide_into(Board, PosX, PosY, NewPosX, NewPosY, SlidedPiece) 
+% Succeed if Piece can slide into NewPosX and NewPosY, returning the SlidedPiece.
+% the slide makes the jumps according to the movement rules
+can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to UpLeft
+    piece(PosX, PosY, _, _) = Piece,
     DirX is PosX - NewPosX,
     DirY is PosY - NewPosY,
     DirX = 1,
@@ -121,11 +170,10 @@ can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to UpLeft
     0 is PosX mod 2,
     PosX1 is PosX, PosY1 is PosY-1,
     PosX2 is PosX-1, PosY2 is PosY,
-    not((is_place_taken(Board, PosX1, PosY1, Height), is_place_taken(Board, PosX2, PosY2, Height))).
+    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
 
-can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to UpLeft
+can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to UpLeft
     piece(PosX, PosY, _, _) = Piece,
-    get_piece_Height(Piece, Height),
     DirX is PosX - NewPosX,
     DirY is PosY - NewPosY,
     DirX = 1,
@@ -133,11 +181,10 @@ can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to UpLeft
     1 is PosX mod 2,
     PosX1 is PosX, PosY1 is PosY-1,
     PosX2 is PosX-1, PosY2 is PosY+1,
-    not((is_place_taken(Board, PosX1, PosY1, Height), is_place_taken(Board, PosX2, PosY2, Height))).
+    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
 
-can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to Up
+can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to Up
     piece(PosX, PosY, _, _) = Piece,
-    get_piece_Height(Piece, Height),
     DirX is PosX - NewPosX,
     DirY is PosY - NewPosY,
     DirX = 0,
@@ -145,11 +192,10 @@ can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to Up
     0 is PosX mod 2,
     PosX1 is PosX-1, PosY1 is PosY-1,
     PosX2 is PosX+1, PosY2 is PosY-1,
-    not((is_place_taken(Board, PosX1, PosY1, Height), is_place_taken(Board, PosX2, PosY2, Height))).
+    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
 
-can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to Up
+can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to Up
     piece(PosX, PosY, _, _) = Piece,
-    get_piece_Height(Piece, Height),
     DirX is PosX - NewPosX,
     DirY is PosY - NewPosY,
     DirX = 0,
@@ -157,11 +203,10 @@ can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to Up
     1 is PosX mod 2,
     PosX1 is PosX-1, PosY1 is PosY,
     PosX2 is PosX+1, PosY2 is PosY,
-    not((is_place_taken(Board, PosX1, PosY1, Height), is_place_taken(Board, PosX2, PosY2, Height))).
+    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
 
-can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to Up Right
+can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to Up Right
     piece(PosX, PosY, _, _) = Piece,
-    get_piece_Height(Piece, Height),
     DirX is PosX - NewPosX,
     DirY is PosY - NewPosY,
     DirX = -1,
@@ -169,11 +214,10 @@ can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to Up Right
     0 is PosX mod 2,
     PosX1 is PosX, PosY1 is PosY-1,
     PosX2 is PosX+1, PosY2 is PosY,
-    not((is_place_taken(Board, PosX1, PosY1, Height), is_place_taken(Board, PosX2, PosY2, Height))).
+    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
 
-can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to Up Right
+can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to Up Right
     piece(PosX, PosY, _, _) = Piece,
-    get_piece_Height(Piece, Height),
     DirX is PosX - NewPosX,
     DirY is PosY - NewPosY,
     DirX = -1,
@@ -181,11 +225,10 @@ can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to Up Right
     1 is PosX mod 2,
     PosX1 is PosX, PosY1 is PosY-1,
     PosX2 is PosX+1, PosY2 is PosY+1,
-    not((is_place_taken(Board, PosX1, PosY1, Height), is_place_taken(Board, PosX2, PosY2, Height))).
+    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
 
-can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to Down Right
+can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to Down Right
     piece(PosX, PosY, _, _) = Piece,
-    get_piece_Height(Piece, Height),
     DirX is PosX - NewPosX,
     DirY is PosY - NewPosY,
     DirX = -1,
@@ -193,10 +236,9 @@ can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to Down Right
     0 is PosX mod 2,
     PosX1 is PosX, PosY1 is PosY+1,
     PosX2 is PosX+1, PosY2 is PosY-1,
-    not((is_place_taken(Board, PosX1, PosY1, Height), is_place_taken(Board, PosX2, PosY2, Height))).
-can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to Down Right
+    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
+can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to Down Right
     piece(PosX, PosY, _, _) = Piece,
-    get_piece_Height(Piece, Height),
     DirX is PosX - NewPosX,
     DirY is PosY - NewPosY,
     DirX = -1,
@@ -204,11 +246,10 @@ can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to Down Right
     1 is PosX mod 2,
     PosX1 is PosX+1, PosY1 is PosY,
     PosX2 is PosX, PosY2 is PosY+1,
-    not((is_place_taken(Board, PosX1, PosY1, Height), is_place_taken(Board, PosX2, PosY2, Height))).
+    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
 
-can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to Down
+can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to Down
     piece(PosX, PosY, _, _) = Piece,
-    get_piece_Height(Piece, Height),
     DirX is PosX - NewPosX,
     DirY is PosY - NewPosY,
     DirX = 0,
@@ -216,10 +257,9 @@ can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to Down
     0 is PosX mod 2,
     PosX1 is PosX-1, PosY1 is PosY,
     PosX2 is PosX+1, PosY2 is PosY,
-    not((is_place_taken(Board, PosX1, PosY1, Height), is_place_taken(Board, PosX2, PosY2, Height))).
-can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to Down
+    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
+can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to Down
     piece(PosX, PosY, _, _) = Piece,
-    get_piece_Height(Piece, Height),
     DirX is PosX - NewPosX,
     DirY is PosY - NewPosY,
     DirX = 0,
@@ -227,11 +267,10 @@ can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to Down
     1 is PosX mod 2,
     PosX1 is PosX-1, PosY1 is PosY+1,
     PosX2 is PosX+1, PosY2 is PosY+1,
-    not((is_place_taken(Board, PosX1, PosY1, Height), is_place_taken(Board, PosX2, PosY2, Height))).
+    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
 
-can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to Down Left
+can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to Down Left
     piece(PosX, PosY, _, _) = Piece,
-    get_piece_Height(Piece, Height),
     DirX is PosX - NewPosX,
     DirY is PosY - NewPosY,
     DirX = 1,
@@ -239,11 +278,10 @@ can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to Down Left
     0 is PosX mod 2,
     PosX1 is PosX+1, PosY1 is PosY+1,
     PosX2 is PosX, PosY2 is PosY+1,
-    not((is_place_taken(Board, PosX1, PosY1, Height), is_place_taken(Board, PosX2, PosY2, Height))).
+    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
 
-can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to Down Left
+can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to Down Left
     piece(PosX, PosY, _, _) = Piece,
-    get_piece_Height(Piece, Height),
     DirX is PosX - NewPosX,
     DirY is PosY - NewPosY,
     DirX = 1,
@@ -251,4 +289,4 @@ can_slide_into(Board, Piece, NewPosX, NewPosY) :- % Slide to Down Left
     1 is PosX mod 2,
     PosX1 is PosX-1, PosY1 is PosY,
     PosX2 is PosX, PosY2 is PosY+1,
-    not((is_place_taken(Board, PosX1, PosY1, Height), is_place_taken(Board, PosX2, PosY2, Height))).
+    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
