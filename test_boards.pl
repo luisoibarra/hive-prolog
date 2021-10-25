@@ -19,22 +19,23 @@ test_boards([piece(2,2,white,[ant|_])], [piece(2,3,black,[ant|_]), piece(1,1,whi
 test_boards([piece(2,2,white,[ant|_])], [piece(2,3,black,[ant|_]), piece(1,1,white,[ant|_]), piece(2,4,black,[ant|_]), piece(1,0,white,[ant|_]), piece(2,5,black,[ant|_]), piece(1,1,white,[ant|_])], false) :- write(6).
 
 % Queen Movement
-test_boards([piece(2,2,white,[queen,0|_]),piece(1,1,_,[_,0|_]),piece(1,2,_,[_,0|_])], [[piece(2,2,white,[queen,0|_]),piece(2,1,white,[queen,0|_])]], true) :- write(7).
-test_boards([piece(2,2,white,[queen,0|_]),piece(1,1,_,[_,0|_]),piece(2,1,_,[_,0|_])], [[piece(2,2,white,[queen,0|_]),piece(2,1,white,[queen,0|_])]], false) :- write(8).
+test_boards([piece(2,2,white,[queen,0|_]),piece(1,1,_,[_,0|_]),piece(1,2,_,[_,0|_])], [[piece(2,2,white,[queen,0|_]),[2,1]]], true) :- write(7).
+test_boards([piece(2,2,white,[queen,0|_]),piece(1,1,_,[_,0|_]),piece(2,1,_,[_,0|_])], [[piece(2,2,white,[queen,0|_]),[2,1]]], false) :- write(8).
 
 % Cricket Movement
-test_boards([piece(2,2,_,[cricket,0|_]),piece(3,2,_,[_,0|_]),piece(4,3,_,[_,0|_])], [[piece(2,2,_,[cricket,0|_]),piece(1,2,_,[cricket,0|_])]], false) :- write(9).
-test_boards([piece(2,2,_,[cricket,0|_]),piece(3,2,_,[_,0|_]),piece(4,3,_,[_,0|_])], [[piece(2,2,_,[cricket,0|_]),piece(4,3,_,[cricket,0|_])]], false) :- write(10).
-test_boards([piece(2,2,_,[cricket,0|_]),piece(3,2,_,[_,0|_]),piece(4,3,_,[_,0|_])], [[piece(2,2,_,[cricket,0|_]),piece(4,2,_,[cricket,0|_])]], false) :- write(11).
-test_boards([piece(2,2,_,[cricket,0|_]),piece(3,2,_,[_,0|_]),piece(4,3,_,[_,0|_])], [[piece(2,2,_,[cricket,0|_]),piece(5,3,_,[cricket,0|_])]], true) :- write(12).
+test_boards([piece(2,2,_,[cricket,0|_]),piece(3,2,_,[_,0|_]),piece(4,3,_,[_,0|_])], [[piece(2,2,_,[cricket,0|_]),[1,2]]], false) :- write(9).
+test_boards([piece(2,2,_,[cricket,0|_]),piece(3,2,_,[_,0|_]),piece(4,3,_,[_,0|_])], [[piece(2,2,_,[cricket,0|_]),[4,3]]], false) :- write(10).
+test_boards([piece(2,2,_,[cricket,0|_]),piece(3,2,_,[_,0|_]),piece(4,3,_,[_,0|_])], [[piece(2,2,_,[cricket,0|_]),[4,2]]], false) :- write(11).
+test_boards([piece(2,2,_,[cricket,0|_]),piece(3,2,_,[_,0|_]),piece(4,3,_,[_,0|_])], [[piece(2,2,_,[cricket,0|_]),[5,3]]], true) :- write(12).
 
 % Beetle Movement
-test_boards([piece(2,2,_,[queen, 0|_]),piece(2,3,_,[beetle, 0|_]),piece(3,2,_,[ant, 0|_]),piece(4,3,_,[beetle, 0|_]),piece(4,2,_,[beetle, 0|_]),piece(3,1,_,[beetle, 0|_])], [[piece(2,3,_,[beetle, 0|_]),piece(3,2,_,[beetle, 0|_])]], false) :- write(13).
-test_boards([piece(2,2,_,[queen, 0|_]),piece(3,2,_,[beetle, 0|_]),piece(2,3,_,[beetle, 0|_]),piece(4,3,_,[beetle, 0|_]),piece(4,2,_,[beetle, 0|_]),piece(3,1,_,[beetle, 0|_])], [[piece(2,3,_,[beetle, 0|_]),piece(3,2,_,[beetle, 1|_])]], true) :- write(14).
-test_boards([piece(2,2,_,[queen, 0|_]),piece(3,2,_,[beetle, 0|_]),piece(2,3,_,[beetle, 0|_]),piece(3,3,_,[beetle, 1|_]),piece(3,3,_,[beetle, 0|_]),piece(2,2,_,[beetle, 1|_]),piece(3,2,_,[ant, 0|_]),piece(4,3,_,[beetle, 0|_]),piece(4,2,_,[beetle, 0|_]),piece(3,1,_,[beetle, 0|_])], [[piece(2,3,_,[beetle, 0|_]),piece(3,2,_,[beetle, 1|_])]], false) :- write(15).
-test_boards([piece(2,2,_,[queen, 0|_]),piece(3,2,_,[beetle, 0|_]),piece(3,2,_,[beetle, 1|_]),piece(3,3,_,[beetle, 1|_]),piece(3,3,_,[beetle, 0|_]),piece(2,3,_,[beetle, 0|_]),piece(2,2,_,[beetle, 1|_]),piece(3,2,_,[ant, 0|_]),piece(4,3,_,[beetle, 0|_]),piece(4,2,_,[beetle, 0|_]),piece(3,1,_,[beetle, 0|_])], [[piece(3,2,_,[beetle, 1|_]),piece(2,3,_,[beetle, 1|_])]], false) :- write(16).
-test_boards([piece(2,2,_,[queen, 0|_]),piece(3,2,_,[beetle, 0|_]),piece(3,2,_,[beetle, 1|_]),piece(3,3,_,[beetle, 1|_]),piece(3,3,_,[beetle, 0|_]),piece(2,2,_,[beetle, 1|_]),piece(3,2,_,[ant, 0|_]),piece(4,3,_,[beetle, 0|_]),piece(4,2,_,[beetle, 0|_]),piece(3,1,_,[beetle, 0|_])], [[piece(3,2,_,[beetle, 1|_]),piece(2,3,_,[beetle, 1|_])]], false) :- write(17).
-test_boards([piece(2,2,_,[queen, 0|_]),piece(2,2,_,[beetle, 1|_]),piece(3,2,_,[beetle, 0|_]),piece(3,2,_,[beetle, 1|_]),piece(4,3,_,[beetle, 0|_]),piece(4,2,_,[beetle, 0|_]),piece(3,1,_,[beetle, 0|_])], [[piece(3,2,_,[beetle, 1|_]),piece(2,3,_,[beetle, 1|_])]], true) :- write(18).
+test_boards([piece(2,2,_,[queen, 0|_]),piece(2,3,_,[beetle, 0|_]),piece(3,2,_,[ant, 0|_]),piece(4,3,_,[beetle, 0|_]),piece(4,2,_,[beetle, 0|_]),piece(3,1,_,[beetle, 0|_])], [[piece(2,3,_,[beetle, 0|_]),[3,2]]], false) :- write(13).
+test_boards([piece(2,2,_,[queen, 0|_]),piece(3,2,_,[beetle, 0|_]),piece(2,3,_,[beetle, 0|_]),piece(4,3,_,[beetle, 0|_]),piece(4,2,_,[beetle, 0|_]),piece(3,1,_,[beetle, 0|_])], [[piece(2,3,_,[beetle, 0|_]),[3,2]]], true) :- write(14).
+test_boards([piece(2,2,_,[queen, 0|_]),piece(3,2,_,[beetle, 0|_]),piece(2,3,_,[beetle, 0|_]),piece(3,3,_,[beetle, 1|_]),piece(3,3,_,[beetle, 0|_]),piece(2,2,_,[beetle, 1|_]),piece(3,2,_,[ant, 0|_]),piece(4,3,_,[beetle, 0|_]),piece(4,2,_,[beetle, 0|_]),piece(3,1,_,[beetle, 0|_])], [[piece(2,3,_,[beetle, 0|_]),[3,2]]], false) :- write(15).
+test_boards([piece(2,2,_,[queen, 0|_]),piece(3,2,_,[beetle, 0|_]),piece(3,2,_,[beetle, 1|_]),piece(3,3,_,[beetle, 1|_]),piece(3,3,_,[beetle, 0|_]),piece(2,3,_,[beetle, 0|_]),piece(2,2,_,[beetle, 1|_]),piece(3,2,_,[ant, 0|_]),piece(4,3,_,[beetle, 0|_]),piece(4,2,_,[beetle, 0|_]),piece(3,1,_,[beetle, 0|_])], [[piece(3,2,_,[beetle, 1|_]),[2,3]]], false) :- write(16).
+test_boards([piece(2,2,_,[queen, 0|_]),piece(3,2,_,[beetle, 0|_]),piece(3,2,_,[beetle, 1|_]),piece(3,3,_,[beetle, 1|_]),piece(3,3,_,[beetle, 0|_]),piece(2,2,_,[beetle, 1|_]),piece(3,2,_,[ant, 0|_]),piece(4,3,_,[beetle, 0|_]),piece(4,2,_,[beetle, 0|_]),piece(3,1,_,[beetle, 0|_])], [[piece(3,2,_,[beetle, 1|_]),[2,3]]], false) :- write(17).
+test_boards([piece(2,2,_,[queen, 0|_]),piece(2,2,_,[beetle, 1|_]),piece(3,2,_,[beetle, 0|_]),piece(3,2,_,[beetle, 1|_]),piece(4,3,_,[beetle, 0|_]),piece(4,2,_,[beetle, 0|_]),piece(3,1,_,[beetle, 0|_])], [[piece(3,2,_,[beetle, 1|_]),[2,3]]], true) :- write(18).
+
 
 
 % Simulate game
@@ -43,14 +44,14 @@ simulate_test_boards(_, [], ExpectedResult, true) :- ExpectedResult == true.
 simulate_test_boards(_, [], ExpectedResult, false) :- ExpectedResult \= true.
 
 % Move Piece Simulation
-simulate_test_boards(InitialBoard, [[PieceToMove, PieceMoved]|_], ExpectedResult, true) :- 
+simulate_test_boards(InitialBoard, [[PieceToMove, [NewPosX, NewPosY]]|_], ExpectedResult, true) :- 
     false == ExpectedResult,
-    not(move(InitialBoard, PieceToMove, PieceMoved, _)), !.
-simulate_test_boards(InitialBoard, [[PieceToMove, PieceMoved]|_], ExpectedResult, false) :- 
+    not(move(InitialBoard, PieceToMove, NewPosX, NewPosY, PieceMoved, _)), !.
+simulate_test_boards(InitialBoard, [[PieceToMove, [NewPosX, NewPosY]]|_], ExpectedResult, false) :- 
     false \= ExpectedResult, 
-    not(move(InitialBoard, PieceToMove, PieceMoved, _)), !.
-simulate_test_boards(InitialBoard, [[PieceToMove, PieceMoved]|Pieces], ExpectedResult, Result) :- 
-    move(InitialBoard, PieceToMove, PieceMoved, NewBoard),
+    not(move(InitialBoard, PieceToMove, NewPosX, NewPosY, PieceMoved, _)), !.
+simulate_test_boards(InitialBoard, [[PieceToMove, [NewPosX, NewPosY]]|Pieces], ExpectedResult, Result) :- 
+    move(InitialBoard, PieceToMove, NewPosX, NewPosY, PieceMoved, NewBoard),
     !, simulate_test_boards(NewBoard, Pieces, ExpectedResult, Result).
 
 % Add Piece Simulation

@@ -38,7 +38,10 @@ is_place_taken([_|Board], PosX, PosY, Height) :- is_place_taken(Board, PosX, Pos
 
 % connected_board(Board) Succeed if Board is connected
 connected_board([]).
-connected_board([Piece|Board]) :- connected_board([Piece|Board], [Piece], [Piece]).
+connected_board([Piece|Board]) :- 
+    piece(PosX, PosY,_,_) = Piece,
+    get_all_pieces_list([Piece|Board], piece(PosX, PosY,_,_), Visited),
+    connected_board([Piece|Board], [Piece], Visited).
 
 connected_board(Board, [], Visited) :- length(Board, LengthB),
                                        length(Visited, LengthB),
@@ -46,9 +49,9 @@ connected_board(Board, [], Visited) :- length(Board, LengthB),
 connected_board(Board, [Piece|ToProcess], Visited) :- 
     pieces_together(Piece, Board, Neighbors),
     list_difference(Neighbors, Visited, NotVisitedNeigbors),
-    concat_list(NotVisitedNeigbors, ToProcess, NewToProcess),
+    concat_set_list(NotVisitedNeigbors, ToProcess, NewToProcess),
     first_element_list_or_empty_list(NewToProcess, NewVisitedItem),
-    concat_list(NewVisitedItem, Visited, NewVisited),
+    concat_set_list(NewVisitedItem, Visited, NewVisited),
     connected_board(Board, NewToProcess, NewVisited).
 
 
@@ -98,6 +101,7 @@ positions_next_to(PosX, PosY, PosXNew, PosYNew, dw_l) :- position_down_left(PosX
 
 % pieces_together(Piece1, Piece2) 
 pieces_together(piece(PosX1, PosY1, _, _), piece(PosX2, PosY2, _, _)) :- positions_next_to(PosX1, PosY1, PosX2, PosY2, _).
+pieces_together(piece(PosX1, PosY1, _, _), piece(PosX1, PosY1, _, _)).
 
 % pieces_together(Piece, Board, PiecesTogether)
 pieces_together(piece(_, _, _, _), [], []) :- !.

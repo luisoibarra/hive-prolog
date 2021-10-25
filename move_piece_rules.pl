@@ -1,4 +1,4 @@
-:- module(move_piece_rules, [move/4]).
+:- module(move_piece_rules, [move/6]).
 :- use_module(board_utils). 
 :- use_module(list_utils). 
 :- use_module(piece_utils). 
@@ -29,10 +29,13 @@ pre_move_rules(Board, Piece) :-
 
 % post_move_rules(OldBoard, OldPiece, NewPiece, NewBoard) Rules that must be fulfilled after the piece is moved
 post_move_rules(OldBoard, OldPiece, NewPiece, NewBoard) :- 
-    single_hive_after(OldBoard, OldPiece, NewPiece).
+    connected_board(NewBoard). % Single Hive Simplified
+    % single_hive_after(OldBoard, OldPiece, NewPiece).
+
+% movement_funtions(Board, OldPiece, NewPosX, NewPosY, MovedPiece, NewBoard)
 
 % Queen Movement
-queen_moves_position(Board, Piece, NewPiece, NewBoard) :- 
+queen_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :- 
     pre_move_rules(Board, Piece),
 
     piece(PosX, PosY,_,_) = Piece,
@@ -47,7 +50,7 @@ queen_moves_position(Board, Piece, NewPiece, NewBoard) :-
     post_move_rules(Board, Piece, NewPiece, NewBoard).
 
 % Cricket Movement
-cricket_moves_position(Board, Piece, NewPiece, NewBoard) :-
+cricket_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :-
     pre_move_rules(Board, Piece),
   
     piece(PosX, PosY,Color,Extra) = Piece,
@@ -60,7 +63,7 @@ cricket_moves_position(Board, Piece, NewPiece, NewBoard) :-
     post_move_rules(Board, Piece, NewPiece, NewBoard).
 
 % Beetle Movement
-beetle_moves_position(Board, Piece, NewPiece, NewBoard) :- 
+beetle_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :- 
     pre_move_rules(Board, Piece),
 
     piece(PosX, PosY,_,_) = Piece,
@@ -73,13 +76,13 @@ beetle_moves_position(Board, Piece, NewPiece, NewBoard) :-
 
 
 % move(Board, OldPiece, NewPiece, NewBoard) Return the NewBoard after the move is made.
-move(Board, OldPiece, NewPiece, NewBoard) :- 
+move(Board, OldPiece, NewPosX, NewPosY, NewPiece, NewBoard) :- 
     get_piece_Type(OldPiece, queen),
-    queen_moves_position(Board, OldPiece, NewPiece, NewBoard), !.
-move(Board, OldPiece, NewPiece, NewBoard) :- 
+    queen_moves_position(Board, OldPiece, NewPosX, NewPosY, NewPiece, NewBoard), !.
+move(Board, OldPiece, NewPosX, NewPosY, NewPiece, NewBoard) :- 
     get_piece_Type(OldPiece, cricket),
-    cricket_moves_position(Board, OldPiece, NewPiece, NewBoard).
-move(Board, OldPiece, NewPiece, NewBoard) :- 
+    cricket_moves_position(Board, OldPiece, NewPosX, NewPosY, NewPiece, NewBoard).
+move(Board, OldPiece, NewPosX, NewPosY, NewPiece, NewBoard) :- 
     get_piece_Type(OldPiece, beetle),
-    beetle_moves_position(Board, OldPiece, NewPiece, NewBoard).
+    beetle_moves_position(Board, OldPiece, NewPosX, NewPosY, NewPiece, NewBoard).
 
