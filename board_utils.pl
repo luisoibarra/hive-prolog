@@ -129,14 +129,8 @@ get_all_pieces([First|_], PiecePatter, First) :- PiecePatter = First.
 get_all_pieces([_|Pieces], PiecePatter, Result) :- get_all_pieces(Pieces, PiecePatter, Result).
 
 % get_all_pieces_list(Pieces, Pattern, ListResult): Succeed if ListResult is the list of all pieces that unifies with with Pattern in Pieces
-get_all_pieces_list([], _, []).
-get_all_pieces_list([Piece|Rest], Pattern, Result) :- 
-    not(Piece = Pattern),
-    get_all_pieces_list(Rest, Pattern, Result),
-    !.
-get_all_pieces_list([Piece|Rest], Pattern, [Piece|Result]) :- 
-    Piece = Pattern, 
-    get_all_pieces_list(Rest, Pattern, Result).
+get_all_pieces_list(List, Pattern, Result) :- 
+    findall(X, (member(X,List), Pattern=X), Result).
 
 % get_all_pieces_at(Board, PosX, PosY, List): Return all pieces in board that are in the given position
 get_all_pieces_at(Board, PosX, PosY, List) :- get_all_pieces_list(Board, piece(PosX, PosY, _, _), List).
@@ -147,17 +141,30 @@ can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY
     get_position_max_Height_or_0(Board, NewPosX, NewPosY, MaxHeight),
     (
         MaxHeight >= Height,
+        is_place_taken(Board, NewPosX, NewPosY, MaxHeight),
+        SearchHeight is MaxHeight+1,
+        not((is_place_taken(Board, PosX1, PosY1, SearchHeight), 
+             is_place_taken(Board, PosX2, PosY2, SearchHeight))),
+        set_piece_Height(piece(NewPosX, NewPosY, Color, Extra), SearchHeight, SlidedPiece)
+        ;
+        MaxHeight >= Height,
+        not(is_place_taken(Board, NewPosX, NewPosY, MaxHeight)),
         not((is_place_taken(Board, PosX1, PosY1, MaxHeight), 
-             is_place_taken(Board, PosX2, PosY2, MaxHeight)))
+             is_place_taken(Board, PosX2, PosY2, MaxHeight))),
+        set_piece_Height(piece(NewPosX, NewPosY, Color, Extra), MaxHeight, SlidedPiece)
         ;
         MaxHeight < Height,
         not((is_place_taken(Board, PosX1, PosY1, Height), 
              is_place_taken(Board, PosX2, PosY2, Height)))
     ),
     (
+        MaxHeight >= Height
+        ;
+        MaxHeight < Height,
         is_place_taken(Board, NewPosX, NewPosY, MaxHeight),
         set_piece_Height(piece(NewPosX, NewPosY, Color, Extra), MaxHeight+1, SlidedPiece)
         ;
+        MaxHeight < Height,
         not(is_place_taken(Board, NewPosX, NewPosY, MaxHeight)),
         set_piece_Height(piece(NewPosX, NewPosY, Color, Extra), MaxHeight, SlidedPiece)
     ).

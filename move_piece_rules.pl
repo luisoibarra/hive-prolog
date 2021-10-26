@@ -74,6 +74,13 @@ beetle_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :-
 
     post_move_rules(Board, Piece, NewPiece, NewBoard).
 
+% Spider Movement
+spider_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :- 
+    pre_move_rules(Board, Piece),
+
+    % TODO POR AQUI
+
+    post_move_rules(Board, Piece, NewPiece, NewBoard).
 
 % move(Board, OldPiece, NewPiece, NewBoard) Return the NewBoard after the move is made.
 move(Board, OldPiece, NewPosX, NewPosY, NewPiece, NewBoard) :- 

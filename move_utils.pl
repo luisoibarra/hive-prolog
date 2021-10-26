@@ -23,6 +23,23 @@ first_empty_place_from(Board, PosX, PosY, Dir, CurrLength, Length, NewPosX, NewP
     NewPosY = TempPosY.
 
 
+% border_move(Board, PosX, PosY, MinLength, BorderX, BorderY) Returns the borders positions sliding from PosX,PosY and the MinLength to arrive there.
 
+border_move(Board, [], Visited, Result).
+border_move(Board, [Piece|ToProcess], Visited, Result) :- 
+    piece(PosX, PosY,_,_) = Piece,
+    get_piece_Height(Piece,Height),
 
+    pieces_together(Piece, Board, Neighbors),
 
+    positions_next_to(PosX, PosY, NewPosX, NewPosY, _),
+    not(is_place_taken(Board, NewPosX, NewPosY, Height)),
+    can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece). % TODO POR AQUI
+
+    % pieces_together(Piece, Board, Neighbors),
+    % list_difference(Neighbors, Visited, NotVisitedNeigbors),
+    % concat_set_list(NotVisitedNeigbors, ToProcess, NewToProcess),
+    % first_element_list_or_empty_list(NewToProcess, NewVisitedItem),
+    % concat_set_list(NewVisitedItem, Visited, NewVisited),
+    % connected_board(Board, NewToProcess, NewVisited).
+% Auxiliar
