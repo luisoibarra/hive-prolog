@@ -36,6 +36,49 @@ test_boards([piece(2,2,_,[queen, 0|_]),piece(3,2,_,[beetle, 0|_]),piece(3,2,_,[b
 test_boards([piece(2,2,_,[queen, 0|_]),piece(3,2,_,[beetle, 0|_]),piece(3,2,_,[beetle, 1|_]),piece(3,3,_,[beetle, 1|_]),piece(3,3,_,[beetle, 0|_]),piece(2,2,_,[beetle, 1|_]),piece(3,2,_,[ant, 0|_]),piece(4,3,_,[beetle, 0|_]),piece(4,2,_,[beetle, 0|_]),piece(3,1,_,[beetle, 0|_])], [[piece(3,2,_,[beetle, 1|_]),[2,3]]], false) :- write(17).
 test_boards([piece(2,2,_,[queen, 0|_]),piece(2,2,_,[beetle, 1|_]),piece(3,2,_,[beetle, 0|_]),piece(3,2,_,[beetle, 1|_]),piece(4,3,_,[beetle, 0|_]),piece(4,2,_,[beetle, 0|_]),piece(3,1,_,[beetle, 0|_])], [[piece(3,2,_,[beetle, 1|_]),[2,3]]], true) :- write(18).
 
+% Spider Movement
+test_boards([piece(2,2,_,[queen ,0]),piece(1,2,_,[queen,0]),
+             piece(0,2,_,[queen ,0]),piece(0,1,_,[queen,0]),
+             piece(1,0,_,[queen ,0]),piece(2,1,_,[queen,0]),
+             piece(1,1,_,[spider,0])], 
+             [[piece(1,1,_,[spider,0|_]), [_,_]]], false) :- write(19).
+test_boards([piece(1,2,_,[queen,0]),
+             piece(0,2,_,[queen ,0]),piece(0,1,_,[queen,0]),
+             piece(1,0,_,[queen ,0]),piece(2,1,_,[queen,0]),
+             piece(1,1,_,[spider,0])], 
+             [[piece(1,1,_,[spider,0|_]), [1,3]]], false) :- write(20).
+test_boards([piece(1,2,_,[queen,0]),
+            piece(0,2,_,[queen ,0]),piece(0,1,_,[queen,0]),
+            piece(1,0,_,[queen ,0]),
+            piece(1,1,_,[spider,0])], 
+            [[piece(1,1,_,[spider,0|_]), [1,3]]], true) :- write(21).
+test_boards([piece(1,2,_,[queen,0]),
+            piece(0,2,_,[queen ,0]),piece(0,1,_,[queen,0]),
+            piece(1,0,_,[queen ,0]),
+            piece(1,1,_,[spider,0])], 
+            [[piece(1,1,_,[spider,0|_]), [2,3]]], false) :- write(22).
+
+% Ant Movement
+test_boards([piece(1,2,_,[queen,0]),
+            piece(0,2,_,[queen ,0]),piece(0,1,_,[queen,0]),
+            piece(1,0,_,[queen ,0]),
+            piece(1,1,_,[ant,0])], 
+            [[piece(1,1,_,[ant,0|_]), [2,3]]], true) :- write(23).
+test_boards([piece(1,2,_,[queen,0]),
+            piece(0,2,_,[queen ,0]),piece(0,1,_,[queen,0]),
+            piece(1,0,_,[queen ,0]),
+            piece(1,1,_,[ant,0])], 
+            [[piece(1,1,_,[ant,0|_]), [0,0]]], true) :- write(24).
+test_boards([piece(1,2,_,[queen,0]),
+            piece(0,2,_,[queen ,0]),piece(0,1,_,[queen,0]),
+            piece(1,0,_,[queen ,0]),
+            piece(1,1,_,[ant,0])], 
+            [[piece(1,1,_,[ant,0|_]), [3,2]]], false) :- write(25).
+test_boards([piece(1,2,_,[queen,0]),
+            piece(0,2,_,[queen ,0]),piece(0,1,_,[queen,0]),
+            piece(1,0,_,[queen ,0]),piece(2,2,_,[queen,0]),
+            piece(1,1,_,[ant,0])], 
+            [[piece(1,1,_,[ant,0|_]), [_,_]]], false) :- write(26).
 
 
 % Simulate game

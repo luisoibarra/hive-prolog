@@ -78,18 +78,46 @@ beetle_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :-
 spider_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :- 
     pre_move_rules(Board, Piece),
 
-    % TODO POR AQUI
+    border_move(Board, Piece, BorderMoves),
+    get_all_pieces_list(BorderMoves, [_,3], SpiderMovesWithDistance),
+    unzip(SpiderMovesWithDistance, SpiderMoves, Distances),
+    !,
+    member(NewPiece, SpiderMoves),
+    piece(NewPosX, NewPosY, _,_) = NewPiece,
+    remove_board_piece(Board, Piece, RemovedBoard),
+    NewBoard = [NewPiece|RemovedBoard],
 
     post_move_rules(Board, Piece, NewPiece, NewBoard).
+
+% Ant Movement
+ant_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :- 
+    pre_move_rules(Board, Piece),
+
+    border_move(Board, Piece, BorderMoves),
+    unzip(BorderMoves, AntMoves, Distances),
+    !,
+    member(NewPiece, AntMoves),
+    piece(NewPosX, NewPosY, _,_) = NewPiece,
+    remove_board_piece(Board, Piece, RemovedBoard),
+    NewBoard = [NewPiece|RemovedBoard],
+
+    post_move_rules(Board, Piece, NewPiece, NewBoard).
+
 
 % move(Board, OldPiece, NewPiece, NewBoard) Return the NewBoard after the move is made.
 move(Board, OldPiece, NewPosX, NewPosY, NewPiece, NewBoard) :- 
     get_piece_Type(OldPiece, queen),
-    queen_moves_position(Board, OldPiece, NewPosX, NewPosY, NewPiece, NewBoard), !.
+    queen_moves_position(Board, OldPiece, NewPosX, NewPosY, NewPiece, NewBoard).
 move(Board, OldPiece, NewPosX, NewPosY, NewPiece, NewBoard) :- 
     get_piece_Type(OldPiece, cricket),
     cricket_moves_position(Board, OldPiece, NewPosX, NewPosY, NewPiece, NewBoard).
 move(Board, OldPiece, NewPosX, NewPosY, NewPiece, NewBoard) :- 
     get_piece_Type(OldPiece, beetle),
     beetle_moves_position(Board, OldPiece, NewPosX, NewPosY, NewPiece, NewBoard).
+move(Board, OldPiece, NewPosX, NewPosY, NewPiece, NewBoard) :- 
+    get_piece_Type(OldPiece, spider),
+    spider_moves_position(Board, OldPiece, NewPosX, NewPosY, NewPiece, NewBoard).
+move(Board, OldPiece, NewPosX, NewPosY, NewPiece, NewBoard) :- 
+    get_piece_Type(OldPiece, ant),
+    ant_moves_position(Board, OldPiece, NewPosX, NewPosY, NewPiece, NewBoard).
 

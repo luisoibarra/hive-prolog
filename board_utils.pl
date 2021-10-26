@@ -54,48 +54,31 @@ connected_board(Board, [Piece|ToProcess], Visited) :-
     concat_set_list(NewVisitedItem, Visited, NewVisited),
     connected_board(Board, NewToProcess, NewVisited).
 
+% dir_offset(Dir, PosX, OffsetX, OffsetY): Offset for every direction according PosX
+dir_offset(up_l, PosX, -1, -1) :- 0 is PosX mod 2.
+dir_offset(up_l, PosX, -1, 0) :- 1 is PosX mod 2.
+dir_offset(up, PosX, 0, -1).
+dir_offset(up_r, PosX, 1, -1) :- 0 is PosX mod 2.
+dir_offset(up_r, PosX, 1, 0) :- 1 is PosX mod 2.
+dir_offset(dw_r, PosX, 1, 0) :- 0 is PosX mod 2.
+dir_offset(dw_r, PosX, 1, 1) :- 1 is PosX mod 2.
+dir_offset(dw, PosX, 0, 1).
+dir_offset(dw_l, PosX, -1, 0) :- 0 is PosX mod 2.
+dir_offset(dw_l, PosX, -1, 1) :- 1 is PosX mod 2.
 
-position_up_left(PosX, PosY, PosXNew, PosYNew) :- 0 is PosX mod 2,
-                                                  PosXNew is PosX-1,
-                                                  PosYNew is PosY-1. % Up Left
-position_up_left(PosX, PosY, PosXNew, PosYNew) :- 1 is PosX mod 2,
-                                                   PosXNew is PosX-1, % Up Left
-                                                   PosYNew is PosY.
+% complementary_directions(MainDir, ComplDir1, ComplDir2) Returns the directions surrounding the MainDir
+complementary_directions(up_l, dw_l, up).
+complementary_directions(up, up_l, up_r).
+complementary_directions(up_r, up, dw_r).
+complementary_directions(dw_r, up_r, dw).
+complementary_directions(dw, dw_r, dw_l).
+complementary_directions(dw_l, dw, up_l).
 
-position_up(PosX, PosY, PosXNew, PosYNew) :- PosYNew is PosY-1, % Up
-                                            PosXNew is PosX.
-
-position_up_right(PosX, PosY, PosXNew, PosYNew) :- 0 is PosX mod 2,
-                                                    PosXNew is PosX+1,
-                                                    PosYNew is PosY-1. % Up Right
-position_up_right(PosX, PosY, PosXNew, PosYNew) :- 1 is PosX mod 2,
-                                                    PosXNew is PosX+1,
-                                                    PosYNew is PosY. % Up Right
-
-position_down_right(PosX, PosY, PosXNew, PosYNew) :- 1 is PosX mod 2,
-                                                    PosXNew is PosX+1, 
-                                                    PosYNew is PosY+1. % Down Right
-position_down_right(PosX, PosY, PosXNew, PosYNew) :- 0 is PosX mod 2,
-                                                   PosXNew is PosX+1, 
-                                                   PosYNew is PosY. % Down Right
-
-position_down(PosX, PosY, PosXNew, PosYNew) :- PosYNew is PosY+1, % Down
-                                                PosXNew is PosX.
-
-position_down_left(PosX, PosY, PosXNew, PosYNew) :- 1 is PosX mod 2,
-                                                    PosXNew is PosX-1, 
-                                                    PosYNew is PosY+1. % Down Left
-position_down_left(PosX, PosY, PosXNew, PosYNew) :- 0 is PosX mod 2,
-                                                    PosXNew is PosX-1, 
-                                                    PosYNew is PosY. % Down Left
-                                                    
-% positions_next_to(Piece, PosX, PosY, Dir)
-positions_next_to(PosX, PosY, PosXNew, PosYNew, up_l) :- position_up_left(PosX, PosY, PosXNew, PosYNew).
-positions_next_to(PosX, PosY, PosXNew, PosYNew, up) :- position_up(PosX, PosY, PosXNew, PosYNew).
-positions_next_to(PosX, PosY, PosXNew, PosYNew, up_r) :- position_up_right(PosX, PosY, PosXNew, PosYNew).
-positions_next_to(PosX, PosY, PosXNew, PosYNew, dw_r) :- position_down_right(PosX, PosY, PosXNew, PosYNew).
-positions_next_to(PosX, PosY, PosXNew, PosYNew, dw) :- position_down(PosX, PosY, PosXNew, PosYNew).
-positions_next_to(PosX, PosY, PosXNew, PosYNew, dw_l) :- position_down_left(PosX, PosY, PosXNew, PosYNew).
+% positions_next_to(PosX, PosY, PosXNew, PosYNew, Dir)
+positions_next_to(PosX, PosY, PosXNew, PosYNew, Dir) :- 
+    dir_offset(Dir, PosX, OffsetX, OffsetY),
+    PosXNew is PosX + OffsetX,
+    PosYNew is PosY + OffsetY.
 
 
 
@@ -135,6 +118,22 @@ get_all_pieces_list(List, Pattern, Result) :-
 % get_all_pieces_at(Board, PosX, PosY, List): Return all pieces in board that are in the given position
 get_all_pieces_at(Board, PosX, PosY, List) :- get_all_pieces_list(Board, piece(PosX, PosY, _, _), List).
 
+
+% can_slide_into(Board, PosX, PosY, NewPosX, NewPosY, SlidedPiece) 
+% Succeed if Piece can slide into NewPosX and NewPosY, returning the SlidedPiece.
+% the slide makes the jumps according to the movement rules
+can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to UpLeft
+    piece(PosX, PosY, _, _) = Piece,
+    DirX is NewPosX - PosX,
+    DirY is NewPosY - PosY,
+    dir_offset(MainDir, PosX, DirX, DirY),
+    complementary_directions(MainDir, ComplDir1, ComplDir2),
+    dir_offset(ComplDir1, PosX, OffComplX1, OffComplY1),
+    dir_offset(ComplDir2, PosX, OffComplX2, OffComplY2),
+    PosX1 is PosX + OffComplX1, PosY1 is PosY + OffComplY1,
+    PosX2 is PosX + OffComplX2, PosY2 is PosY + OffComplY2,
+    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
+
 can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece) :- 
     piece(_, _, Color, Extra) = Piece,
     get_piece_Height(Piece, Height),
@@ -168,136 +167,3 @@ can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY
         not(is_place_taken(Board, NewPosX, NewPosY, MaxHeight)),
         set_piece_Height(piece(NewPosX, NewPosY, Color, Extra), MaxHeight, SlidedPiece)
     ).
-
-% can_slide_into(Board, PosX, PosY, NewPosX, NewPosY, SlidedPiece) 
-% Succeed if Piece can slide into NewPosX and NewPosY, returning the SlidedPiece.
-% the slide makes the jumps according to the movement rules
-can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to UpLeft
-    piece(PosX, PosY, _, _) = Piece,
-    DirX is PosX - NewPosX,
-    DirY is PosY - NewPosY,
-    DirX = 1,
-    DirY = 1,
-    0 is PosX mod 2,
-    PosX1 is PosX, PosY1 is PosY-1,
-    PosX2 is PosX-1, PosY2 is PosY,
-    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
-
-can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to UpLeft
-    piece(PosX, PosY, _, _) = Piece,
-    DirX is PosX - NewPosX,
-    DirY is PosY - NewPosY,
-    DirX = 1,
-    DirY = 0,
-    1 is PosX mod 2,
-    PosX1 is PosX, PosY1 is PosY-1,
-    PosX2 is PosX-1, PosY2 is PosY+1,
-    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
-
-can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to Up
-    piece(PosX, PosY, _, _) = Piece,
-    DirX is PosX - NewPosX,
-    DirY is PosY - NewPosY,
-    DirX = 0,
-    DirY = 1,
-    0 is PosX mod 2,
-    PosX1 is PosX-1, PosY1 is PosY-1,
-    PosX2 is PosX+1, PosY2 is PosY-1,
-    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
-
-can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to Up
-    piece(PosX, PosY, _, _) = Piece,
-    DirX is PosX - NewPosX,
-    DirY is PosY - NewPosY,
-    DirX = 0,
-    DirY = 1,
-    1 is PosX mod 2,
-    PosX1 is PosX-1, PosY1 is PosY,
-    PosX2 is PosX+1, PosY2 is PosY,
-    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
-
-can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to Up Right
-    piece(PosX, PosY, _, _) = Piece,
-    DirX is PosX - NewPosX,
-    DirY is PosY - NewPosY,
-    DirX = -1,
-    DirY = 1,
-    0 is PosX mod 2,
-    PosX1 is PosX, PosY1 is PosY-1,
-    PosX2 is PosX+1, PosY2 is PosY,
-    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
-
-can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to Up Right
-    piece(PosX, PosY, _, _) = Piece,
-    DirX is PosX - NewPosX,
-    DirY is PosY - NewPosY,
-    DirX = -1,
-    DirY = 0,
-    1 is PosX mod 2,
-    PosX1 is PosX, PosY1 is PosY-1,
-    PosX2 is PosX+1, PosY2 is PosY+1,
-    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
-
-can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to Down Right
-    piece(PosX, PosY, _, _) = Piece,
-    DirX is PosX - NewPosX,
-    DirY is PosY - NewPosY,
-    DirX = -1,
-    DirY = 0,
-    0 is PosX mod 2,
-    PosX1 is PosX, PosY1 is PosY+1,
-    PosX2 is PosX+1, PosY2 is PosY-1,
-    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
-can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to Down Right
-    piece(PosX, PosY, _, _) = Piece,
-    DirX is PosX - NewPosX,
-    DirY is PosY - NewPosY,
-    DirX = -1,
-    DirY = -1,
-    1 is PosX mod 2,
-    PosX1 is PosX+1, PosY1 is PosY,
-    PosX2 is PosX, PosY2 is PosY+1,
-    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
-
-can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to Down
-    piece(PosX, PosY, _, _) = Piece,
-    DirX is PosX - NewPosX,
-    DirY is PosY - NewPosY,
-    DirX = 0,
-    DirY = -1,
-    0 is PosX mod 2,
-    PosX1 is PosX-1, PosY1 is PosY,
-    PosX2 is PosX+1, PosY2 is PosY,
-    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
-can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to Down
-    piece(PosX, PosY, _, _) = Piece,
-    DirX is PosX - NewPosX,
-    DirY is PosY - NewPosY,
-    DirX = 0,
-    DirY = -1,
-    1 is PosX mod 2,
-    PosX1 is PosX-1, PosY1 is PosY+1,
-    PosX2 is PosX+1, PosY2 is PosY+1,
-    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
-
-can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to Down Left
-    piece(PosX, PosY, _, _) = Piece,
-    DirX is PosX - NewPosX,
-    DirY is PosY - NewPosY,
-    DirX = 1,
-    DirY = 0,
-    0 is PosX mod 2,
-    PosX1 is PosX+1, PosY1 is PosY+1,
-    PosX2 is PosX, PosY2 is PosY+1,
-    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
-
-can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to Down Left
-    piece(PosX, PosY, _, _) = Piece,
-    DirX is PosX - NewPosX,
-    DirY is PosY - NewPosY,
-    DirX = 1,
-    DirY = -1,
-    1 is PosX mod 2,
-    PosX1 is PosX-1, PosY1 is PosY,
-    PosX2 is PosX, PosY2 is PosY+1,
-    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
