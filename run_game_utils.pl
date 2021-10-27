@@ -1,4 +1,4 @@
-:- module(run_game_utils,[set_piece/5, move_piece/6, end_rotation_feedback/3, get_game_GameHistory/2]).
+:- module(run_game_utils,[make_a_play/5, get_game_GameHistory/2, get_game_Turn/2]).
 :- use_module(add_piece_rules). 
 :- use_module(game_rules). 
 :- use_module(move_piece_rules). 
@@ -7,9 +7,11 @@
 :- use_module(piece_utils). 
 
 
-% game(Board, CurrentPlayer, [WhiteTypePieces, BlackTypePieces, GameHistory]).
+% game(Board, CurrentPlayer, [WhiteTypePieces, BlackTypePieces, GameHistory, Turn]).
 get_game_GameHistory(Game, GameHistory) :- 
     game(_, _, [_,_, GameHistory|_]) = Game.
+get_game_Turn(Game, Turn) :- 
+    game(_, _, [_,_,_,Turn|_]) = Game.
 
 
 switch_player(white, black). 
@@ -25,41 +27,71 @@ get_piece_type_to_play(black, PiecePosition, WhiteTypePieces, BlackTypePieces, P
 
 % set_piece(PiecePosition, PosX, PosY, Game, NewGame)
 set_piece(PiecePosition, PosX, PosY, Game, NewGame) :- 
-    game(Board, CurrentPlayer, [WhiteTypePieces, BlackTypePieces, GameHistory|Extra]) = Game,
+    game(Board, CurrentPlayer, [WhiteTypePieces, BlackTypePieces, GameHistory, Turn|Extra]) = Game,
     
     get_piece_type_to_play(CurrentPlayer, PiecePosition, WhiteTypePieces, BlackTypePieces, PieceType, NewWhiteTypePieces, NewBlackTypePieces),
     build_piece(PosX, PosY, CurrentPlayer, [PieceType, 0], Piece),
     add_piece(Board, Piece, NewBoard),
 
     switch_player(CurrentPlayer, NewCurrentPlayer),
-    game(NewBoard, NewCurrentPlayer, [NewWhiteTypePieces, NewBlackTypePieces, [Game|GameHistory]|Extra]) = NewGame.
+    NewTurn is Turn + 1,
+    game(NewBoard, NewCurrentPlayer, [NewWhiteTypePieces, NewBlackTypePieces, [Game|GameHistory], NewTurn|Extra]) = NewGame.
 
 % move_piece(PosX, PosY, DestPosX, DestPosY, Game, NewGame) 
 move_piece(PosX, PosY, DestPosX, DestPosY, Game, NewGame) :- 
-    game(Board, CurrentPlayer, [WhiteTypePieces, BlackTypePieces, GameHistory|Extra]) = Game,
+    game(Board, CurrentPlayer, [WhiteTypePieces, BlackTypePieces, GameHistory, Turn|Extra]) = Game,
     get_top_piece_at(Board, PosX, PosY, PieceToMove),
-    get_piece_Type(PieceToMove, CurrentPlayer),
+    get_piece_Color(PieceToMove, CurrentPlayer),
 
     move(Board, PieceToMove, DestPosX, DestPosY, _, NewBoard),
 
     switch_player(CurrentPlayer, NewCurrentPlayer),
-    game(NewBoard, NewCurrentPlayer, [WhiteTypePieces, BlackTypePieces, [Game|GameHistory]|Extra]) = NewGame.
+    NewTurn is Turn + 1,
+    game(NewBoard, NewCurrentPlayer, [WhiteTypePieces, BlackTypePieces, [Game|GameHistory], NewTurn|Extra]) = NewGame.
 
-end_rotation_feedback(Game, Feedback, ContinueGame) :-
-    nonvar(ContinueGame),
+end_turn_feedback(Game, Feedback, GameStatus) :-
 
-    game(Board, CurrentPlayer, [WhiteTypePieces, BlackTypePieces, GameHistory|Extra]) = Game,
+    game(Board, CurrentPlayer, [_, _, GameHistory|_]) = Game,
     switch_player(PrevPlayer, CurrentPlayer),
-    repeated_game_positions(GameHistory, Amount),
     (
         queen_surrounded(Board, PrevPlayer),
         string_concat('Game Over ', PrevPlayer, Feedback),
-        ContinueGame = false
+        GameStatus = over
         ;
+        queen_surrounded(Board, CurrentPlayer),
+        string_concat('Game Over ', CurrentPlayer, Feedback),
+        GameStatus = over
+        ;
+        repeated_game_positions(GameHistory, Amount),
         Amount >= 3,
         Feedback = 'Game Over, repeated positions detected. Tie',
-        ContinueGame = false
-        ; 
+        GameStatus = tie
+        ; % TODO Missing no possible moves
         Feedback = '',
-        ContinueGame = true
+        GameStatus = continue
     ).
+
+
+% make_a_play(Play, Game, NewGame, Feedback, GameStatus)
+make_a_play(set_play(PositionSelectedPieceToSet, PosX, PosY), Game, NewGame, Feedback, GameStatus) :-
+    (
+        set_piece(PositionSelectedPieceToSet, PosX, PosY, Game, NewGame),
+        end_turn_feedback(NewGame, Feedback, GameStatus)
+        ;
+        % If HERE set_piece is false
+        NewGame = Game,
+        Feedback = 'Invalid piece set',
+        GameStatus = invalid
+    ).
+
+make_a_play(move_play(PosX, PosY, NewPosX, NewPosY), Game, NewGame, Feedback, GameStatus) :-
+    (
+        move_piece(PosX, PosY, NewPosX, NewPosY, Game, NewGame),
+        end_turn_feedback(NewGame, Feedback, GameStatus)
+        ;
+        % If HERE move_piece is false
+        NewGame = Game,
+        Feedback = 'Invalid piece move',
+        GameStatus = invalid
+    ).
+

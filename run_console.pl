@@ -1,4 +1,4 @@
-:- module(run_console,[init_game/0,run_game/2]).
+:- module(run_console,[init_game/0,run_game/1]).
 :- use_module(run_game_utils). 
 % Console Interface
 
@@ -24,12 +24,13 @@ init_game() :-
     game([],white,[
         [queen, cricket, cricket, cricket, ant, ant, ant, beetle, beetle, spider, spider],
         [queen, cricket, cricket, cricket, ant, ant, ant, beetle, beetle, spider, spider],
-        []
+        [],
+        1
     ]) = Game,
-    run_game(Game,1).
+    run_game(Game).
 
-run_game(Game, Turn) :- 
-    game(Board, CurrentPlayer, [WhiteTypePieces, BlackTypePieces|_]) = Game,
+run_game(Game) :- 
+    game(Board, CurrentPlayer, [WhiteTypePieces, BlackTypePieces, Turn|_]) = Game,
     write('Player '), write(CurrentPlayer), write(' turn'), nl,
     print_board(Board), nl,
     print_pieces(BlackTypePieces, WhiteTypePieces), nl,
@@ -39,35 +40,23 @@ run_game(Game, Turn) :-
     read_with_headline('', Option),
     (
         1 = Option,
-        read_with_headline('Select piece to place:', PieceTypeAdd),
+        read_with_headline('Select piece to place:', PositionPieceTypeAdd),
         write('Write the position'), nl,
         read_position(PosX, PosY),
-        set_piece(PieceTypeAdd, PosX, PosY, Game, NewGame)
+        make_a_play(set_play(PositionPieceTypeAdd, PosX, PosY), Game, NewGame, Feedback, GameStatus)
         ;
         2 = Option,
         write('Write the position of the piece to move'), nl,
         read_position(PosX, PosY),
         write('Write the detination position'), nl,
         read_position(DestPosX, DestPosY),
-        move_piece(PosX, PosY, DestPosX, DestPosY, Game, NewGame)
+        make_a_play(move_play(PosX, PosY,DestPosX, DestPosY), Game, NewGame, Feedback, GameStatus)
     ),
     nl,!,
-    (
-        0 is Turn mod 2, % Both players played
-        get_game_GameHistory(NewGame, NewHistory),
-        end_rotation_feedback(NewHistory, Feedback, ContinueGame),
-        write(Feedback),nl
-        ;
-        true        
-    ),
-    ( % Succeed if 1 is Turn mod 2 or ContinueGame
-        var(ContinueGame)
-        ;
-        ContinueGame
-    ),
-    NewTurn is Turn + 1,
-    run_game(NewGame, NewTurn).
+    write(Feedback),nl,
+    GameStatus = continue,
+    run_game(NewGame).
 
-run_game(Game, Turn) :- 
+run_game(Game) :- 
     write('Some error or invalid play was made, please verify'), nl,
-    run_game(Game, Turn).
+    run_game(Game).

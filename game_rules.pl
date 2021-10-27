@@ -18,6 +18,9 @@ queen_surrounded(Board, Color) :-
 
 % repeated_game_positions(GameHistory, Amount) Return the Amount of repeated turn position assuming two players only
 repeated_game_positions([], 0).
+repeated_game_positions([_], 0).
+repeated_game_positions([_,_], 0).
+repeated_game_positions([_,_,_], 0).
 repeated_game_positions([Game1,Game2,Game3,Game4|GameHistory], Amount) :- 
     game(Board1, _, _) = Game1,
     game(Board2, _, _) = Game2,
@@ -27,7 +30,7 @@ repeated_game_positions([Game1,Game2,Game3,Game4|GameHistory], Amount) :-
         equal_set_board(Board1, Board3),
         equal_set_board(Board2, Board4),
         repeated_game_positions(GameHistory, ReturnedAmount),
-        Amount is Return + 1
+        Amount is ReturnedAmount + 1
         ;
         Amount is 0
     ).
