@@ -12,6 +12,13 @@ top_at_position(OldBoard, Piece) :-
     get_piece_Height(Piece, Height), 
     not((get_all_pieces(OldBoard, piece(PosX, PosY, _, _), piece(PosX, PosY, _, [_, Height2|_])), Height < Height2)).
 
+% queen_present(Board, Piece) Succeed if there is a queen of the piece color in Board. 
+queen_present(Board, Piece) :- 
+    get_piece_Color(Piece, Color),
+    member(piece(_,_,Color,[queen|_]), Board), 
+    !.
+    
+
 % connected_board_if_removed(Board, Piece) Succeed if Board is connected after removing Piece
 connected_board_if_removed(Board, Piece) :- 
     remove_board_piece(Board, Piece, ResultBoard),
@@ -25,10 +32,11 @@ single_hive_after(Board, PieceToRemove, PieceToAdd) :-
 
 % pre_move_rules(Board, Piece) Rules that must fulfil all pieces on given Board to be able to move
 pre_move_rules(Board, Piece) :- 
-    top_at_position(Board, Piece).
+    top_at_position(Board, Piece),
+    queen_present(Board, Piece).
 
 % post_move_rules(OldBoard, OldPiece, NewPiece, NewBoard) Rules that must be fulfilled after the piece is moved
-post_move_rules(OldBoard, OldPiece, NewPiece, NewBoard) :- 
+post_move_rules(_, _, _, NewBoard) :- 
     connected_board(NewBoard). % Single Hive Simplified
     % single_hive_after(OldBoard, OldPiece, NewPiece).
 
@@ -80,7 +88,7 @@ spider_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :-
 
     border_move(Board, Piece, BorderMoves),
     get_all_pieces_list(BorderMoves, [_,3], SpiderMovesWithDistance),
-    unzip(SpiderMovesWithDistance, SpiderMoves, Distances),
+    unzip(SpiderMovesWithDistance, SpiderMoves, _),
     !,
     member(NewPiece, SpiderMoves),
     piece(NewPosX, NewPosY, _,_) = NewPiece,
@@ -94,7 +102,7 @@ ant_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :-
     pre_move_rules(Board, Piece),
 
     border_move(Board, Piece, BorderMoves),
-    unzip(BorderMoves, AntMoves, Distances),
+    unzip(BorderMoves, AntMoves, _),
     !,
     member(NewPiece, AntMoves),
     piece(NewPosX, NewPosY, _,_) = NewPiece,

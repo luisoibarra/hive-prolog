@@ -80,6 +80,12 @@ test_boards([piece(1,2,_,[queen,0]),
             piece(1,1,_,[ant,0])], 
             [[piece(1,1,_,[ant,0|_]), [_,_]]], false) :- write(26).
 
+% General Movement
+test_boards([piece(1,2,_,[ant,0]),
+            piece(0,2,_,[ant ,0]),piece(0,1,_,[ant,0]),
+            piece(1,0,_,[ant ,0]),
+            piece(1,1,_,[ant,0])], 
+            [[piece(1,1,_,[ant,0|_]), [2,3]]], false) :- write(27).
 
 % Simulate game
 % End Simulation

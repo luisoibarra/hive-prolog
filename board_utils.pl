@@ -1,7 +1,7 @@
 :- module(board_utils, 
     [remove_board_piece/3, is_place_taken/4, connected_board/1, positions_next_to/5,
     pieces_together/3, can_slide_into/5, get_all_pieces/3, exist_queen/1, color_played_list/3,
-    placed_around_of/3, get_all_pieces_list/3, get_all_pieces_at/4
+    placed_around_of/3, get_all_pieces_list/3, get_all_pieces_at/4, get_top_piece_at/4
     ]).
 :- use_module(list_utils). 
 :- use_module(piece_utils). 
@@ -34,7 +34,10 @@ is_place_taken([Piece|_], PosX, PosY, Height) :-
     !.
 is_place_taken([_|Board], PosX, PosY, Height) :- is_place_taken(Board, PosX, PosY, Height).
 
-
+% get_top_piece_at(Board, PosX, PosY, Piece) Return the heighest piece at given position  
+get_top_piece_at(Board, PosX, PosY, Piece) :- 
+    get_position_max_Height_or_0(Board, PosX, PosY, Height),
+    get_all_pieces(Board, piece(PosX, PosY, _,[_,Height|_]), Piece), !.
 
 % connected_board(Board) Succeed if Board is connected
 connected_board([]).
@@ -57,12 +60,12 @@ connected_board(Board, [Piece|ToProcess], Visited) :-
 % dir_offset(Dir, PosX, OffsetX, OffsetY): Offset for every direction according PosX
 dir_offset(up_l, PosX, -1, -1) :- 0 is PosX mod 2.
 dir_offset(up_l, PosX, -1, 0) :- 1 is PosX mod 2.
-dir_offset(up, PosX, 0, -1).
+dir_offset(up, _, 0, -1).
 dir_offset(up_r, PosX, 1, -1) :- 0 is PosX mod 2.
 dir_offset(up_r, PosX, 1, 0) :- 1 is PosX mod 2.
 dir_offset(dw_r, PosX, 1, 0) :- 0 is PosX mod 2.
 dir_offset(dw_r, PosX, 1, 1) :- 1 is PosX mod 2.
-dir_offset(dw, PosX, 0, 1).
+dir_offset(dw, _, 0, 1).
 dir_offset(dw_l, PosX, -1, 0) :- 0 is PosX mod 2.
 dir_offset(dw_l, PosX, -1, 1) :- 1 is PosX mod 2.
 
@@ -108,7 +111,7 @@ exist_queen([Piece|_]) :- get_piece_Type(Piece, queen), !.
 exist_queen([_|Pieces]) :- exist_queen(Pieces). 
 
 % get_all_pieces(Pieces, Pattern, Result): Succeed if a piece in Pieces unifies with Pattern
-get_all_pieces([First|_], PiecePatter, First) :- PiecePatter = First.
+get_all_pieces([First|_], PiecePatter, First) :- findall(X, PiecePatter = X, [First]).
 get_all_pieces([_|Pieces], PiecePatter, Result) :- get_all_pieces(Pieces, PiecePatter, Result).
 
 % get_all_pieces_list(Pieces, Pattern, ListResult): Succeed if ListResult is the list of all pieces that unifies with with Pattern in Pieces
