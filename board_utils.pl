@@ -1,8 +1,7 @@
 :- module(board_utils, 
     [remove_board_piece/3, is_place_taken/4, connected_board/1, positions_next_to/5,
     pieces_together/3, can_slide_into/5, get_all_pieces/3, exist_queen/1, color_played_list/3,
-    placed_around_of/3, get_all_pieces_list/3, get_all_pieces_at/4, get_top_piece_at/4
-    ]).
+    placed_around_of/3, get_all_pieces_list/3, get_all_pieces_at/4, get_top_piece_at/4]).
 :- use_module(list_utils). 
 :- use_module(piece_utils). 
 
@@ -109,6 +108,7 @@ color_played_list([_|Pieces], Color, Result) :- color_played_list(Pieces, Color,
 % exist_queen(Pieces): Succeed if a queen is found
 exist_queen([Piece|_]) :- get_piece_Type(Piece, queen), !.
 exist_queen([_|Pieces]) :- exist_queen(Pieces). 
+    
 
 % get_all_pieces(Pieces, Pattern, Result): Succeed if a piece in Pieces unifies with Pattern
 get_all_pieces([First|_], PiecePatter, First) :- findall(X, PiecePatter = X, [First]).

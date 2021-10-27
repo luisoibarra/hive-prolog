@@ -1,14 +1,16 @@
-:- module(run_console,[init_game/0,run_game/1]).
+:- module(run_console,[init_game/0,run_game/2]).
 :- use_module(run_game_utils). 
 % Console Interface
 
-print_board(Board) :- write(Board).
+print_board(Board) :- 
+    write('Board'), nl,
+    write(Board).
 
 print_pieces(BlackTypePieces, WhiteTypePieces) :- 
-    write(white), nl,
+    write(white), write(' pieces'), nl,
     write(WhiteTypePieces), nl, nl,
-    write(black), nl,
-    write(BlackTypePieces), nl, nl.
+    write(black), write(' pieces'), nl,
+    write(BlackTypePieces), nl.
 
 read_position(PosX, PosY) :- 
     read_with_headline('Position X', PosX), 
@@ -21,11 +23,12 @@ read_with_headline(Headline, Read) :-
 init_game() :-
     game([],white,[
         [queen, cricket, cricket, cricket, ant, ant, ant, beetle, beetle, spider, spider],
-        [queen, cricket, cricket, cricket, ant, ant, ant, beetle, beetle, spider, spider]
+        [queen, cricket, cricket, cricket, ant, ant, ant, beetle, beetle, spider, spider],
+        []
     ]) = Game,
-    run_game(Game).
+    run_game(Game,1).
 
-run_game(Game) :- 
+run_game(Game, Turn) :- 
     game(Board, CurrentPlayer, [WhiteTypePieces, BlackTypePieces|_]) = Game,
     write('Player '), write(CurrentPlayer), write(' turn'), nl,
     print_board(Board), nl,
@@ -48,4 +51,23 @@ run_game(Game) :-
         read_position(DestPosX, DestPosY),
         move_piece(PosX, PosY, DestPosX, DestPosY, Game, NewGame)
     ),
-    run_game(NewGame).
+    nl,!,
+    (
+        0 is Turn mod 2, % Both players played
+        get_game_GameHistory(NewGame, NewHistory),
+        end_rotation_feedback(NewHistory, Feedback, ContinueGame),
+        write(Feedback),nl
+        ;
+        true        
+    ),
+    ( % Succeed if 1 is Turn mod 2 or ContinueGame
+        var(ContinueGame)
+        ;
+        ContinueGame
+    ),
+    NewTurn is Turn + 1,
+    run_game(NewGame, NewTurn).
+
+run_game(Game, Turn) :- 
+    write('Some error or invalid play was made, please verify'), nl,
+    run_game(Game, Turn).
