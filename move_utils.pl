@@ -44,7 +44,7 @@ border_move(Board, Piece, Result) :-
     border_move(Board, [[Piece,0]], [Piece], PreResult),
     [_|Result] = PreResult.
 
-border_move(Board, [], Visited, []).
+border_move(_, [], _, []).
 border_move(Board, [[Piece, Distance]|ToProcess], Visited, [[Piece, Distance]|Result]) :- 
     piece(PosX, PosY,_,_) = Piece,
     get_piece_Height(Piece,Height),
@@ -63,9 +63,7 @@ border_move(Board, [[Piece, Distance]|ToProcess], Visited, [[Piece, Distance]|Re
     NewDistance is Distance + 1,
     zip_const(NotVisited, NewDistance, AddToProcess),
     concat_set_list(ToProcess, AddToProcess, NewToProcess),
-    first_element_list_or_empty_list(NewToProcess, NewVisitedItem),
     (
-        NewVisitedItem = [[NewPieceToProcess,Dist]],
         concat_positions_different(NotVisited,Visited,NewVisited)
         ;
         true

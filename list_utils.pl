@@ -1,5 +1,6 @@
 :- module(list_utils, [list_difference/3, concat_list/3, first_element_list_or_empty_list/2,
-    concat_set_list/3, map/3, zip/3, unzip/3, zip_const/3]).
+    concat_set_list/3, map/3, zip/3, unzip/3, zip_const/3, element_at/3,
+    remove_at/3]).
 
 
 % list_difference(List1, List2, Result) List1-List2=Result
@@ -33,3 +34,14 @@ zip_const([I1|List1], X, [[I1,X]|Result]) :- zip_const(List1, X, Result).
 
 map(_,[],[]).
 map(F,[X|Y],[V|R]):- T =..[F,X,V], call(T), map(F,Y,R).
+
+element_at([Element|_], 0, Element) :- !. 
+element_at([_|List], Index, Element) :- 
+    NewIndex is Index - 1, 
+    element_at(List, NewIndex, Element). 
+
+remove_at([_|List], 0, List) :- !.
+remove_at([X|List], Index, [X|Result]) :-
+    NewIndex is Index - 1, 
+    remove_at(List, NewIndex, Result).
+    
