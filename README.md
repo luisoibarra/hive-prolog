@@ -1,22 +1,27 @@
 # Hive
 
+Implementación del juego Hive en Prolog.
+
+## Jugar
+
+1. En la consola ejecutar `swipl run_console.pl`
+2. Luego ejecutar `init_game().`
+
 ## Test
 
-Para correr los test correr la función `run_board_test`
+Los testing en `test_boards.pl` son para probar movimientos y el añadido de piezas con más flexibilidad de que se tiene en el juego original. Para correrlos cargar el archivo y ejecutar `run_board_test().`
 
-Hasta el 6 los test están correctos, para ver la correctitud fijarse en lo que se escribe en la consola
+Los testing en `test_games.pl` son simulaciones de juegos con todas las reglas. Para correrlos cargar el archivo y ejecutar `run_game_tests().`
 
 ## Bibliografía
 
-Se usará para las posiciones de los hexágonos: offset coordinates odd-q
-
-https://www.redblobgames.com/grids/hexagons/
+Se usará para las posiciones de los hexágonos estilo offset coordinates odd-q de la página https://www.redblobgames.com/grids/hexagons/.
 
 ## Pasos restantes
 
 - [x] Ver cómo se puede organizar mejor el proyecto en módulos
-- [ ] Movimientos de fichas (Hecho mas menos el de Reina, seguir avanzando con los demás elementos)
-- [ ] Jugar en consola entre personas
+- [x] Movimientos de fichas
+- [x] Jugar en consola entre personas
 - [ ] IA
 - [ ] UI
 
