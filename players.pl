@@ -15,6 +15,7 @@ all_next_game_steps(Game, Steps) :-
     findall(step(A,NG,Fs,Sts), next_game_step(Game, A, NG, Fs, Sts), Steps).
 
 % game([],white,[[queen,ant,ant],[queen,ant,ant],[],1])
+% game([piece(3,3,white,[queen,0])],black,[[queen,ant,ant],[queen,ant,ant],[],1])
 
 % random_player(Game, Action) Returns a random action to be played
 random_player(Game, Action) :- 
