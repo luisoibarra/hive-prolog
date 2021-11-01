@@ -13,8 +13,7 @@ first_empty_place_from(Board, PosX, PosY, Dir, Length, NewPosX, NewPosY) :-
 first_empty_place_from(Board, PosX, PosY, Dir, CurrLength, Length, NewPosX, NewPosY) :- 
     positions_next_to(PosX, PosY, TempPosX, TempPosY, Dir),
     is_place_taken(Board, TempPosX, TempPosY,_),
-    first_empty_place_from(Board, TempPosX, TempPosY, Dir, CurrLength+1, Length, NewPosX, NewPosY),
-    !.
+    first_empty_place_from(Board, TempPosX, TempPosY, Dir, CurrLength+1, Length, NewPosX, NewPosY).
 
 first_empty_place_from(Board, PosX, PosY, Dir, CurrLength, Length, NewPosX, NewPosY) :- 
     positions_next_to(PosX, PosY, TempPosX, TempPosY, Dir),

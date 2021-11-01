@@ -36,7 +36,7 @@ is_place_taken([_|Board], PosX, PosY, Height) :- is_place_taken(Board, PosX, Pos
 % get_top_piece_at(Board, PosX, PosY, Piece) Return the heighest piece at given position  
 get_top_piece_at(Board, PosX, PosY, Piece) :- 
     get_position_max_Height_or_0(Board, PosX, PosY, Height),
-    get_all_pieces(Board, piece(PosX, PosY, _,[_,Height|_]), Piece), !.
+    get_all_pieces(Board, piece(PosX, PosY, _,[_,Height|_]), Piece).
 
 % connected_board(Board) Succeed if Board is connected
 connected_board([]).
@@ -119,7 +119,22 @@ get_all_pieces_list(List, Pattern, Result) :-
     findall(X, (member(X,List), Pattern=X), Result).
 
 % get_all_pieces_at(Board, PosX, PosY, List): Return all pieces in board that are in the given position
-get_all_pieces_at(Board, PosX, PosY, List) :- get_all_pieces_list(Board, piece(PosX, PosY, _, _), List).
+get_all_pieces_at(Board, PosX, PosY, List) :- 
+    integer(PosX), integer(PosY), !,
+    get_all_pieces_list(Board, piece(PosX, PosY, _, _), List).
+get_all_pieces_at(Board, PosX, PosY, Elem) :- 
+    aux_get_all_pieces_at(Board, Elements),
+    member(Elem, Elements),
+    [Item|_] = Elem,
+    piece(PosX, PosY, _, _) = Item.
+
+aux_get_all_pieces_at([],[]).
+aux_get_all_pieces_at(Board, [List|Elements]) :- 
+    Board = [Element|_],
+    piece(PosX, PosY, _, _) = Element,
+    get_all_pieces_at(Board, PosX, PosY, List),
+    remove_all(Board, piece(PosX, PosY, _, _), NewBoard),
+    aux_get_all_pieces_at(NewBoard, Elements).
 
 
 % can_slide_into(Board, PosX, PosY, NewPosX, NewPosY, SlidedPiece) 

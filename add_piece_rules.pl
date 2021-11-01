@@ -26,15 +26,13 @@ add_piece([], Piece, [Piece]) :- !.
 add_piece(InitialBoard, Piece, [Piece|InitialBoard]) :- piece(_, _, C2, _) = Piece, 
                                                  color_played_list(InitialBoard, C2, C2Pieces),
                                                  length(C2Pieces, 0),
-                                                 placed_around_of(InitialBoard, Piece, _),
-                                                 !.
+                                                 placed_around_of(InitialBoard, Piece, _).
 % Between the second and third play the queen can be out of the board
 add_piece(InitialBoard, Piece, [Piece|InitialBoard]) :- piece(_, _, C2, _) = Piece, 
                                             color_played_list(InitialBoard, C2, C2Pieces),
                                             length(C2Pieces, Length),
                                             0 < Length, Length < 3,
-                                            place_piece_rules(InitialBoard, Piece),
-                                            !.
+                                            place_piece_rules(InitialBoard, Piece).
 
 % Forth play and ahead, queen must be on the board
 add_piece(InitialBoard, Piece, [Piece|InitialBoard]) :- piece(_, _, C2, _) = Piece, 
@@ -42,5 +40,4 @@ add_piece(InitialBoard, Piece, [Piece|InitialBoard]) :- piece(_, _, C2, _) = Pie
                                         length(C2Pieces, Length),
                                         Length > 2,
                                         exist_queen([Piece|C2Pieces]),
-                                        place_piece_rules(InitialBoard, Piece),
-                                        !.
+                                        place_piece_rules(InitialBoard, Piece).

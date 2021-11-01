@@ -25,3 +25,6 @@ Se usará para las posiciones de los hexágonos estilo offset coordinates odd-q 
 - [ ] IA
 - [ ] UI
 
+TODO:
+Hacer que se imprima en la consola el estado del juego independientemente de si es jugador en consola o no.
+Hay errores a la hora de colocar piezas, me coloco una hormiga encima de una reina.
