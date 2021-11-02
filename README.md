@@ -28,4 +28,6 @@ Artificial Inteligence: A Modern Approach, Capítulo 5 pág 161
 - [ ] UI
 
 TODO:
-Hay errores a la hora de colocar piezas, me coloco una hormiga encima de una reina.
+- Hacer que el feedback se pueda dar desde dentro del juego, una opción puede ser codificar el feedback para que luego se pueda decidir el mensaje más fácil.
+- Cambiar la estructura de game(_,_,_,_) para que admita varios jugadores facilmente poniendo una lista de jugadores con sus piezas a poner en el último argumento de primera posicion en vez de tener las listas de piezas pestas sin agrupar, ya que esto difculta el agrego de varios jugadores.
+- Organizar módulos por carpetas

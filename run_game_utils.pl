@@ -1,4 +1,5 @@
-:- module(run_game_utils,[make_a_play/5, get_game_GameHistory/2, get_game_Turn/2]).
+:- module(run_game_utils,[make_a_play/5, get_game_GameHistory/2, get_game_Turn/2,
+                    get_game_PiecesInfo/2]).
 :- use_module(add_piece_rules). 
 :- use_module(game_rules). 
 :- use_module(move_piece_rules). 
@@ -9,37 +10,39 @@
 
 % game(Board, CurrentPlayer, [WhiteTypePieces, BlackTypePieces, GameHistory, Turn]).
 get_game_GameHistory(Game, GameHistory) :- 
-    game(_, _, [_,_, GameHistory|_]) = Game.
+    game(_, _, [_, GameHistory|_]) = Game.
 get_game_Turn(Game, Turn) :- 
-    game(_, _, [_,_,_,Turn|_]) = Game.
-
+    game(_, _, [_,_,Turn|_]) = Game.
+get_game_PiecesInfo(Game, PiecesInfo) :-
+    game(_, _, [PiecesInfo|_]) = Game.
 
 switch_player(white, black). 
 switch_player(black, white). 
 
 % get_piece_type_to_play(CurrentPlayer, PiecePosition, WhiteTypePieces, BlackTypePieces, PieceType, NewWhiteTypePieces, NewBlackTypePieces) 
-get_piece_type_to_play(white, PiecePosition, WhiteTypePieces, BlackTypePieces, PieceType, NewWhiteTypePieces, BlackTypePieces) :- 
-    element_at(WhiteTypePieces, PiecePosition, PieceType),
-    remove_at(WhiteTypePieces, PiecePosition, NewWhiteTypePieces).
-get_piece_type_to_play(black, PiecePosition, WhiteTypePieces, BlackTypePieces, PieceType, WhiteTypePieces, NewBlackTypePieces) :- 
-    element_at(BlackTypePieces, PiecePosition, PieceType),
-    remove_at(BlackTypePieces, PiecePosition, NewBlackTypePieces).
+get_piece_type_to_play(Player, PiecePosition, PiecesToSet, PieceType, NewPiecesToSet) :- 
+    PieceInfo = pieces_info(Player, Pieces),
+    member(PieceInfo, PiecesToSet),
+    element_at(Pieces, PiecePosition, PieceType),
+    remove_at(Pieces, PiecePosition, NewPlayersPieces),
+    exchange_elements(PiecesToSet, PieceInfo, pieces_info(Player, NewPlayersPieces), NewPiecesToSet).
+    
 
 % set_piece(PiecePosition, PosX, PosY, Game, NewGame)
 set_piece(PiecePosition, PosX, PosY, Game, NewGame) :- 
-    game(Board, CurrentPlayer, [WhiteTypePieces, BlackTypePieces, GameHistory, Turn|Extra]) = Game,
+    game(Board, CurrentPlayer, [PiecesToSet, GameHistory, Turn|Extra]) = Game,
     
-    get_piece_type_to_play(CurrentPlayer, PiecePosition, WhiteTypePieces, BlackTypePieces, PieceType, NewWhiteTypePieces, NewBlackTypePieces),
+    get_piece_type_to_play(CurrentPlayer, PiecePosition, PiecesToSet, PieceType, NewPiecesToSet),
     build_piece(PosX, PosY, CurrentPlayer, [PieceType, 0], Piece),
     add_piece(Board, Piece, NewBoard),
 
     switch_player(CurrentPlayer, NewCurrentPlayer),
     NewTurn is Turn + 1,
-    game(NewBoard, NewCurrentPlayer, [NewWhiteTypePieces, NewBlackTypePieces, [Game|GameHistory], NewTurn|Extra]) = NewGame.
+    game(NewBoard, NewCurrentPlayer, [NewPiecesToSet, [Game|GameHistory], NewTurn|Extra]) = NewGame.
 
 % move_piece(PosX, PosY, DestPosX, DestPosY, Game, NewGame) 
 move_piece(PosX, PosY, DestPosX, DestPosY, Game, NewGame) :- 
-    game(Board, CurrentPlayer, [WhiteTypePieces, BlackTypePieces, GameHistory, Turn|Extra]) = Game,
+    game(Board, CurrentPlayer, [PiecesToSet, GameHistory, Turn|Extra]) = Game,
     get_top_piece_at(Board, PosX, PosY, PieceToMove),
     get_piece_Color(PieceToMove, CurrentPlayer),
 
@@ -47,11 +50,11 @@ move_piece(PosX, PosY, DestPosX, DestPosY, Game, NewGame) :-
 
     switch_player(CurrentPlayer, NewCurrentPlayer),
     NewTurn is Turn + 1,
-    game(NewBoard, NewCurrentPlayer, [WhiteTypePieces, BlackTypePieces, [Game|GameHistory], NewTurn|Extra]) = NewGame.
+    game(NewBoard, NewCurrentPlayer, [PiecesToSet, [Game|GameHistory], NewTurn|Extra]) = NewGame.
 
 end_turn_feedback(Game, Feedback, GameStatus) :-
 
-    game(Board, CurrentPlayer, [_, _, GameHistory|_]) = Game,
+    game(Board, CurrentPlayer, [_, GameHistory|_]) = Game,
     switch_player(PrevPlayer, CurrentPlayer),
     (
         queen_surrounded(Board, PrevPlayer),

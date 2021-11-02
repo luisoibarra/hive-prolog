@@ -8,8 +8,9 @@
 
 % Pieces can be placed only next to pieces of the same color and away from pieces of different colors
 piece_next_to_allied_and_away_from_enemy(InitialBoard, Piece) :- placed_around_of(InitialBoard, Piece, NeighborPiece),
-                                                  piece(_, _, C1, _) = Piece,
+                                                  piece(PosX, PosY, C1, _) = Piece,
                                                   piece(_, _, C1, _) = NeighborPiece,
+                                                  not(is_place_taken(InitialBoard, PosX, PosY, 0)),
                                                   not((placed_around_of(InitialBoard, Piece, piece(_, _, C2, _)),C2\=C1)).
 
 % place_piece_rules(Board, Piece): Succeed if all rules regarding placing a piece are true

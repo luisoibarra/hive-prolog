@@ -1,7 +1,7 @@
 :- module(list_utils, [list_difference/3, concat_list/3, first_element_list_or_empty_list/2,
     concat_set_list/3, map/3, zip/3, unzip/3, zip_const/3, element_at/3,
-    remove_at/3, remove_all/3, get_random_element/2]).
-
+    remove_at/3, remove_all/3, get_random_element/2, maxim/4, exchange_elements/4]).
+:- use_module('IA/minmax_utils').
 
 % list_difference(List1, List2, Result) List1-List2=Result
 list_difference([], _, []) :- !.
@@ -65,3 +65,25 @@ get_random_element(List, Element) :-
     Length > 0,
     Pos is random(Length),
     element_at(List, Pos, Element).
+
+maxim([Default|List], ComparerFunctor, ComparerPreArgs, Min) :-
+    concat_list([ComparerFunctor], ComparerPreArgs, FunctorList), 
+    aux_maxim(List, Default, FunctorList, Min).
+aux_maxim([], CurrentMin, _, CurrentMin).
+aux_maxim([Current|List], CurrentMin, PreComparerFunctorList, Min) :-
+    concat_list(PreComparerFunctorList, [Current, CurrentMin], ComparerFunctorList),
+    Comparer =.. ComparerFunctorList,
+    (
+        call(Comparer),
+        aux_maxim(List, Current, PreComparerFunctorList, Min)
+        ;
+        not(call(Comparer)),
+        aux_maxim(List, CurrentMin, PreComparerFunctorList, Min)
+    ).
+
+exchange_elements([],_,_,[]).
+exchange_elements([Element1|List], Element1, Element2, [Element2|ResultList]) :- 
+    exchange_elements(List, Element1, Element2, ResultList), !.
+exchange_elements([Element|List], Element1, Element2, [Element|ResultList]) :- 
+    Element \= Element1,
+    exchange_elements(List, Element1, Element2, ResultList).
