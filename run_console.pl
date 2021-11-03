@@ -42,8 +42,8 @@ run_game(Game, GameConfig, Players) :-
     call(PlayF), !,
     
     % Play
+    write(Action),nl,
     make_a_play(Action, Game, NewGame, Feedback, GameStatus),
-    
     % Play Feedback
     CallShowGameFeedbackFunc =.. [ShowGameFeedbackFunc, Action, NewGame, Feedback, GameStatus],
     call(CallShowGameFeedbackFunc),

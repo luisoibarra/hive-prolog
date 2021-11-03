@@ -24,7 +24,7 @@ minmax(InitialState, ResultSelectionFunctor, NextStateGeneratorFunctor, Terminal
     GenerateAll =.. [NextStateGeneratorFunctor, InitialState, AllNextStates],
     call(GenerateAll),
     NextDepth is Depth - 1,
-    findall(X, (member(Y, AllNextStates), 
+    findall([Y,X], (member(Y, AllNextStates), 
                 minmax(Y, ResultSelectionFunctor, NextStateGeneratorFunctor, TerminalTestFunctor, UtilityFunctor, NextDepth, X))
             ,Results),
     Selector =.. [ResultSelectionFunctor, InitialState, Results, Result],

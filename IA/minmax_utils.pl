@@ -7,8 +7,8 @@
 player_index(0,white).
 player_index(1,black).
 
-% maxim_fuc(Player, [step(...),VectorValue1], [step(...),VectorValue2]) Compares which Argument is greater according to Player
-maxim_fuc(Player, [_,V1], [_,V2]) :-
+% maxim_fuc(Player, [step(...),[step(...),VectorValue1]], [step(...),[step(...),VectorValue2]]) Compares which Argument is greater according to Player
+maxim_fuc(Player, [_,[_,V1]], [_,[_,V2]]) :-
     player_index(Index, Player),
     element_at(V1, Index, Value1),
     element_at(V2, Index, Value2),
@@ -16,9 +16,9 @@ maxim_fuc(Player, [_,V1], [_,V2]) :-
 
 % result_selection(State, VectorList, Result) Returns the maxim value in VectorList according maxin_fun
 result_selection(State, VectorList, Result) :- 
-    step(Action,game(_,Player, _),_,_) = State,
-    maxim(VectorList, maxim_fuc, [Player], [_,Vector]),
-    Result = [Action,Vector].
+    step(_,game(_,Player, _),_,_) = State,
+    maxim(VectorList, maxim_fuc, [Player], [Step,[_,Vector]]),
+    [Step,Vector] = Result.
 
 % next_step_generator(State, NextStates) Returns all posible NextStates from State
 next_step_generator(State, NextStates) :- 

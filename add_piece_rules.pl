@@ -24,10 +24,11 @@ add_piece([], Piece, [Piece]) :- !.
 
 % First Play: The Piece must be from different color and 
 % must be placed next to the existing piece
-add_piece(InitialBoard, Piece, [Piece|InitialBoard]) :- piece(_, _, C2, _) = Piece, 
+add_piece(InitialBoard, Piece, [Piece|InitialBoard]) :- piece(PosX, PosY, C2, _) = Piece, 
                                                  color_played_list(InitialBoard, C2, C2Pieces),
                                                  length(C2Pieces, 0),
-                                                 placed_around_of(InitialBoard, Piece, _).
+                                                 placed_around_of(InitialBoard, Piece, _),
+                                                 not(is_place_taken(InitialBoard, PosX, PosY, 0)).
 % Between the second and third play the queen can be out of the board
 add_piece(InitialBoard, Piece, [Piece|InitialBoard]) :- piece(_, _, C2, _) = Piece, 
                                             color_played_list(InitialBoard, C2, C2Pieces),

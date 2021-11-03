@@ -22,7 +22,8 @@ ia_player(Game, Action) :-
     game([],_,_) = Game,
     random_player(Game, Action).
 ia_player(Game, Action) :-
-    minmax(step(none,Game,none,continue),result_selection, next_step_generator, terminal_test, sample_utility_function, 2, [Action,_]).
+    minmax(step(none,Game,none,continue),result_selection, next_step_generator, terminal_test, sample_utility_function, 2, [Step,_]),
+    step(Action, _, _, _) = Step.
 
 % console_human_player(Game, Action) Implements the console interface and input for a human player
 console_human_player(Game, Action) :-
