@@ -62,5 +62,5 @@ sample_utility_player_function(State, Player, Value) :-
     get_game_PiecesInfo(Game, PieceInfos),
     member(pieces_info(Player, Pieces), PieceInfos),
     length(Pieces, Length),
-    Value is Length. % Allways try to move
-    % Value is -Length. % Allways try to set 
+    % Value is Length. % Allways try to move
+    Value is -Length. % Allways try to set 
