@@ -1,20 +1,11 @@
-:- module(players, [random_player/2, console_human_player/2]).
+:- module(players, [random_player/2, console_human_player/2, ia_player/2]).
 :- use_module(list_utils). 
-:- use_module(piece_utils). 
-:- use_module(board_utils). 
-:- use_module(move_utils). 
+:- use_module('IA/ia_utils'). 
+:- use_module('IA/minmax'). 
+:- use_module('IA/minmax_utils'). 
 :- use_module(run_game_utils).
 :- use_module(console_utils).
 
-% next_game_step(Game, Action, NewGame, Feedback, Status) Given a Game returns a posible Action NewGame Feedback Status
-next_game_step(Game, Action, NewGame, Feedback, Status) :-
-    make_a_play(Action, Game, NewGame, Feedback, Status).
-
-% all_next_game_steps(Game, Steps) Returns all the posible steps given a Game
-all_next_game_steps(Game, Steps) :-
-    findall(step(A,NG,Fs,Sts), next_game_step(Game, A, NG, Fs, Sts), Steps).
-
-% game([],white,[[queen,ant,ant],[queen,ant,ant],[],1])
 
 % random_player(Game, Action) Returns a random action to be played
 random_player(Game, Action) :- 
@@ -26,6 +17,13 @@ random_player(Game, Action) :-
     all_next_game_steps(Game, Steps),
     findall(A, (member(Step, Steps), step(A, _, _, Status) = Step, Status \= invalid), Actions),
     get_random_element(Actions, Action).
+
+ia_player(Game, Action) :-
+    game([],_,_) = Game,
+    random_player(Game, Action).
+ia_player(Game, Action) :-
+    minmax(step(none,Game,none,continue),result_selection, next_step_generator, terminal_test, sample_utility_function, 2, [Step,_]),
+    step(Action, _, _, _) = Step.
 
 % console_human_player(Game, Action) Implements the console interface and input for a human player
 console_human_player(Game, Action) :-

@@ -2,11 +2,12 @@
    
 % test_games(TestName, Game, Movements, ExpectedResults) :- 
 test_games('Set Queens',Game, Movements, ExpectedResults) :- 
-    game(Board, CurrentPlayer, [WhiteTypePieces, BlackTypePieces, GameHistory, Turn|_]) = Game,
+    game(Board, CurrentPlayer, [PiecesToSet, GameHistory, Turn|_]) = Game,
     Board = [],
     CurrentPlayer = white,
-    WhiteTypePieces = [queen, ant, ant, ant],
-    BlackTypePieces = [queen, ant, ant, ant],
+    WhiteTypePieces = pieces_info(white,[queen, ant, ant, ant]),
+    BlackTypePieces = pieces_info(black,[queen, ant, ant, ant]),
+    PiecesToSet = [WhiteTypePieces, BlackTypePieces],
     GameHistory = [],
     Turn = 1,
     Movements = [set_play(0, 3, 3), set_play(0, 3, 2)],
@@ -14,22 +15,24 @@ test_games('Set Queens',Game, Movements, ExpectedResults) :-
 
 
 test_games('Fail Set Queens',Game, Movements, ExpectedResults) :- 
-    game(Board, CurrentPlayer, [WhiteTypePieces, BlackTypePieces, GameHistory, Turn|_]) = Game,
+    game(Board, CurrentPlayer, [PiecesToSet, GameHistory, Turn|_]) = Game,
     Board = [],
     CurrentPlayer = white,
-    WhiteTypePieces = [queen, ant, ant, ant],
-    BlackTypePieces = [queen, ant, ant, ant],
+    WhiteTypePieces = pieces_info(white,[queen, ant, ant, ant]),
+    BlackTypePieces = pieces_info(black,[queen, ant, ant, ant]),
+    PiecesToSet = [WhiteTypePieces, BlackTypePieces],
     GameHistory = [],
     Turn = 1,
     Movements = [set_play(0, 3, 3), set_play(0, 4, 2)],
     ExpectedResults = [continue, invalid].
 
 test_games('Place queen before 4th round', Game, Movements, ExpectedResults) :- 
-    game(Board, CurrentPlayer, [WhiteTypePieces, BlackTypePieces, GameHistory, Turn|_]) = Game,
+    game(Board, CurrentPlayer, [PiecesToSet, GameHistory, Turn|_]) = Game,
     Board = [],
     CurrentPlayer = white,
-    WhiteTypePieces = [ant, ant, ant, ant, ant],
-    BlackTypePieces = [ant, ant, ant, ant, ant],
+    WhiteTypePieces = pieces_info(white,[ant, ant, ant, ant, ant]),
+    BlackTypePieces = pieces_info(black,[ant, ant, ant, ant, ant]),
+    PiecesToSet = [WhiteTypePieces, BlackTypePieces],
     GameHistory = [],
     Turn = 1,
     Movements = [set_play(0, 3, 3), set_play(0, 4, 3),
@@ -42,11 +45,12 @@ test_games('Place queen before 4th round', Game, Movements, ExpectedResults) :-
                        invalid].
 
 test_games('Move when queen is placed', Game, Movements, ExpectedResults) :- 
-    game(Board, CurrentPlayer, [WhiteTypePieces, BlackTypePieces, GameHistory, Turn|_]) = Game,
+    game(Board, CurrentPlayer, [PiecesToSet, GameHistory, Turn|_]) = Game,
     Board = [],
     CurrentPlayer = white,
-    WhiteTypePieces = [ant, ant, ant, queen, ant],
-    BlackTypePieces = [ant, ant, ant, queen, ant],
+    WhiteTypePieces = pieces_info(white,[ant, ant, ant, queen, ant]),
+    BlackTypePieces = pieces_info(black,[ant, ant, ant, queen, ant]),
+    PiecesToSet = [WhiteTypePieces, BlackTypePieces],
     GameHistory = [],
     Turn = 1,
     Movements = [set_play(0, 3, 3), set_play(0, 4, 3),
@@ -56,11 +60,12 @@ test_games('Move when queen is placed', Game, Movements, ExpectedResults) :-
 
 
 test_games('Queen surrounded', Game, Movements, ExpectedResults) :- 
-    game(Board, CurrentPlayer, [WhiteTypePieces, BlackTypePieces, GameHistory, Turn|_]) = Game,
+    game(Board, CurrentPlayer, [PiecesToSet, GameHistory, Turn|_]) = Game,
     Board = [],
     CurrentPlayer = white,
-    WhiteTypePieces = [ant, queen, ant, ant, ant, ant],
-    BlackTypePieces = [ant, queen, ant, ant, ant],
+    WhiteTypePieces = pieces_info(white,[ant, queen, ant, ant, ant, ant]),
+    BlackTypePieces = pieces_info(black,[ant, queen, ant, ant, ant]),
+    PiecesToSet = [WhiteTypePieces, BlackTypePieces],
     GameHistory = [],
     Turn = 1,
     Movements = [set_play(0, 3, 3), set_play(0, 4, 3),

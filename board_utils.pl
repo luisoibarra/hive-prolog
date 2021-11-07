@@ -95,7 +95,12 @@ pieces_together(Piece1, [Piece2|Pieces], [Piece2|Result]) :- pieces_together(Pie
 pieces_together(Piece1, [_|Pieces], Result) :- pieces_together(Piece1, Pieces, Result).
 
 % placed_around_of(Board, Piece, AroundPiece): Return the pieces that are next to Piece in Board
-placed_around_of([BoardPiece|_], Piece, BoardPiece) :- pieces_together(BoardPiece, Piece).
+placed_around_of([BoardPiece|_], Piece, BoardPiece) :- 
+    pieces_together(BoardPiece, Piece),
+    piece(PosX1, PosY1, _, _) = BoardPiece,
+    piece(PosX2, PosY2, _, _) = Piece,
+    not((PosX1=PosX2,PosY1=PosY2)).
+
 placed_around_of([_|Board], Piece, BoardPiece) :- placed_around_of(Board, Piece, BoardPiece).
 
 % color_played_list(Board, Color, Pieces): Returns in Pieces all the pieces of color Color
