@@ -33,9 +33,14 @@ Implementación del juego Hive en Prolog.
   - Game: Instancia del `game` generada en el paso.
   - Feedback: String con un mensaje sobre el estado del paso
   - Status: Indica el estado del paso ej: invalid, continue, over, tie.
-- game_config(ShowGameStateFunc, ShowGameFeedbackFunc)
-  - ShowGameStateFunc: Functor a una función que muestra el estado de juego
-  - ShowGameFeedbackFunc: Functor a una función que muestra el estado del juego inmediato a una jugada
+- game_config(FeedbackPlayerInfoList, ExtraPlayerInfoList)
+  - FeedbackPlayerInfoList: Lista que contiene `feedback_info` con los functors a llamar para la actualización del estado de los usuarios
+  - ExtraPlayerInfoList: Lista que contiene `extra_info` sobre la configuración de los usuarios.
+- feedback_info(PlayerColor, StartGameStateUserFeedback, EndGameStateUserFeedback)
+  - StartGameStateUserFeedback: Functor a llamar para mostrar y actualizar el estado del juego en el cliente 
+  - EndGameStateUserFeedback: Functor a llamar para mostrar y actualizar el estado del juego luego de que se haya hecho una jugada
+- extra_info(Player, ExtraConfigInfo)
+  - ExtraConfigInfo: Lista que contiene información adicional sobre el jugador necesaria para hacer los updates. Por ejemplo se usa para guardar la dirección de los jugadores HTTP conteniendo un `http_player_config(Host, Port, BasePath)`.
 - player(CurrentPlayer, \[PlayerFunctor\])
   - CurrentPlayer: white, black, etc.
   - PlayerFunctor: Functor a una función que devuelve la acción del jugador
@@ -56,10 +61,113 @@ Artificial Inteligence: A Modern Approach, Capítulo 5 pág 161
 - Hacer que el feedback se pueda dar desde dentro del juego, una opción puede ser codificar el feedback para que luego se pueda decidir el mensaje más fácil.
 - Organizar módulos por carpetas
 
+## Interfaz HTTP
+
+Se hace un POST al host con el puerto establecido al path `player_{COLOR DEL JUGADOR}`. Por ejemplo un pseudo HEADER podría ser `POST http://localhost:9000/player_white`.
+
+Cuerpos del POST:
+
+1. Llamado actualizando el estado:
+
+- Se enviará un JSON con el siguiente formato
+
+``` json
+// Representación de una instancia de juego. Se usará esta plantilla luego.
+game = 
+{
+  "turn":1,
+  "board":[
+    {
+      "x":2,
+      "y":3,
+      "color":"white",
+      "type":"queen",
+      "height":0
+    },
+    {
+      "x":3,
+      "y":3,
+      "color":"black",
+      "type":"queen",
+      "height":0
+    },
+    {
+      "x":4,
+      "y":3,
+      "color":"white",
+      "type":"ant",
+      "height":0
+    }
+  ],
+  "player":"black",
+  "remaining_pieces":[
+    {
+      "player":"white",
+      "pieces":["ant"]
+    },
+    {
+      "player":"black",
+      "pieces":["ant", "ant"]
+    }
+  ]
+}
+
+```
+2. Llamado para recibir la acción a jugar
+- Se enviará un JSON con el siguiente formato
+```json
+
+{
+  "action":"play",
+  "player":"white"
+}
+
+```
+- Se espera recibir un JSON con alguno de los siguientes formatos
+```json
+// En caso de que se ponga una ficha
+// Representación de una acción de juego. Se usará esta plantilla luego.
+action=
+{
+  "type":"set",
+  "final_x":2,
+  "final_y":3,
+  "piece_index":0
+}
+
+```
+```json
+// En caso de que se mueva una ficha
+// Representación de una acción de juego. Se usará esta plantilla luego.
+action=
+{
+  "type":"move",
+  "final_x":3,
+  "final_y":3,
+  "from_x":2,
+  "from_y":3
+}
+
+```
+
+3. Llamado para informar sobre el feedback de la jugada
+- Se enviará un JSON con el siguiente formato
+```json
+
+{
+  "game":<game>,
+  "action":<action>,
+  "feedback":"Game Over",
+  "status": "tie"
+}
+// status Puede ser alguno de estos valores: [invalid, continue, tie, over]
+```
+
+
 ## Pasos restantes
 
 - [x] Ver cómo se puede organizar mejor el proyecto en módulos
 - [x] Movimientos de fichas
 - [x] Jugar en consola entre personas
-- [ ] IA
+- [ ] AI
 - [ ] UI

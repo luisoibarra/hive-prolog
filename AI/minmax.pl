@@ -29,3 +29,6 @@ minmax(InitialState, ResultSelectionFunctor, NextStateGeneratorFunctor, Terminal
             ,Results),
     Selector =.. [ResultSelectionFunctor, InitialState, Results, Result],
     call(Selector).
+
+
+% two_minimax(InitialState, MaxMinState, Alpha, Beta, ResultSelectionFunctor, NextStateGeneratorFunctor, TerminalTestFunctor, UtilityFunctor, Depth, Result)

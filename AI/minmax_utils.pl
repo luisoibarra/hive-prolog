@@ -2,7 +2,7 @@
     utility_function/3, utility_for_player/4, sample_utility_function/2, maxim_fuc/3]).
 :- use_module('../list_utils').
 :- use_module('../run_game_utils').
-:- use_module(ia_utils).
+:- use_module(ai_utils).
 
 player_index(0,white).
 player_index(1,black).
