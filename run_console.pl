@@ -9,7 +9,6 @@ select_player(1, console_human_player, print_game_state, print_game_feedback, em
 select_player(2, ai_player, print_game_state, print_game_feedback, empty_player_extra_config).
 select_player(3, random_player, print_game_state, print_game_feedback, empty_player_extra_config).
 
-
 init_game() :-
     % Initial game instance
     game([],white,[

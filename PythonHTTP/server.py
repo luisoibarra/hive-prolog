@@ -51,9 +51,9 @@ async def root():
 #     return {"p":p, "q":q}
 
 
-@app.post("/player_white")
-@app.post("/player_black")
-def player(param: Union[GameFeedback, Game, ActionRequest]):
+@app.post("/player_{player}")
+def player(player:str, param: Union[GameFeedback, Game, ActionRequest]):
+    print(player)    
     if isinstance(param, Game):
         print("Aqui es donde el juego se debe de actualizar")
         print(param)
