@@ -149,7 +149,7 @@ class Render(pygame.Surface):
                 row, col = row, col - 1
         else:
             if x < .5 * self.radius and abs(y - SQRT3 * self.radius / 2) < SQRT3 * self.radius / 2 - x:
-                row, col = row - 1, col - 1
+                row, col = row , col -1
             elif y < SQRT3 * self.radius / 2:
                 row, col = row - 1, col
 
