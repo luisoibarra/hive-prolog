@@ -2,6 +2,7 @@ from abc import ABCMeta, abstractmethod
 import pygame
 import math
 from hexmap.Map import Grid
+from models import Game, Action
 import os
 
 SQRT3 = math.sqrt(3)
@@ -13,6 +14,14 @@ pieceRadius = radius / 2
 turn = 1
 window=None
 
+# String that returns the game with info about the last play
+play_feedback:str = None
+# String that gives information about the state of the play and game, can be [continue, invalid, tie, over]
+play_status:str = None
+# Rendered game instance 
+game_instance:Game = None
+# Action to perform 
+action_to_perform:Action = None
 
 BLACK = (0, 0, 0)
 GRAY = (180, 180, 180)
@@ -382,6 +391,10 @@ def run():
         global window
         global turn
         global CLICKED_PIECES_ON_HAND
+        global game_instance
+        global action_to_perform
+        global play_feedback
+        global play_status
         
         fpsClock = pygame.time.Clock()
         window = pygame.display.set_mode((640, 480), 1)
@@ -431,7 +444,6 @@ def run():
                                     WHITEPIECES[i]+=-1
                                 else:
                                     BLACKPIECES[i]+=-1
-                                    
                                 turn = (turn + 1) % 2
 
                                 ################################
@@ -486,6 +498,10 @@ def run():
             #fog.draw()
             window.blit(grid, (radius*2  ,radius*2 ))
             window.blit(units, (radius*2 , radius*2 ))
+            if game_instance:
+                print("Game instance exist")
+                game_instance = None
+                action_to_perform = "Something"
             #window.blit(fog, (0, 0))
             pygame.display.update()
             fpsClock.tick(10)

@@ -1,77 +1,57 @@
-from typing import List, Union
+from typing import List, Optional, Union
 from fastapi import FastAPI
-from pydantic import BaseModel
-from pydantic.types import OptionalInt
+from models import *
 import visual
+import time
 
 app = FastAPI()
+  
+def console_action_input() -> Optional[Action]:
+    print("Haz una jugada")
+    play = input("1: Set, 2: Move: ")
+    if play == "1":
+        index = input("index de la pieza a colocar: ")
+        pos_x = input("Pos x: ")
+        pos_y = input("Pos y: ")
+        return Action(type="set",final_x=int(pos_x),final_y=int(pos_y), piece_index=int(index))
+    if play == "2":
+        src_pos_x = input("Desde Pos x: ")
+        src_pos_y = input("Desde Pos y: ")
+        dest_pos_x = input("Para Pos x: ")
+        dest_pos_y = input("Para Pos y: ")
+        return Action(type="move", from_x=int(src_pos_x), from_y=int(src_pos_y),final_x=int(dest_pos_x),final_y=int(dest_pos_y))
+    return None
 
-class Piece(BaseModel):
-    x:int
-    y:int
-    color:str
-    type:str
-    height:int
+def visual_action_input() -> Optional[Action]:
+    while not visual.action_to_perform:
+        time.sleep(.3)
+    action = visual.action_to_perform
+    visual.action_to_perform = None
+    return action
 
-class RemainingPiece(BaseModel):
-    player:str
-    pieces:List[str]
+def update_visual_game_instance(game: Game):
+    visual.game_instance = game
 
-class Game(BaseModel):
-    turn:int
-    board: List[Piece]
-    player:str
-    remaining_pieces:List[RemainingPiece]
-
-class ActionRequest(BaseModel):
-    action:str
-    player:str
-    
-class Action(BaseModel):
-    type:str
-    final_x:int
-    final_y:int
-    piece_index:OptionalInt
-    from_x:OptionalInt
-    from_y:OptionalInt
-    
-class GameFeedback(BaseModel):
-    game:Game
-    action:Action
-    feedback:str
-    status:str
-        
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-# @app.post("/player_white")
-# def player_white():
-#     p = input("Escribe p")
-#     q = input("Escribe q")
-#     return {"p":p, "q":q}
-
+def update_visual_play_feedback(feedback: GameFeedback):
+    update_visual_game_instance(feedback.game)
+    visual.play_feedback = feedback.feedback
+    visual.play_status = feedback.status
 
 @app.post("/player_{player}")
-def player(player:str, param: Union[GameFeedback, Game, ActionRequest]):
+async def player(player:str, param: Union[GameFeedback, Game, ActionRequest]):
     print(player)    
     if isinstance(param, Game):
-        print("Aqui es donde el juego se debe de actualizar")
+        print("Instancia de juego:")
         print(param)
+        update_visual_game_instance(param)
     if isinstance(param, ActionRequest):
-        print("Haz una jugada")
-        play = input("1: Set, 2: Move: ")
-        if play == "1":
-            index = input("index de la pieza a colocar: ")
-            pos_x = input("Pos x: ")
-            pos_y = input("Pos y: ")
-            return Action(type="set",final_x=int(pos_x),final_y=int(pos_y), piece_index=int(index))
-        if play == "2":
-            src_pos_x = input("Desde Pos x: ")
-            src_pos_y = input("Desde Pos y: ")
-            dest_pos_x = input("Para Pos x: ")
-            dest_pos_y = input("Para Pos y: ")
-            return Action(type="move", from_x=int(src_pos_x), from_y=int(src_pos_y),final_x=int(dest_pos_x),final_y=int(dest_pos_y))
+        action = None
+        while not action:
+            # action = console_action_input()
+            action = visual_action_input()
+        return action
     if isinstance(param, GameFeedback):
-        print("Aqui es donde el juego muestra el update despues de una jugada")
+        print("Feedback de jugada")
         print(param)
+        update_visual_play_feedback(param)
+        
