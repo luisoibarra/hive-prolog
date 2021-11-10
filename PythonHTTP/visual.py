@@ -47,7 +47,13 @@ PIECES_ON_GRID = ["Q", "S", "A", "B", "C"]
 
 PIECES_IMAGES = [queen,spider,ant,beetle,cricket]
 
-CLICKED_PIECES = [0 for _ in range(len(PIECES))]
+CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
+
+CLICKED_PIECE_ON_GRID = None
+
+BLACKPIECES = [3,3,3,3,3]
+
+WHITEPIECES = [3,3,3,3,3]
 
 
 class Render(pygame.Surface):
@@ -200,11 +206,22 @@ class RenderPieces:
             pieceRect = pygame.Rect(i * width_of_piece, location, width_of_piece, height_of_piece)
             
             if turn == self.playerBlack:
-                clicked =  CLICKED_PIECES[i]
+                clicked =  CLICKED_PIECES_ON_HAND[i]
+                if turn:
+                    if WHITEPIECES[i] == 0:
+                        continue
+                    else:
+                        count = WHITEPIECES[i]
+                else:
+
+                    if BLACKPIECES[i]==0:
+                        continue
+                    else:
+                        count = BLACKPIECES[i]
             else:
                 clicked = 0
-
-            piece.paint(pieceRect,self.playerBlack,clicked)
+                
+            piece.paint(pieceRect,self.playerBlack,clicked,count)
 
     def get_cell(self, position,window):
         """
@@ -298,7 +315,7 @@ if __name__ == '__main__':
                 color2 = BLACK
                 color1 = WHITE
             radius = unitRect.width/ 2
-            pieceText = mediumFont.render(self.label, True, color1)
+            pieceText = mediumFont.render(f"{self.label}", True, color1)
             pieceTextRect = unitRect
             # center = surface.get_rect().center
             center = pieceTextRect.center
@@ -316,7 +333,7 @@ if __name__ == '__main__':
         def __init__(self,label) -> None:
             self.label = label
 
-        def paint(self, pieceRect,playerBlack,clicked):
+        def paint(self, pieceRect,playerBlack,clicked,count):
             if playerBlack:
                 color1=WHITE
                 color2=BLACK
@@ -328,7 +345,8 @@ if __name__ == '__main__':
             if clicked:
                 color2 = GRAY
 
-            pieceText = mediumFont.render(self.label, True, color1)
+            pieceText = smallFont.render(
+                f"{self.label} : {count}", True, color1)
             pieceTextRect = pieceText.get_rect()
             pieceTextRect.center = pieceRect.center
             pygame.draw.rect(window, color2, pieceRect)
@@ -380,8 +398,8 @@ if __name__ == '__main__':
                         print(whitePiece)
                         
                         if turn == 0:
-                            CLICKED_PIECES = [0 for _ in range(len(PIECES))]
-                            CLICKED_PIECES[i] = 1
+                            CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
+                            CLICKED_PIECES_ON_HAND[i] = 1
 
                         
                     elif event.pos[1]>window.get_height()-pieceRadius - 8:
@@ -390,29 +408,42 @@ if __name__ == '__main__':
                         print(blackPiece)
                         
                         if turn == 1:
-                            CLICKED_PIECES = [0 for _ in range(len(PIECES))]
-                            CLICKED_PIECES[i] = 1
+                            CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
+                            CLICKED_PIECES_ON_HAND[i] = 1
                     else:
                         print("Clicked on grid")
                         cell = units.get_cell(event.pos)
                         print(cell)
                         if cell:
-                            if sum(CLICKED_PIECES)==1:
-                                CLICKED_PIECES = [0 for _ in range(len(PIECES))]
+                            if sum(CLICKED_PIECES_ON_HAND)==1:
+                                CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
                                 
                                 #################################
                                 # PLACE A PIECE 
                                 m.units[cell] = Unit(m, PIECES_ON_GRID[i] , PIECES_IMAGES[i], turn)
+                                if turn:
+                                    WHITEPIECES[i]+=-1
+                                else:
+                                    BLACKPIECES[i]+=-1
+                                    
                                 turn = (turn + 1) % 2
+
 
                                 ################################
 
-                            elif sum(CLICKED_PIECES)==0:
+                            elif sum(CLICKED_PIECES_ON_HAND)==0:
 
                                 ###############################
                                 # MAYBE FOR SELECTING A PIECE TO MOVE OR 
                                 # SELECTING THE DESTINATION GRID FOR A PLACED PIECE TO MOVE FOR
-                                
+                                if CLICKED_PIECE_ON_GRID:
+                                    if CLICKED_PIECE_ON_GRID == cell:
+                                        CLICKED_PIECE_ON_GRID = None
+                                    else:
+                                        # Move()
+                                        pass
+                                else:
+                                    CLICKED_PIECE_ON_GRID = cell
 
                                 ###############################
                                 pass
