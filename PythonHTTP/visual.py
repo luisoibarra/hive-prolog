@@ -11,6 +11,7 @@ pygame.init()
 radius = 32
 pieceRadius = radius / 2
 turn = 1
+window=None
 
 
 BLACK = (0, 0, 0)
@@ -275,8 +276,7 @@ class RenderFog(Render):
 def trim_cell(surface):
     pass
 
-
-if __name__ == '__main__':
+def run():
     from hexmap.Map import Map, MapUnit
     import sys
 
@@ -288,6 +288,7 @@ if __name__ == '__main__':
             self.label = label
             self.image = image
             self.playerBlack = playerBlack
+            self.selected = False
 
 
         def paint(self, unitRect,playerBlack):
@@ -300,12 +301,12 @@ if __name__ == '__main__':
             radius = unitRect.width/ 2
             pieceText = mediumFont.render(self.label, True, color1)
             pieceTextRect = unitRect
-            # center = surface.get_rect().center
             center = pieceTextRect.center
             center=(center[0]+ (radius/1.5),center[1]+(radius/4))
             pieceTextRect.center = center
-            # pygame.draw.circle(surface, color2, (radius, int(
-            #     SQRT3 / 2 * radius)), int(radius - radius * .3))
+            if self.selected:
+                center = (pieceTextRect.center[0]-radius/2,pieceTextRect.center[1]-radius/4)
+                pygame.draw.circle(window, color2, center, radius/1.5)
             window.blit(pieceText, pieceTextRect)
 
 
@@ -359,9 +360,11 @@ if __name__ == '__main__':
     print(m.ascii())
 
     try:
+        global window
+        global turn
+        global CLICKED_PIECES
         
         fpsClock = pygame.time.Clock()
-
         window = pygame.display.set_mode((640, 480), 1)
         from pygame.locals import QUIT, MOUSEBUTTONDOWN
 
@@ -380,8 +383,9 @@ if __name__ == '__main__':
                         print(whitePiece)
                         
                         if turn == 0:
-                            CLICKED_PIECES = [0 for _ in range(len(PIECES))]
-                            CLICKED_PIECES[i] = 1
+                            if not CLICKED_PIECES[i] and sum(CLICKED_PIECES) >= 1:
+                                CLICKED_PIECES = [0 for _ in range(len(PIECES))]
+                            CLICKED_PIECES[i] = not CLICKED_PIECES[i]
 
                         
                     elif event.pos[1]>window.get_height()-pieceRadius - 8:
@@ -390,8 +394,9 @@ if __name__ == '__main__':
                         print(blackPiece)
                         
                         if turn == 1:
-                            CLICKED_PIECES = [0 for _ in range(len(PIECES))]
-                            CLICKED_PIECES[i] = 1
+                            if not CLICKED_PIECES[i] and sum(CLICKED_PIECES) >= 1:
+                                CLICKED_PIECES = [0 for _ in range(len(PIECES))]
+                            CLICKED_PIECES[i] = not CLICKED_PIECES[i]
                     else:
                         print("Clicked on grid")
                         cell = units.get_cell(event.pos)
@@ -412,10 +417,16 @@ if __name__ == '__main__':
                                 ###############################
                                 # MAYBE FOR SELECTING A PIECE TO MOVE OR 
                                 # SELECTING THE DESTINATION GRID FOR A PLACED PIECE TO MOVE FOR
-                                
-
-                                ###############################
-                                pass
+                                unit = m.units.get(cell, None)                            
+                                if unit:
+                                    if not unit.selected and sum([x.selected for x in m.units.values()]) >= 1:
+                                        for x in m.units.values():
+                                            x.selected = False
+                                    unit.selected = not unit.selected
+                                else:
+                                    for x in m.units.values():
+                                        x.selected = False
+                            ###############################
                             
                             else:
                                 raise Exception("Multiple clicked pieces")
@@ -438,3 +449,11 @@ if __name__ == '__main__':
             fpsClock.tick(10)
     finally:
         pygame.quit()
+
+
+if __name__ == '__main__':
+    run()
+else:
+    from threading import Thread
+    t = Thread(target=run)
+    t.start()

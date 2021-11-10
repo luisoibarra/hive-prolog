@@ -2,6 +2,7 @@ from typing import List, Union
 from fastapi import FastAPI
 from pydantic import BaseModel
 from pydantic.types import OptionalInt
+import visual
 
 app = FastAPI()
 
