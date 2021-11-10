@@ -381,7 +381,7 @@ def run():
     try:
         global window
         global turn
-        global CLICKED_PIECES
+        global CLICKED_PIECES_ON_HAND
         
         fpsClock = pygame.time.Clock()
         window = pygame.display.set_mode((640, 480), 1)
@@ -402,9 +402,9 @@ def run():
                         print(whitePiece)
                         
                         if turn == 0:
-                            if not CLICKED_PIECES[i] and sum(CLICKED_PIECES) >= 1:
-                                CLICKED_PIECES = [0 for _ in range(len(PIECES))]
-                            CLICKED_PIECES[i] = not CLICKED_PIECES[i]
+                            if not CLICKED_PIECES_ON_HAND[i] and sum(CLICKED_PIECES_ON_HAND) >= 1:
+                                CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
+                            CLICKED_PIECES_ON_HAND[i] = not CLICKED_PIECES_ON_HAND[i]
 
                         
                     elif event.pos[1]>window.get_height()-pieceRadius - 8:
@@ -413,9 +413,9 @@ def run():
                         print(blackPiece)
                         
                         if turn == 1:
-                            if not CLICKED_PIECES[i] and sum(CLICKED_PIECES) >= 1:
-                                CLICKED_PIECES = [0 for _ in range(len(PIECES))]
-                            CLICKED_PIECES[i] = not CLICKED_PIECES[i]
+                            if not CLICKED_PIECES_ON_HAND[i] and sum(CLICKED_PIECES_ON_HAND) >= 1:
+                                CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
+                            CLICKED_PIECES_ON_HAND[i] = not CLICKED_PIECES_ON_HAND[i]
                     else:
                         print("Clicked on grid")
                         cell = units.get_cell(event.pos)
