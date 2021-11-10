@@ -26,6 +26,7 @@ action_to_perform:Action = None
 BLACK = (0, 0, 0)
 GRAY = (180, 180, 180)
 WHITE = (255, 255, 255)
+ORANGE = pygame.Color('orange')
 
 # Fonts
 OPEN_SANS ="assets/fonts/OpenSans-Regular.ttf"
@@ -61,9 +62,9 @@ CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
 
 CLICKED_PIECE_ON_GRID = None
 
-BLACKPIECES = [3,3,3,3,3]
+BLACKPIECES = [1 for _ in range(len(PIECES))]
 
-WHITEPIECES = [3,3,3,3,3]
+WHITEPIECES = [1 for _ in range(len(PIECES))]
 
 
 class Render(pygame.Surface):
@@ -218,16 +219,16 @@ class RenderPieces:
             if turn == self.playerBlack:
                 clicked =  CLICKED_PIECES_ON_HAND[i]
                 if turn:
+                    if BLACKPIECES[i] == 0:
+                        continue
+                    else:
+                        count = BLACKPIECES[i]
+                    
+                else:
                     if WHITEPIECES[i] == 0:
                         continue
                     else:
                         count = WHITEPIECES[i]
-                else:
-
-                    if BLACKPIECES[i]==0:
-                        continue
-                    else:
-                        count = BLACKPIECES[i]
             else:
                 clicked = 0
                 
@@ -319,11 +320,10 @@ def run():
 
 
         def paint(self, unitRect,playerBlack):
+            color2 = GRAY
             if playerBlack:
-                color2 = WHITE
                 color1 = BLACK
             else:
-                color2 = BLACK
                 color1 = WHITE
             radius = unitRect.width/ 2
             pieceText = mediumFont.render(f"{self.label}", True, color1)
@@ -414,7 +414,7 @@ def run():
                         whitePiece,i = piecesWhite.get_cell(event.pos, window)
                         print(whitePiece)
                         
-                        if turn == 0:
+                        if turn == 0 and WHITEPIECES[i] != 0:
                             if not CLICKED_PIECES_ON_HAND[i] and sum(CLICKED_PIECES_ON_HAND) >= 1:
                                 CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
                             CLICKED_PIECES_ON_HAND[i] = not CLICKED_PIECES_ON_HAND[i]
@@ -425,7 +425,7 @@ def run():
                         blackPiece,i = piecesBlack.get_cell(event.pos, window)
                         print(blackPiece)
                         
-                        if turn == 1:
+                        if turn == 1 and BLACKPIECES[i]!=0:
                             if not CLICKED_PIECES_ON_HAND[i] and sum(CLICKED_PIECES_ON_HAND) >= 1:
                                 CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
                             CLICKED_PIECES_ON_HAND[i] = not CLICKED_PIECES_ON_HAND[i]
@@ -441,9 +441,10 @@ def run():
                                 # PLACE A PIECE 
                                 m.units[cell] = Unit(m, PIECES_ON_GRID[i] , PIECES_IMAGES[i], turn)
                                 if turn:
-                                    WHITEPIECES[i]+=-1
-                                else:
                                     BLACKPIECES[i]+=-1
+                                else:
+                                    WHITEPIECES[i]+=-1
+                                    
                                 turn = (turn + 1) % 2
 
                                 ################################
@@ -486,14 +487,26 @@ def run():
                                 raise Exception("Multiple clicked pieces")
 
 
-            window.fill(pygame.Color('orange'))
+            window.fill(ORANGE)
             grid.draw()
             units.draw()
             if turn:
                 piecesBlack.draw(window)
+                turnColor = BLACK
                 
             else:
                 piecesWhite.draw(window)
+                turnColor = WHITE
+            playerText = "Player Black" if turn else "Player White"
+            turnText = smallFont.render(
+                f"{playerText}", True, turnColor)
+
+            turnTextRect = turnText.get_rect()
+            turnRect = pygame.Rect(window.get_width() - radius*4, radius*2.5,turnTextRect.width,turnTextRect.height)
+            turnTextRect.center = turnRect.center
+            pygame.draw.rect(window, ORANGE, turnRect)
+            window.blit(turnText, turnTextRect)
+
 
             #fog.draw()
             window.blit(grid, (radius*2  ,radius*2 ))
