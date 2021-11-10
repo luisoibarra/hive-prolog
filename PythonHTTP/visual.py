@@ -297,7 +297,8 @@ if __name__ == '__main__':
     from hexmap.Map import Map, MapUnit
     import sys
 
-
+    def valid_cell_in_map(cell):
+        pass
 
     class Unit(MapUnit):
         def __init__(self, grid,label,image,playerBlack):
@@ -432,20 +433,23 @@ if __name__ == '__main__':
                                 ################################
 
                             elif sum(CLICKED_PIECES_ON_HAND)==0:
+                                # NEED TO BE A PLACED PIECE ON MAP
+                                if valid_cell_in_map(cell):
 
-                                ###############################
-                                # MAYBE FOR SELECTING A PIECE TO MOVE OR 
-                                # SELECTING THE DESTINATION GRID FOR A PLACED PIECE TO MOVE FOR
-                                if CLICKED_PIECE_ON_GRID:
-                                    if CLICKED_PIECE_ON_GRID == cell:
-                                        CLICKED_PIECE_ON_GRID = None
+                                    ###############################
+                                    # MAYBE FOR SELECTING A PIECE TO MOVE OR 
+                                    # SELECTING THE DESTINATION GRID FOR A PLACED PIECE TO MOVE FOR
+                                    if CLICKED_PIECE_ON_GRID:
+                                        if CLICKED_PIECE_ON_GRID == cell:
+                                            CLICKED_PIECE_ON_GRID = None
+                                        else:
+                                            # Move()
+                                            pass
                                     else:
-                                        # Move()
-                                        pass
-                                else:
-                                    CLICKED_PIECE_ON_GRID = cell
+                                        CLICKED_PIECE_ON_GRID = cell
+                                        # WE SHOULD GET THE LABEL FROM THE MAP WITH THE CELL
 
-                                ###############################
+                                    ###############################
                                 pass
                             
                             else:
