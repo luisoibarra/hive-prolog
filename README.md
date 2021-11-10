@@ -2,6 +2,16 @@
 
 Implementación del juego Hive en Prolog.
 
+## Requerimientos
+
+### Mínimos
+
+- Tener de alguna forma **SwiProlog**
+
+### Deseables
+
+- Tener las dependencias de Python descritas en el **requirements.txt**
+
 ## Jugar
 
 ### Docker
@@ -22,6 +32,12 @@ Correr container con el proyecto:
 
 1. En la consola ejecutar `swipl main.pl` o `swipl -o main.out -c main.pl;./main.out`
 2. Luego ejecutar `main().`
+
+Una vez hacen esto seguir las instrucciones de la consola para jugar.
+
+### Interfaz visual
+
+Para jugar con interfaz visual ejectar el script **play.sh**. Para esto debe tener los *requerimientos deseables* cumplidos. Además debe seleccionar al menos un jugador HTTP al iniciar el juego en la consola de prolog y verificar que se esté en localhost y con el puerto correcto. Para esto basta con que dejen los valores predefinidos.
 
 ## Estructuras
 
