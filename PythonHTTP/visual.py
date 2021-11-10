@@ -24,17 +24,28 @@ mediumFont = pygame.font.Font(OPEN_SANS, 28)
 largeFont = pygame.font.Font(OPEN_SANS, 40)
 
 # Add images
-flag = pygame.image.load(os.path.join("assets/images/flag.png"))
-flag = pygame.transform.scale(flag, (radius, radius * 2))
-mine = pygame.image.load("assets/images/mine.png")
-mine = pygame.transform.scale(mine, (radius*2, radius*2))
+# flag = pygame.image.load(os.path.join("assets/images/flag.png"))
+# flag = pygame.transform.scale(flag, (radius, radius * 2))
+# mine = pygame.image.load("assets/images/mine.png")
+# mine = pygame.transform.scale(mine, (radius*2, radius*2))
+queen = pygame.image.load(os.path.join("assets/images/queen.png"))
+queen = pygame.transform.scale(queen, (int(radius*SQRT3), radius * 2))
+spider = pygame.image.load(os.path.join("assets/images/spider.png"))
+spider = pygame.transform.scale(spider, (int(radius*SQRT3), radius * 2))
+ant = pygame.image.load(os.path.join("assets/images/ant.png"))
+ant = pygame.transform.scale(ant, (int(radius*SQRT3), radius * 2))
+beetle = pygame.image.load(os.path.join("assets/images/beetle.png"))
+beetle = pygame.transform.scale(beetle, (int(radius*SQRT3), radius * 2))
+cricket = pygame.image.load(os.path.join("assets/images/cricket.png"))
+cricket = pygame.transform.scale(cricket, (int(radius*SQRT3), radius * 2))
+
 
 # Pieces
 PIECES = ['Queen', 'Spider', 'Ant', 'Beetle', 'Cricket']
 
 PIECES_ON_GRID = ["Q", "S", "A", "B", "C"]
 
-PIECES_IMAGES = []
+PIECES_IMAGES = [queen,spider,ant,beetle,cricket]
 
 CLICKED_PIECES = [0 for _ in range(len(PIECES))]
 
@@ -272,9 +283,10 @@ if __name__ == '__main__':
 
 
     class Unit(MapUnit):
-        def __init__(self, grid,label,playerBlack):
+        def __init__(self, grid,label,image,playerBlack):
             super().__init__(grid)
             self.label = label
+            self.image = image
             self.playerBlack = playerBlack
 
 
@@ -412,8 +424,12 @@ if __name__ == '__main__':
             window.fill(pygame.Color('orange'))
             grid.draw()
             units.draw()
-            piecesBlack.draw(window)
-            piecesWhite.draw(window)
+            if turn:
+                piecesBlack.draw(window)
+                
+            else:
+                piecesWhite.draw(window)
+
             #fog.draw()
             window.blit(grid, (radius*2  ,radius*2 ))
             window.blit(units, (radius*2 , radius*2 ))
