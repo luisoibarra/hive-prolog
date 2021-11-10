@@ -27,7 +27,7 @@ convert_action_from_json(ActionJson, Action) :-
 
 % CONVERT TO JSON %
 convert_game_to_json(Game, GameJson) :-
-    game(Board, CurrentPlayer, [PlayerPieces, Turn|_]) = Game,
+    game(Board, CurrentPlayer, [PlayerPieces, _, Turn|_]) = Game,
     convert_pieces_to_json(Board, BoardJson),
     convert_players_remaining_pieces_to_json(PlayerPieces, PlayerPiecesJson),
     GameJson = json([turn=Turn, board=BoardJson, player=CurrentPlayer, remaining_pieces=PlayerPiecesJson]).

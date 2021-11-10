@@ -4,8 +4,24 @@ Implementación del juego Hive en Prolog.
 
 ## Jugar
 
-1. En la consola ejecutar `swipl run_console.pl`
-2. Luego ejecutar `init_game().`
+### Docker
+
+Crear imagen de Docker:
+
+1. Abrir consola en la carpeta del proyecto
+2. En la consola ejecutar `docker build -t swipl-hive:v1 .` Notar el punto al final.
+   - Este paso le descargará la imagen de SwiProlog del repositorio de la UCLV `docker.uclv.cu/swipl:8.2.4`.
+   - En caso de ya tener una imagen de prolog en el sistema cambiar el `FROM <Nombre de la imagen>` en el Dockerfile.
+
+Correr container con el proyecto:
+
+1. En la consola ejecutar `docker run --rm -it --net=host swipl-hive:v1 ./main.out`
+2. Luego ejecutar `main().`
+
+### Sin Docker
+
+1. En la consola ejecutar `swipl main.pl` o `swipl -o main.out -c main.pl;./main.out`
+2. Luego ejecutar `main().`
 
 ## Estructuras
 
@@ -37,7 +53,7 @@ Implementación del juego Hive en Prolog.
   - FeedbackPlayerInfoList: Lista que contiene `feedback_info` con los functors a llamar para la actualización del estado de los usuarios
   - ExtraPlayerInfoList: Lista que contiene `extra_info` sobre la configuración de los usuarios.
 - feedback_info(PlayerColor, StartGameStateUserFeedback, EndGameStateUserFeedback)
-  - StartGameStateUserFeedback: Functor a llamar para mostrar y actualizar el estado del juego en el cliente 
+  - StartGameStateUserFeedback: Functor a llamar para mostrar y actualizar el estado del juego en el cliente
   - EndGameStateUserFeedback: Functor a llamar para mostrar y actualizar el estado del juego luego de que se haya hecho una jugada
 - extra_info(Player, ExtraConfigInfo)
   - ExtraConfigInfo: Lista que contiene información adicional sobre el jugador necesaria para hacer los updates. Por ejemplo se usa para guardar la dirección de los jugadores HTTP conteniendo un `http_player_config(Host, Port, BasePath)`.
@@ -57,7 +73,8 @@ Se usará para las posiciones de los hexágonos estilo offset coordinates odd-q 
 
 Artificial Inteligence: A Modern Approach, Capítulo 5 pág 161
 
-## TODO:
+## TODO
+
 - Hacer que el feedback se pueda dar desde dentro del juego, una opción puede ser codificar el feedback para que luego se pueda decidir el mensaje más fácil.
 - Organizar módulos por carpetas
 
@@ -73,7 +90,7 @@ Cuerpos del POST:
 
 ``` json
 // Representación de una instancia de juego. Se usará esta plantilla luego.
-game = 
+game =
 {
   "turn":1,
   "board":[
@@ -113,8 +130,10 @@ game =
 }
 
 ```
+
 2. Llamado para recibir la acción a jugar
-- Se enviará un JSON con el siguiente formato
+   - Se enviará un JSON con el siguiente formato
+
 ```json
 
 {
@@ -123,7 +142,9 @@ game =
 }
 
 ```
+
 - Se espera recibir un JSON con alguno de los siguientes formatos
+
 ```json
 // En caso de que se ponga una ficha
 // Representación de una acción de juego. Se usará esta plantilla luego.
@@ -136,6 +157,7 @@ action=
 }
 
 ```
+
 ```json
 // En caso de que se mueva una ficha
 // Representación de una acción de juego. Se usará esta plantilla luego.
@@ -151,7 +173,8 @@ action=
 ```
 
 3. Llamado para informar sobre el feedback de la jugada
-- Se enviará un JSON con el siguiente formato
+   - Se enviará un JSON con el siguiente formato
+
 ```json
 
 {
@@ -162,7 +185,6 @@ action=
 }
 // status Puede ser alguno de estos valores: [invalid, continue, tie, over]
 ```
-
 
 ## Pasos restantes
 
