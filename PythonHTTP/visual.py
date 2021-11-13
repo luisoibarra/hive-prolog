@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 import pygame
 import math
 from hexmap.Map import Grid
-from models import Game, Action
+from models import Game, Action, RemainingPiece
 import os
 
 SQRT3 = math.sqrt(3)
@@ -35,10 +35,7 @@ mediumFont = pygame.font.Font(OPEN_SANS, 28)
 largeFont = pygame.font.Font(OPEN_SANS, 40)
 
 # Add images
-# flag = pygame.image.load(os.path.join("assets/images/flag.png"))
-# flag = pygame.transform.scale(flag, (radius, radius * 2))
-# mine = pygame.image.load("assets/images/mine.png")
-# mine = pygame.transform.scale(mine, (radius*2, radius*2))
+
 queen = pygame.image.load(os.path.join("assets/images/queen.png"))
 queen = pygame.transform.scale(queen, (int(radius*SQRT3), radius * 2))
 spider = pygame.image.load(os.path.join("assets/images/spider.png"))
@@ -58,13 +55,13 @@ PIECES_ON_GRID = ["Q", "S", "A", "B", "C"]
 
 PIECES_IMAGES = [queen,spider,ant,beetle,cricket]
 
-CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
+CLICKED_PIECES_ON_HAND = []
 
 CLICKED_PIECE_ON_GRID = None
 
-BLACKPIECES = [1 for _ in range(len(PIECES))]
+BLACKPIECES_AMOUNT = [1 for _ in range(len(PIECES))]
 
-WHITEPIECES = [1 for _ in range(len(PIECES))]
+WHITEPIECES_AMOUNT = [1 for _ in range(len(PIECES))]
 
 
 class Render(pygame.Surface):
@@ -170,7 +167,6 @@ class Render(pygame.Surface):
        left = max(window.get_width() - self.width, 0)
        return (top, left)
 
-
 class RenderUnits(Render):
     """
     A premade render object that will automatically draw the Units from the map 
@@ -219,16 +215,16 @@ class RenderPieces:
             if turn == self.playerBlack:
                 clicked =  CLICKED_PIECES_ON_HAND[i]
                 if turn:
-                    if BLACKPIECES[i] == 0:
+                    if BLACKPIECES_AMOUNT[i] == 0:
                         continue
                     else:
-                        count = BLACKPIECES[i]
+                        count = BLACKPIECES_AMOUNT[i]
                     
                 else:
-                    if WHITEPIECES[i] == 0:
+                    if WHITEPIECES_AMOUNT[i] == 0:
                         continue
                     else:
-                        count = WHITEPIECES[i]
+                        count = WHITEPIECES_AMOUNT[i]
             else:
                 clicked = 0
                 
@@ -266,49 +262,9 @@ class RenderGrid(Render):
                 pygame.draw.polygon(self, self.GRID_COLOR, points, 1)
 
 
-class RenderFog(Render):
-
-    OBSCURED = pygame.Color(00, 00, 00, 255)
-    SEEN = pygame.Color(00, 00, 00, 100)
-    VISIBLE = pygame.Color(00, 00, 00, 0)
-
-    def __init__(self, map, *args, **keywords):
-
-        super(RenderFog, self).__init__(
-            map, *args, flags=pygame.SRCALPHA, **keywords)
-        if not hasattr(self.map, 'fog'):
-            self.map.fog = Grid(default=self.OBSCURED)
-
-    def draw(self):
-
-        #Some constants for the math
-        height = self.radius * SQRT3
-        width = 1.5 * self.radius
-        offset = height / 2
-
-        for cell in self.map.cells():
-            row, col = cell
-            surface = self.get_cell(cell)
-
-            # Calculate the position of the cell
-            top = row * height - offset * col
-            left = width * col
-
-            #Determine the points that corresponds with
-            points = [(x + left, y + top) for (x, y) in self.cell]
-            # Draw the polygon onto the surface
-            pygame.draw.polygon(self, self.map.fog[cell], points, 0)
-
-
-def trim_cell(surface):
-    pass
-
 def run():
     from hexmap.Map import Map, MapUnit
     import sys
-
-    def valid_cell_in_map(cell):
-        pass
 
     class Unit(MapUnit):
         def __init__(self, grid,label,image,playerBlack):
@@ -336,8 +292,6 @@ def run():
                 pygame.draw.circle(window, color2, center, radius/1.5)
             window.blit(pieceText, pieceTextRect)
 
-
-
     class Piece:
     
 
@@ -363,38 +317,91 @@ def run():
             pygame.draw.rect(window, color2, pieceRect)
             window.blit(pieceText, pieceTextRect)
 
+    def update_amounts(game_instance: Game):
+        global PIECES
+        global BLACKPIECES_AMOUNT
+        global WHITEPIECES_AMOUNT
+
+        all_black_pieces = []
+        all_white_pieces = []
+
+        for pieces in game_instance.remaining_pieces:
+            if pieces.player.lower() == "white":
+                all_white_pieces = pieces.pieces
+            else:
+                all_black_pieces = pieces.pieces
+
+        BLACKPIECES_AMOUNT = [all_black_pieces.count(piece) for piece in PIECES]
+        WHITEPIECES_AMOUNT = [all_white_pieces.count(piece) for piece in PIECES]
+
+    global window
+    global turn
     
+    global game_instance
+    global action_to_perform
+    global play_feedback
+    global play_status
+    
+    global PIECES 
+
+    global PIECES_ON_GRID 
+
+    global PIECES_IMAGES 
+
+    global CLICKED_PIECES_ON_HAND
+
+    global CLICKED_PIECE_ON_GRID 
+
+    global BLACKPIECES_AMOUNT 
+
+    global WHITEPIECES_AMOUNT 
+
 
     m = Map((6, 8))
-    pieces = [Piece(piece) for piece in PIECES]
-    piecesBlack = RenderPieces(pieceRadius, pieces, playerBlack=True)
-    piecesWhite = RenderPieces(pieceRadius, pieces, playerBlack=False)
+
+    game_instance = Game(turn=0,
+                         board = [],
+                         player="white",
+                         remaining_pieces=[
+                             RemainingPiece(
+                                player="white",
+                                pieces = ['Queen',"Queen", 'Spider',
+                                         'Ant', 'Beetle', 'Cricket']
+                                ),
+                             RemainingPiece(
+                                 player="black",
+                                 pieces=['Queen', "Queen", 'Spider',
+                                         'Ant', 'Beetle', 'Cricket',"Cricket"]
+                             )
+                            ]
+                            )
+
+    all_black_pieces = []
+    all_white_pieces = []
+
+    for pieces in game_instance.remaining_pieces:
+        if pieces.player.lower() == "white":
+            all_white_pieces = pieces.pieces
+        else:
+            all_black_pieces = pieces.pieces
+    
+    PIECES = list(set(all_black_pieces))
+    PIECES.sort()
+    PIECES_ON_GRID = [string.upper()[0] for string in PIECES]
+    CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
+    update_amounts(game_instance)
+
+    
+    piecesBlack = RenderPieces(pieceRadius, [Piece(piece) for piece in PIECES], playerBlack=True)
+    piecesWhite = RenderPieces(
+        pieceRadius, [Piece(piece) for piece in PIECES], playerBlack=False)
     grid = RenderGrid(m, radius)
     units = RenderUnits(m, radius)
-    
-    #fog = RenderFog(m, radius=32)
-
-    # m.units[(0, 0)] = Unit(m, 'R', True)
-    # m.units[(3, 2)] = Unit(m)
-    # m.units[(5, 3)] = Unit(m)
-    # m.units[(5, 4)] = Unit(m)
-
-    # for cell in m.spread((3, 2), radius=2):
-    #     m.fog[cell] = fog.SEEN
-
-    # for cell in m.spread((3, 2)):
-    #     m.fog[cell] = fog.VISIBLE
 
     print(m.ascii())
 
     try:
-        global window
-        global turn
-        global CLICKED_PIECES_ON_HAND
-        global game_instance
-        global action_to_perform
-        global play_feedback
-        global play_status
+        
         
         fpsClock = pygame.time.Clock()
         window = pygame.display.set_mode((640, 480), 1)
@@ -414,7 +421,7 @@ def run():
                         whitePiece,i = piecesWhite.get_cell(event.pos, window)
                         print(whitePiece)
                         
-                        if turn == 0 and WHITEPIECES[i] != 0:
+                        if turn == 0 and WHITEPIECES_AMOUNT[i] != 0:
                             if not CLICKED_PIECES_ON_HAND[i] and sum(CLICKED_PIECES_ON_HAND) >= 1:
                                 CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
                             CLICKED_PIECES_ON_HAND[i] = not CLICKED_PIECES_ON_HAND[i]
@@ -425,7 +432,7 @@ def run():
                         blackPiece,i = piecesBlack.get_cell(event.pos, window)
                         print(blackPiece)
                         
-                        if turn == 1 and BLACKPIECES[i]!=0:
+                        if turn == 1 and BLACKPIECES_AMOUNT[i]!=0:
                             if not CLICKED_PIECES_ON_HAND[i] and sum(CLICKED_PIECES_ON_HAND) >= 1:
                                 CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
                             CLICKED_PIECES_ON_HAND[i] = not CLICKED_PIECES_ON_HAND[i]
@@ -440,38 +447,24 @@ def run():
                                 #################################
                                 # PLACE A PIECE 
                                 m.units[cell] = Unit(m, PIECES_ON_GRID[i] , PIECES_IMAGES[i], turn)
+                                
                                 if turn:
-                                    BLACKPIECES[i]+=-1
+                                    BLACKPIECES_AMOUNT[i]+=-1
+                                    piece_index = all_black_pieces.index(PIECES[i])
                                 else:
-                                    WHITEPIECES[i]+=-1
+                                    WHITEPIECES_AMOUNT[i]+=-1
+                                    piece_index = all_white_pieces.index(PIECES[i])
+
+                                action = Action(type = "set",
+                                                final_x = cell[0],
+                                                final_y = cell[1],
+                                                piece_index = piece_index)
                                     
                                 turn = (turn + 1) % 2
 
                                 ################################
 
                             elif sum(CLICKED_PIECES_ON_HAND)==0:
-                                # TODO Revisar si el código de abajo es necesario
-                                # NEED TO BE A PLACED PIECE ON MAP
-                                # if valid_cell_in_map(cell): 
-
-                                #     ###############################
-                                #     # MAYBE FOR SELECTING A PIECE TO MOVE OR 
-                                #     # SELECTING THE DESTINATION GRID FOR A PLACED PIECE TO MOVE FOR
-                                #     if CLICKED_PIECE_ON_GRID:
-                                #         if CLICKED_PIECE_ON_GRID == cell:
-                                #             CLICKED_PIECE_ON_GRID = None
-                                #         else:
-                                #             # Move()
-                                #             pass
-                                #     else:
-                                #         CLICKED_PIECE_ON_GRID = cell
-                                #         # WE SHOULD GET THE LABEL FROM THE MAP WITH THE CELL
-
-                                #     ###############################
-
-                                ###############################
-                                # MAYBE FOR SELECTING A PIECE TO MOVE OR 
-                                # SELECTING THE DESTINATION GRID FOR A PLACED PIECE TO MOVE FOR
                                 unit = m.units.get(cell, None)                            
                                 if unit:
                                     if not unit.selected and sum([x.selected for x in m.units.values()]) >= 1:
@@ -479,9 +472,17 @@ def run():
                                             x.selected = False
                                     unit.selected = not unit.selected
                                 else:
-                                    for x in m.units.values():
+                                    for index , x in m.units.items():
+                                        if x.selected:
+                                            from_x,from_y = index
+
+                                            action = Action(type="move",
+                                                            final_x=cell[0],
+                                                            final_y=cell[1],
+                                                            from_x=from_x,
+                                                            from_y = from_y)
+
                                         x.selected = False
-                                ###############################
                             
                             else:
                                 raise Exception("Multiple clicked pieces")
