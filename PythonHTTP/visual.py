@@ -317,10 +317,13 @@ def run():
             pygame.draw.rect(window, color2, pieceRect)
             window.blit(pieceText, pieceTextRect)
 
-    def update_amounts(game_instance: Game):
+    def update_variables(game_instance: Game,map:Map):
         global PIECES
         global BLACKPIECES_AMOUNT
         global WHITEPIECES_AMOUNT
+        global turn
+
+        turn = game_instance.turn
 
         all_black_pieces = []
         all_white_pieces = []
@@ -333,6 +336,14 @@ def run():
 
         BLACKPIECES_AMOUNT = [all_black_pieces.count(piece) for piece in PIECES]
         WHITEPIECES_AMOUNT = [all_white_pieces.count(piece) for piece in PIECES]
+
+    def fill_map(game_instance: Game):
+        board = game_instance.board
+        board.sort(lambda x: (x.x,x.y,x.height))
+        for piece in game_instance.board:
+            cell =  (piece.x,piece.y)
+            player = 1 if piece.color == "black" else 0
+            map.units[cell] = Unit(map, piece.type[0].upper(), None, player)
 
     global window
     global turn
@@ -389,7 +400,8 @@ def run():
     PIECES.sort()
     PIECES_ON_GRID = [string.upper()[0] for string in PIECES]
     CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
-    update_amounts(game_instance)
+    update_variables(game_instance)
+    fill_map(game_instance,m)
 
     
     piecesBlack = RenderPieces(pieceRadius, [Piece(piece) for piece in PIECES], playerBlack=True)
@@ -411,6 +423,7 @@ def run():
 
         #Leave it running until exit
         while True:
+            
             for event in pygame.event.get():
                 if event.type == QUIT:
                     pygame.quit()
@@ -449,13 +462,13 @@ def run():
                                 m.units[cell] = Unit(m, PIECES_ON_GRID[i] , PIECES_IMAGES[i], turn)
                                 
                                 if turn:
-                                    BLACKPIECES_AMOUNT[i]+=-1
+                                    #BLACKPIECES_AMOUNT[i]+=-1
                                     piece_index = all_black_pieces.index(PIECES[i])
                                 else:
-                                    WHITEPIECES_AMOUNT[i]+=-1
+                                    #WHITEPIECES_AMOUNT[i]+=-1
                                     piece_index = all_white_pieces.index(PIECES[i])
 
-                                action = Action(type = "set",
+                                action_to_perform = Action(type = "set",
                                                 final_x = cell[0],
                                                 final_y = cell[1],
                                                 piece_index = piece_index)
@@ -476,7 +489,7 @@ def run():
                                         if x.selected:
                                             from_x,from_y = index
 
-                                            action = Action(type="move",
+                                            action_to_perform = Action(type="move",
                                                             final_x=cell[0],
                                                             final_y=cell[1],
                                                             from_x=from_x,
@@ -509,14 +522,15 @@ def run():
             window.blit(turnText, turnTextRect)
 
 
-            #fog.draw()
+           
             window.blit(grid, (radius*2  ,radius*2 ))
             window.blit(units, (radius*2 , radius*2 ))
             if game_instance:
                 print("Game instance exist")
+                update_variables(game_instance)
                 game_instance = None
                 action_to_perform = "Something"
-            #window.blit(fog, (0, 0))
+            
             pygame.display.update()
             fpsClock.tick(10)
     finally:
