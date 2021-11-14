@@ -338,8 +338,12 @@ def run():
         WHITEPIECES_AMOUNT = [all_white_pieces.count(piece) for piece in PIECES]
 
     def fill_map(game_instance: Game):
+
         board = game_instance.board
         board.sort(lambda x: (x.x,x.y,x.height))
+
+        map.units.clear()
+
         for piece in game_instance.board:
             cell =  (piece.x,piece.y)
             player = 1 if piece.color == "black" else 0
@@ -528,6 +532,7 @@ def run():
             if game_instance:
                 print("Game instance exist")
                 update_variables(game_instance)
+                fill_map(game_instance)
                 game_instance = None
                 action_to_perform = "Something"
             
