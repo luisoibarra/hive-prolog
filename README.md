@@ -77,10 +77,12 @@ Artificial Inteligence: A Modern Approach, Capítulo 5 pág 161
 
 - Hacer que el feedback se pueda dar desde dentro del juego, una opción puede ser codificar el feedback para que luego se pueda decidir el mensaje más fácil.
 - Organizar módulos por carpetas
+- Hacer los bichos resantes, mosquito, cochinilla. En caso de ser posible hacer algo para generalizar los bichos
+- Probar la mecánica de juego una vez la interfaz gráfica esté funcional
 
 ## Interfaz HTTP
 
-Se hace un POST al host con el puerto establecido al path `player_{COLOR DEL JUGADOR}`. Por ejemplo un pseudo HEADER podría ser `POST http://localhost:9000/player_white`.
+Se hace un POST al host con el puerto establecido al path `player_{COLOR DEL JUGADOR}`. Por ejemplo un pseudo HEADER podría ser `POST http://localhost:9001/player_white`.
 
 Cuerpos del POST:
 
