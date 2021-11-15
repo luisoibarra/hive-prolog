@@ -9,6 +9,9 @@ SQRT3 = math.sqrt(3)
 
 pygame.init()
 
+###############################################################################
+# Holy 
+
 radius = 32
 pieceRadius = radius / 2
 turn = 1
@@ -337,10 +340,10 @@ def run():
         BLACKPIECES_AMOUNT = [all_black_pieces.count(piece) for piece in PIECES]
         WHITEPIECES_AMOUNT = [all_white_pieces.count(piece) for piece in PIECES]
 
-    def fill_map(game_instance: Game):
+    def fill_map(game_instance: Game, map: Map):
 
         board = game_instance.board
-        board.sort(lambda x: (x.x,x.y,x.height))
+        #board.sort(lambda x: (x.x,x.y,x.height))
 
         map.units.clear()
 
@@ -404,7 +407,7 @@ def run():
     PIECES.sort()
     PIECES_ON_GRID = [string.upper()[0] for string in PIECES]
     CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
-    update_variables(game_instance)
+    update_variables(game_instance,m)
     fill_map(game_instance,m)
 
     
@@ -427,7 +430,7 @@ def run():
 
         #Leave it running until exit
         while True:
-            
+             
             for event in pygame.event.get():
                 if event.type == QUIT:
                     pygame.quit()
@@ -531,8 +534,8 @@ def run():
             window.blit(units, (radius*2 , radius*2 ))
             if game_instance:
                 print("Game instance exist")
-                update_variables(game_instance)
-                fill_map(game_instance)
+                update_variables(game_instance,m)
+                fill_map(game_instance,m)
                 game_instance = None
                 action_to_perform = "Something"
             

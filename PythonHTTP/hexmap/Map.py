@@ -20,6 +20,7 @@ class Map(object):
         rows , cols = size
         self.rows = rows
         self.cols = cols
+        self.units = Grid()
 
     def __str__(self):
         return "Map (%d, %d)" % (self.rows, self.cols)
@@ -283,7 +284,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print("Args: %s" % (args))
     m = Map((args.rows, args.cols))
-    m.units = Grid()
+    
     numbers = args.numbers
 
     if args.interactive:
