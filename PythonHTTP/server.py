@@ -5,6 +5,7 @@ import visual
 import time
 
 app = FastAPI()
+
   
 def console_action_input() -> Optional[Action]:
     print("Haz una jugada")
