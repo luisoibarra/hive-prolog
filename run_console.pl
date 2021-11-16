@@ -12,8 +12,8 @@ select_player(3, random_player, print_game_state, print_game_feedback, empty_pla
 init_game() :-
     % Initial game instance
     game([],white,[
-        [pieces_info(white,[queen, cricket, cricket, cricket, ant, ant, ant, beetle, beetle, spider, spider]),
-        pieces_info(black,[queen, cricket, cricket, cricket, ant, ant, ant, beetle, beetle, spider, spider])],
+        [pieces_info(white,[queen, cricket, cricket, pillbug, ladybug, ant, ant, beetle, beetle, spider, spider]),
+         pieces_info(black,[queen, cricket, cricket, pillbug, ladybug, ant, ant, beetle, beetle, spider, spider])],
         [],
         1
     ]) = Game,

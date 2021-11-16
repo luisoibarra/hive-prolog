@@ -7,6 +7,9 @@ queen.
 cricket.
 spider.
 beetle.
+mosquito.
+ladybug.
+pillbug.
 
 % Color
 white.

@@ -1,4 +1,5 @@
-:- module(move_utils, [first_empty_place_from/7, border_move/3, move_above_and_finish_down/7]).
+:- module(move_utils, [first_empty_place_from/7, border_move/3, 
+    move_above_and_finish_down/5, pillbug_translate/4]).
 :- use_module(board_utils). 
 :- use_module(piece_utils).
 :- use_module(list_utils).
@@ -69,24 +70,26 @@ border_move(Board, [[Piece, Distance]|ToProcess], Visited, [[Piece, Distance]|Re
     ),
     border_move(Board, NewToProcess, NewVisited,Result).
 
-move_above_and_finish_down(PosX, PosY, BaseHeight, MaxStepsAbove, Board, NewPosX, NewPosY) :-
+move_above_and_finish_down(Piece, MaxStepsAbove, Board, NewPosX, NewPosY) :-
+    piece(PosX, PosY, _, [_, BaseHeight|_]) = Piece,
     move_above_and_finish_down(BaseHeight, MaxStepsAbove, Board, [[PosX, PosY, 0]], [], ReturnInfo),
-    member([NewPosX, NewPosY], ReturnInfo).
+    remove_all(ReturnInfo, [PosX, PosY], NewReturnInfo),
+    member([NewPosX, NewPosY], NewReturnInfo).
 
 % move_above_and_finish_down(BaseHeight, MaxStepsAbove, Board, ToProcess, Visited, ReturnInfo)
 move_above_and_finish_down(_, _, _, [], _, []).
 move_above_and_finish_down(BaseHeight, MaxStepsAbove, Board, [[CurrentX, CurrentY, StepNumber]|ToProcess], Visited, ReturnInfo) :-
     StepNumber < MaxStepsAbove,
     SlideHeight is BaseHeight + 1,
+    NextStepNumber is StepNumber + 1,
     findall(pos(X,Y), positions_next_to(CurrentX, CurrentY, X, Y, _), AroundPositions),
-    findall(P, (
+    findall([P,NextStepNumber], (
         member(pos(X,Y), AroundPositions), 
         get_top_piece_at(Board, X, Y, P), 
         get_piece_Height(P,BaseHeight),
         can_slide_into_height(Board, CurrentX, CurrentY, SlideHeight, _, _, X, Y, _),
-        not(member(P, Visited))), TopPiecesAround),
-    NextStepNumber is StepNumber + 1,
-    findall([X,Y,NextStepNumber], (member(piece(X, Y, _, _), TopPiecesAround)), AddToProcess),
+        not(member([P,NextStepNumber], Visited))), TopPiecesAround),
+    findall([X,Y,NextStepNumber], (member([piece(X, Y, _, _),_], TopPiecesAround)), AddToProcess),
     concat_list(Visited, TopPiecesAround, NewVisited),
     concat_list(ToProcess, AddToProcess, NewToProcess),
     move_above_and_finish_down(BaseHeight, MaxStepsAbove, Board, NewToProcess, NewVisited, ReturnInfo).
@@ -110,3 +113,42 @@ move_above_and_finish_down(BaseHeight, MaxStepsAbove, Board, [[CurrentX, Current
     concat_set_list(PrevReturnInfo, PositionsAvailable, ReturnInfo).
 
 % Auxiliar
+
+% tuple_combination(List1, List2, Item1, Item2) Return True if Item1 is in List1 and Item2 is in List2
+tuple_combination(List, List2, Item1, Item2) :-
+    findall(X, (
+        member(Z, List), 
+        findall([It1, It2], tuple_aux(Z, List2, [It1, It2]),Result),
+        member(X, Result)
+        ), Items),
+    member([Item1, Item2], Items).
+tuple_aux(Item, List2, Result) :-
+    member(Item2, List2),
+    Result = [Item, Item2].
+
+
+% pillbug_translate(Piece, Board, PieceMoved, NewBoard) Pillbug  
+pillbug_translate(Piece, Board, PieceMoved, NewBoard) :- 
+    piece(PosX, PosY, _, _) = Piece,
+    get_piece_Height(Piece, Height),
+
+    findall(P, 
+        (
+            positions_next_to(PosX, PosY, NextX, NextY, _),
+            get_top_piece_at(Board, NextX, NextY, P),
+            get_piece_Height(P, PieceHeight),
+            Height = PieceHeight,
+            Board = [LastPieceMoved|_],
+            P \=  LastPieceMoved
+        ), AroundPieces),
+
+    findall(pos(NextX, NextY), (positions_next_to(PosX, PosY, NextX, NextY, _), not(is_place_taken(Board, NextX, NextY, Height))), FreePositions),
+    tuple_combination(AroundPieces, FreePositions, PieceToMove, pos(NewX, NewY)),
+    SlideHeight is Height + 1,
+    can_slide_into_height(Board, PosX, PosY, SlideHeight, _, _, NewX, NewY, _),
+    remove_board_piece(Board, PieceToMove, PrevBoard),
+    piece(_, _, Type, Extra) = PieceToMove,
+    build_piece(NewX, NewY, Type, Extra, PieceMoved),
+    NewBoard = [PieceMoved|PrevBoard].
+
+
