@@ -59,9 +59,7 @@ http_player(Game, ExtraGameConfig, Action) :-
 http_player_extra_config(ColorPlayer, ExtraGameConfig) :-
     write('Player '), write(ColorPlayer), nl,
     read_with_headline('Host (d if localhost):', HostPrev),
-    write(HostPrev), % <- DELETE THIS
     default_if_empty(HostPrev, d, '127.0.0.1', Host),
-    write(Host), % <- DELETE THIS
     read_with_headline('Port (d if 9001):', PortPrev),
     default_if_empty(PortPrev, d, 9001, Port),
     concat('/player_',ColorPlayer, PrefixPath),

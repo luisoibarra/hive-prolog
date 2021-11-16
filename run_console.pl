@@ -4,6 +4,9 @@
 :- use_module(console_utils).
 :- use_module(http_utils).
 
+% TEST PLAYER
+select_player(t, console_human_player, http_game_state, http_game_feedback, http_player_extra_config).
+% TEST PLAYER
 select_player(0, http_player, http_game_state, http_game_feedback, http_player_extra_config).
 select_player(1, console_human_player, print_game_state, print_game_feedback, empty_player_extra_config).
 select_player(2, ai_player, print_game_state, print_game_feedback, empty_player_extra_config).
@@ -19,6 +22,7 @@ init_game() :-
     ]) = Game,
     % Selecting players
     write('Players:'),nl,
+    write('t: HTTP Visual, Console interaction'),nl, % <- TEST PLAYER DELETE
     write('0: HTTP'),nl,
     write('1: Human'),nl,
     write('2: AI'),nl,
@@ -64,7 +68,9 @@ run_game(Game, GameConfig, Players) :-
     call(PlayF), !,
     
     % Play
+    write('Action'),nl,
     write(Action),nl,
+    write('End Action'),nl,
     make_a_play(Action, Game, NewGame, Feedback, GameStatus),
 
     % Play's Feedback
@@ -74,8 +80,13 @@ run_game(Game, GameConfig, Players) :-
         call(CallShowGameFeedbackFunc)
     ), _),
 
-    GameStatus = continue,
-    run_game(NewGame, GameConfig, Players).
+    (
+        GameStatus = continue,
+        run_game(NewGame, GameConfig, Players),
+        !
+        ;
+        run_game(Game, GameConfig, Players)
+    ).
 
 run_game(Game, GameConfig, Players) :- 
     write('Some error or invalid play was made, please verify'), nl,
