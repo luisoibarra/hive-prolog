@@ -80,6 +80,10 @@ test_boards([piece(1,2,_,[queen,0]),
             piece(1,1,_,[ant,0])], 
             [[piece(1,1,_,[ant,0|_]), [_,_]]], false) :- write(26).
 
+% Mosquito Movement
+test_boards([piece(4,3,_,[queen,0]), piece(4,2,_,[mosquito,0])],
+            [[piece(4,2,_,[mosquito,0]), [5,2]]], true) :- write(27).
+
 % General Movement
 test_boards([piece(1,2,_,[ant,0]),
             piece(0,2,_,[ant ,0]),piece(0,1,_,[ant,0]),

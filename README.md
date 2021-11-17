@@ -28,6 +28,8 @@ Correr container con el proyecto:
 1. En la consola ejecutar `docker run --rm -it --net=host swipl-hive:v1 ./main.out`
 2. Luego ejecutar `main().`
 
+Para actualizar la imagen y correr el container automáticamente se creó el script auxiliar `play_docker.sh`.
+
 ### Sin Docker
 
 1. En la consola ejecutar `swipl main.pl` o `swipl -o main.out -c main.pl;./main.out`

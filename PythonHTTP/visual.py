@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+import time
 import pygame
 import math
 from hexmap.Map import Grid
@@ -212,7 +213,7 @@ class RenderPieces:
 
         for i, piece in enumerate(self.pieces):
             pieceRect = pygame.Rect(i * width_of_piece, location, width_of_piece, height_of_piece)
-            
+            count = 0  # ADDED ADDED ADDED ADDED ADDED
             if turn == self.playerBlack:
                 clicked =  CLICKED_PIECES_ON_HAND[i]
                 if turn:
@@ -374,24 +375,31 @@ def run():
 
 
     m = Map((6, 8))
+    
+    # ADDED ADDED ADDED ADDED ADDED
 
-    game_instance = Game(turn=0,
-                         board = [],
-                         player="white",
-                         remaining_pieces=[
-                             RemainingPiece(
-                                player="white",
-                                pieces = ['Queen',"Queen", 'Spider',
-                                         'Ant', 'Beetle', 'Cricket']
-                                ),
-                             RemainingPiece(
-                                 player="black",
-                                 pieces=['Queen', "Queen", 'Spider',
-                                         'Ant', 'Beetle', 'Cricket',"Cricket"]
-                             )
-                            ]
-                            )
+    # game_instance = Game(turn=0,
+    #                      board = [],
+    #                      player="white",
+    #                      remaining_pieces=[
+    #                          RemainingPiece(
+    #                             player="white",
+    #                             pieces = ['Queen',"Queen", 'Spider',
+    #                                      'Ant', 'Beetle', 'Cricket']
+    #                             ),
+    #                          RemainingPiece(
+    #                              player="black",
+    #                              pieces=['Queen', "Queen", 'Spider',
+    #                                      'Ant', 'Beetle', 'Cricket',"Cricket"]
+    #                          )
+    #                         ]
+    #                         )
 
+    while not game_instance:
+        time.sleep(.5)
+    
+    # ADDED ADDED ADDED ADDED ADDED
+    
     all_black_pieces = []
     all_white_pieces = []
 
@@ -536,7 +544,7 @@ def run():
                 update_variables(game_instance,m)
                 fill_map(game_instance,m)
                 game_instance = None
-                action_to_perform = "Something"
+                # action_to_perform = "Something"
             
             pygame.display.update()
             fpsClock.tick(10)

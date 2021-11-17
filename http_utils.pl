@@ -10,8 +10,7 @@
 send_post(Json, Host, Port, Path, Reply) :- 
     atom_json_term(JsonStr, Json, []),
     Config = [protocol(http),host(Host),port(Port),path(Path)],
-    http_post(Config, atom('application/json',JsonStr), Reply, []),
-    write(Reply).
+    http_post(Config, atom('application/json',JsonStr), Reply, []).
 
 % http_get_action(Game, ExtraGameConfig, Action) Fetch the user action
 http_get_action(Game, ExtraGameConfig, Action) :-

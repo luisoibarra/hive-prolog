@@ -1,26 +1,26 @@
 :- module(board_utils, 
     [remove_board_piece/3, is_place_taken/4, connected_board/1, positions_next_to/5,
-    pieces_together/3, can_slide_into/5, get_all_pieces/3, exist_queen/1, color_played_list/3,
-    placed_around_of/3, get_all_pieces_list/3, get_all_pieces_at/4, get_top_piece_at/4]).
+    pieces_together/3, can_slide_into/5, can_slide_into_height/9, get_all_pieces/3, exist_queen/1, color_played_list/3,
+    placed_around_of/3, get_all_pieces_list/3, get_all_pieces_at/4, get_top_piece_at/4, get_position_max_Height_or_default/5]).
 :- use_module(list_utils). 
 :- use_module(piece_utils). 
 
 
-% get_position_max_Height_or_0(Board, PosX, PosY, MaxHeight): Returns the MaxHeight of all pieces at PosX, PosY in Board
-get_position_max_Height_or_0(Board, PosX, PosY, MaxHeight) :- 
+% get_position_max_Height_or_default(Board, PosX, PosY, Default, MaxHeight): Returns the MaxHeight of all pieces at PosX, PosY in Board
+get_position_max_Height_or_default(Board, PosX, PosY, Default, MaxHeight) :- 
     get_all_pieces_at(Board, PosX, PosY, PosPieces),
-    get_position_max_Height_or_0(PosPieces, 0, MaxHeight).
+    get_position_max_Height_or_default(PosPieces, Default, MaxHeight).
 
-% get_position_max_Height_or_0(PositionPieces, CurrentMax, MaxHeight): Returns in the maximun height of all PositionPieces 
-get_position_max_Height_or_0([], Current, Current).
-get_position_max_Height_or_0([Piece|Rest], CurrentMax, MaxHeight) :- 
+% get_position_max_Height_or_default(PositionPieces, CurrentMax, MaxHeight): Returns in the maximun height of all PositionPieces 
+get_position_max_Height_or_default([], Current, Current).
+get_position_max_Height_or_default([Piece|Rest], CurrentMax, MaxHeight) :- 
     get_piece_Height(Piece, Height),
     Height > CurrentMax,
-    get_position_max_Height_or_0(Rest, Height, MaxHeight).
-get_position_max_Height_or_0([Piece|Rest], CurrentMax, MaxHeight) :- 
+    get_position_max_Height_or_default(Rest, Height, MaxHeight).
+get_position_max_Height_or_default([Piece|Rest], CurrentMax, MaxHeight) :- 
     get_piece_Height(Piece, Height),
     not(Height > CurrentMax),
-    get_position_max_Height_or_0(Rest, CurrentMax, MaxHeight).
+    get_position_max_Height_or_default(Rest, CurrentMax, MaxHeight).
 
 % remove_board_piece(Board, PieceToRemove, ResultBoard). Succeed if Piece is found in Board returning the ResultBoard without the Piece
 remove_board_piece([Piece|Board], Piece, Board) :- !.
@@ -35,7 +35,7 @@ is_place_taken([_|Board], PosX, PosY, Height) :- is_place_taken(Board, PosX, Pos
 
 % get_top_piece_at(Board, PosX, PosY, Piece) Return the heighest piece at given position  
 get_top_piece_at(Board, PosX, PosY, Piece) :- 
-    get_position_max_Height_or_0(Board, PosX, PosY, Height),
+    get_position_max_Height_or_default(Board, PosX, PosY, 0, Height),
     get_all_pieces(Board, piece(PosX, PosY, _,[_,Height|_]), Piece).
 
 % connected_board(Board) Succeed if Board is connected
@@ -146,7 +146,11 @@ aux_get_all_pieces_at(Board, [List|Elements]) :-
 % Succeed if Piece can slide into NewPosX and NewPosY, returning the SlidedPiece.
 % the slide makes the jumps according to the movement rules
 can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to UpLeft
-    piece(PosX, PosY, _, _) = Piece,
+    piece(PosX, PosY, Color, Extra) = Piece,
+    get_piece_Height(Piece, Height),
+    can_slide_into_height(Board, PosX, PosY, Height, Color, Extra, NewPosX, NewPosY, SlidedPiece).
+
+can_slide_into_height(Board, PosX, PosY, Height, Color, Extra, NewPosX, NewPosY, SlidedPiece) :- 
     DirX is NewPosX - PosX,
     DirY is NewPosY - PosY,
     dir_offset(MainDir, PosX, DirX, DirY),
@@ -155,12 +159,8 @@ can_slide_into(Board, Piece, NewPosX, NewPosY, SlidedPiece) :- % Slide to UpLeft
     dir_offset(ComplDir2, PosX, OffComplX2, OffComplY2),
     PosX1 is PosX + OffComplX1, PosY1 is PosY + OffComplY1,
     PosX2 is PosX + OffComplX2, PosY2 is PosY + OffComplY2,
-    can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece).
 
-can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY, SlidedPiece) :- 
-    piece(_, _, Color, Extra) = Piece,
-    get_piece_Height(Piece, Height),
-    get_position_max_Height_or_0(Board, NewPosX, NewPosY, MaxHeight),
+    get_position_max_Height_or_default(Board, NewPosX, NewPosY, 0, MaxHeight),
     (
         MaxHeight >= Height,
         is_place_taken(Board, NewPosX, NewPosY, MaxHeight),
@@ -184,7 +184,8 @@ can_slide_into_height(Board, Piece, PosX1, PosY1, PosX2, PosY2, NewPosX, NewPosY
         ;
         MaxHeight < Height,
         is_place_taken(Board, NewPosX, NewPosY, MaxHeight),
-        set_piece_Height(piece(NewPosX, NewPosY, Color, Extra), MaxHeight+1, SlidedPiece)
+        NewHeight is MaxHeight + 1,
+        set_piece_Height(piece(NewPosX, NewPosY, Color, Extra), NewHeight, SlidedPiece)
         ;
         MaxHeight < Height,
         not(is_place_taken(Board, NewPosX, NewPosY, MaxHeight)),
