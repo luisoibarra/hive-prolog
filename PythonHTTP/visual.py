@@ -10,8 +10,6 @@ SQRT3 = math.sqrt(3)
 
 pygame.init()
 
-###############################################################################
-# Holy 
 
 radius = 32
 pieceRadius = radius / 2
@@ -495,10 +493,11 @@ def run():
                             elif sum(CLICKED_PIECES_ON_HAND)==0:
                                 unit = m.units.get(cell, None)                            
                                 if unit:
-                                    if not unit.selected and sum([x.selected for x in m.units.values()]) >= 1:
-                                        for x in m.units.values():
-                                            x.selected = False
-                                    unit.selected = not unit.selected
+                                    if unit.playerBlack == turn:
+                                        if not unit.selected and sum([x.selected for x in m.units.values()]) >= 1:
+                                            for x in m.units.values():
+                                                x.selected = False
+                                        unit.selected = not unit.selected
                                 else:
                                     for index , x in m.units.items():
                                         if x.selected:
