@@ -159,7 +159,7 @@ ladybug_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :-
     piece(_, _, Color, [Type, _|Extra]) = Piece,
     remove_board_piece(Board, Piece, BoardWithNoLadybug),
     move_above_and_finish_down(Piece, 2, BoardWithNoLadybug, NewPosX, NewPosY),
-    get_position_max_Height_or_default(Board, Piece, NewPosX, NewPosY, -1, MaxHeight),
+    get_position_max_Height_or_default(Board, NewPosX, NewPosY, -1, MaxHeight),
     NewHeight is MaxHeight + 1,
     build_piece(NewPosX, NewPosY, Color, [Type, NewHeight|Extra], NewPiece),
     NewBoard = [NewPiece|BoardWithNoLadybug],

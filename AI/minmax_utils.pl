@@ -1,11 +1,19 @@
 :- module(minmax_utils, [result_selection/3, next_step_generator/2, terminal_test/1,
-    utility_function/3, utility_for_player/4, sample_utility_function/2, maxim_fuc/3]).
+    utility_function/3, utility_for_player/4, sample_utility_function/2, maxim_fuc/3,
+    max/3, min/3, sample_two_player_utility_function/2]).
 :- use_module('../list_utils').
 :- use_module('../run_game_utils').
 :- use_module(ai_utils).
 
 player_index(0,white).
 player_index(1,black).
+
+max(Item1, Item2, Item1) :-
+    Item1 >= Item2, !.
+max(_, Item2, Item2).
+min(Item1, Item2, Item1) :-
+    Item1 =< Item2, !.
+min(_, Item2, Item2).
 
 % maxim_fuc(Player, [step(...),[step(...),VectorValue1]], [step(...),[step(...),VectorValue2]]) Compares which Argument is greater according to Player
 maxim_fuc(Player, [_,[_,V1]], [_,[_,V2]]) :-
@@ -64,3 +72,9 @@ sample_utility_player_function(State, Player, Value) :-
     length(Pieces, Length),
     % Value is Length. % Allways try to move
     Value is -Length. % Allways try to set 
+
+sample_two_player_utility_function(State, Vector) :-
+    step(Action,_, _, _) = State,
+    player_index(0,Player), % Always the first player due to zero sum game
+    sample_utility_player_function(State, Player, Value),
+    Vector = [Action, Value].
