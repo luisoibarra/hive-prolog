@@ -3,7 +3,8 @@
 
 % next_game_step(Game, Action, NewGame, Feedback, Status) Given a Game returns a posible Action NewGame Feedback Status
 next_game_step(Game, step(Action, NewGame, Feedback, Status)) :-
-    make_a_play(Action, Game, NewGame, Feedback, Status).
+    make_a_play(Action, Game, NewGame, Feedback, Status),
+    Status \= invalid.
 
 % all_next_game_steps(Game, Steps) Returns all the posible steps given a Game
 all_next_game_steps(Game, Steps) :-

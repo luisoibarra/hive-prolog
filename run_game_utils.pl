@@ -1,5 +1,5 @@
 :- module(run_game_utils,[make_a_play/5, get_game_GameHistory/2, get_game_Turn/2,
-                    get_game_PiecesInfo/2]).
+                    get_game_PiecesInfo/2, get_game_Players/2]).
 :- use_module(add_piece_rules). 
 :- use_module(game_rules). 
 :- use_module(move_piece_rules). 
@@ -15,6 +15,9 @@ get_game_Turn(Game, Turn) :-
     game(_, _, [_,_,Turn|_]) = Game.
 get_game_PiecesInfo(Game, PiecesInfo) :-
     game(_, _, [PiecesInfo|_]) = Game.
+get_game_Players(Game, Players) :-
+    get_game_PiecesInfo(Game, PiecesInfo),
+    findall(P, member(pieces_info(P,_), PiecesInfo), Players).
 
 switch_player(white, black). 
 switch_player(black, white). 

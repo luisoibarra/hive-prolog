@@ -1,5 +1,6 @@
 :- module(minmax, [minmax/7, two_minimax/9]).
 :- use_module(minmax_utils).
+:- use_module(utility_function).
 
 % minmax(InitialState, NextStateGeneratorFunctor, TerminalTestFunctor, UtilityFunctor) 
 % InitialState: Root node, initial state.

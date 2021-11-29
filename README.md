@@ -79,6 +79,22 @@ Para jugar con interfaz visual ejectar el script **play.sh**. Para esto debe ten
   - CurrentPlayer: white, black, etc.
   - PlayerFunctor: Functor a una función que devuelve la acción del jugador
 
+## Estrategia
+
+### Generales
+
+- Cantidad de moviemientos que se pueden hacer por jugador
+- Cantidad de fichas alrededor de la reina
+- Cantidad de fichas que se pueden mover
+- Cantidad de lugares en donde se puede poner fichas
+- Tipo de fichas en el tablero
+
+### Poner piezas
+
+- Las Piezas tienen una ganancia por ponerlas que puede variar de acuerdo el juego
+  - Al principio se potencian las fichas que son menos potentes en moviemiento ya que la primera ficha que se pone generalmente se mantiene ahí. Por ejemplo la araña
+  - La reina se potencia para colocarla en el 3ro y 4to turno
+
 ## Test
 
 Los testing en `test_boards.pl` son para probar movimientos y el añadido de piezas con más flexibilidad de que se tiene en el juego original. Para correrlos cargar el archivo y ejecutar `run_board_test().`

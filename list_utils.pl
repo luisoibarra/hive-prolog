@@ -1,7 +1,9 @@
 :- module(list_utils, [list_difference/3, concat_list/3, first_element_list_or_empty_list/2,
-    concat_set_list/3, map/3, zip/3, unzip/3, zip_const/3, element_at/3,
-    remove_at/3, remove_all/3, get_random_element/2, maxim/4, exchange_elements/4]).
+    concat_set_list/3, map/4, zip/3, unzip/3, zip_const/3, element_at/3,
+    remove_at/3, remove_all/3, get_random_element/2, maxim/4, exchange_elements/4,
+    unification_filter/3]).
 :- use_module('AI/minmax_utils').
+:- use_module('AI/utility_function').
 
 % list_difference(List1, List2, Result) List1-List2=Result
 list_difference([], _, []) :- !.
@@ -32,8 +34,17 @@ unzip([[Item1, Item2]|Rest],[Item1|Rest1],[Item2|Rest2]) :- unzip(Rest, Rest1, R
 zip_const([],_,[]).
 zip_const([I1|List1], X, [[I1,X]|Result]) :- zip_const(List1, X, Result).
 
-map(_,[],[]).
-map(F,[X|Y],[V|R]):- T =..[F,X,V], call(T), map(F,Y,R).
+map(_, _, [],[]).
+map(F, FArgs, [X|Y], [V|R]):- 
+    concat_list(FArgs, [X], Args), 
+    concat_list([F], Args, FuncArgs), 
+    concat_list(FuncArgs, [V], CompleteFunction), 
+    T =.. CompleteFunction, 
+    call(T), 
+    map(F, FArgs, Y,R).
+
+unification_filter(List, Pattern, Result) :- 
+    findall(X, (member(X,List), Pattern=X), Result).
 
 element_at(List, Index, Element) :- 
     integer(Index), !,

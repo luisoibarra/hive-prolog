@@ -5,13 +5,12 @@
 
 % queen_surrounded(Board, Color) Succeed if any queen of Color is surrounded
 queen_surrounded(Board, Color) :-
-    get_all_pieces(Board, piece(_,_,Color,[queen|_]), Queen),
+    queen_surrounding_pieces(Board, Color, AllSurroundingPieces),
+    get_all_pieces(Board, piece(_,_,Color,[queen|_]), [Queen|_]),
     get_piece_Height(Queen, Height),
-    piece(PosX, PosY, _, _) = Queen,
     findall(X, 
-        (member(X, Board),
-         piece(PosX1, PosX2, _, [_,Height|_]) = X,
-         positions_next_to(PosX, PosY, PosX1, PosX2,_)
+        (member(X, AllSurroundingPieces),
+         piece(_, _, _, [_,Height|_]) = X
         ), SameHeightSurroundNeighbors),
     length(SameHeightSurroundNeighbors, Length),
     Length >= 6.
