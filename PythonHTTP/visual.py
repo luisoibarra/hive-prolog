@@ -32,22 +32,22 @@ ORANGE = pygame.Color('orange')
 
 # Fonts
 OPEN_SANS ="assets/fonts/OpenSans-Regular.ttf"
-smallFont = pygame.font.Font(OPEN_SANS, 20)
+smallFont = pygame.font.Font(OPEN_SANS, 16)
 mediumFont = pygame.font.Font(OPEN_SANS, 28)
 largeFont = pygame.font.Font(OPEN_SANS, 40)
 
 # Add images
 
-queen = pygame.image.load(os.path.join("assets/images/queen.png"))
-queen = pygame.transform.scale(queen, (int(radius*SQRT3), radius * 2))
-spider = pygame.image.load(os.path.join("assets/images/spider.png"))
-spider = pygame.transform.scale(spider, (int(radius*SQRT3), radius * 2))
-ant = pygame.image.load(os.path.join("assets/images/ant.png"))
-ant = pygame.transform.scale(ant, (int(radius*SQRT3), radius * 2))
-beetle = pygame.image.load(os.path.join("assets/images/beetle.png"))
-beetle = pygame.transform.scale(beetle, (int(radius*SQRT3), radius * 2))
-cricket = pygame.image.load(os.path.join("assets/images/cricket.png"))
-cricket = pygame.transform.scale(cricket, (int(radius*SQRT3), radius * 2))
+# queen = pygame.image.load(os.path.join("assets/images/queen.png"))
+# queen = pygame.transform.scale(queen, (int(radius*SQRT3), radius * 2))
+# spider = pygame.image.load(os.path.join("assets/images/spider.png"))
+# spider = pygame.transform.scale(spider, (int(radius*SQRT3), radius * 2))
+# ant = pygame.image.load(os.path.join("assets/images/ant.png"))
+# ant = pygame.transform.scale(ant, (int(radius*SQRT3), radius * 2))
+# beetle = pygame.image.load(os.path.join("assets/images/beetle.png"))
+# beetle = pygame.transform.scale(beetle, (int(radius*SQRT3), radius * 2))
+# cricket = pygame.image.load(os.path.join("assets/images/cricket.png"))
+# cricket = pygame.transform.scale(cricket, (int(radius*SQRT3), radius * 2))
 
 
 # Pieces
@@ -55,7 +55,7 @@ PIECES = ['Queen', 'Spider', 'Ant', 'Beetle', 'Cricket']
 
 PIECES_ON_GRID = ["Q", "S", "A", "B", "C"]
 
-PIECES_IMAGES = [queen,spider,ant,beetle,cricket]
+# PIECES_IMAGES = [queen,spider,ant,beetle,cricket]
 
 CLICKED_PIECES_ON_HAND = []
 
@@ -214,9 +214,9 @@ class RenderPieces:
         for i, piece in enumerate(self.pieces):
             pieceRect = pygame.Rect(i * width_of_piece, location, width_of_piece, height_of_piece)
             count = 0  # ADDED ADDED ADDED ADDED ADDED
-            if turn == self.playerBlack:
+            if(turn % 2) == self.playerBlack:
                 clicked =  CLICKED_PIECES_ON_HAND[i]
-                if turn:
+                if(turn % 2):
                     if BLACKPIECES_AMOUNT[i] == 0:
                         continue
                     else:
@@ -325,7 +325,7 @@ def run():
         global WHITEPIECES_AMOUNT
         global turn
 
-        turn = game_instance.turn
+        turn = game_instance.turn - 1
 
         all_black_pieces = []
         all_white_pieces = []
@@ -347,7 +347,7 @@ def run():
         map.units.clear()
 
         for piece in game_instance.board:
-            cell =  (piece.x,piece.y)
+            cell =  (piece.y,piece.x)
             player = 1 if piece.color == "black" else 0
             map.units[cell] = Unit(map, piece.type[0].upper(), None, player)
 
@@ -363,7 +363,7 @@ def run():
 
     global PIECES_ON_GRID 
 
-    global PIECES_IMAGES 
+    # global PIECES_IMAGES 
 
     global CLICKED_PIECES_ON_HAND
 
@@ -409,8 +409,8 @@ def run():
         else:
             all_black_pieces = pieces.pieces
     
-    PIECES = list(set(all_black_pieces))
-    PIECES.sort()
+    PIECES = list(dict.fromkeys(all_black_pieces).keys())
+    #PIECES.sort()
     PIECES_ON_GRID = [string.upper()[0] for string in PIECES]
     CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
     update_variables(game_instance,m)
@@ -447,7 +447,7 @@ def run():
                         whitePiece,i = piecesWhite.get_cell(event.pos, window)
                         print(whitePiece)
                         
-                        if turn == 0 and WHITEPIECES_AMOUNT[i] != 0:
+                        if(turn % 2) == 0 and WHITEPIECES_AMOUNT[i] != 0:
                             if not CLICKED_PIECES_ON_HAND[i] and sum(CLICKED_PIECES_ON_HAND) >= 1:
                                 CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
                             CLICKED_PIECES_ON_HAND[i] = not CLICKED_PIECES_ON_HAND[i]
@@ -458,7 +458,7 @@ def run():
                         blackPiece,i = piecesBlack.get_cell(event.pos, window)
                         print(blackPiece)
                         
-                        if turn == 1 and BLACKPIECES_AMOUNT[i]!=0:
+                        if(turn % 2) == 1 and BLACKPIECES_AMOUNT[i]!=0:
                             if not CLICKED_PIECES_ON_HAND[i] and sum(CLICKED_PIECES_ON_HAND) >= 1:
                                 CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
                             CLICKED_PIECES_ON_HAND[i] = not CLICKED_PIECES_ON_HAND[i]
@@ -472,28 +472,28 @@ def run():
                                 
                                 #################################
                                 # PLACE A PIECE 
-                                m.units[cell] = Unit(m, PIECES_ON_GRID[i] , PIECES_IMAGES[i], turn)
+                                m.units[cell] = Unit(m, PIECES[i] , None,(turn % 2))
                                 
-                                if turn:
+                                if(turn % 2):
                                     #BLACKPIECES_AMOUNT[i]+=-1
-                                    piece_index = all_black_pieces.index(PIECES[i])
+                                    piece_index = all_black_pieces.index(blackPiece)
                                 else:
                                     #WHITEPIECES_AMOUNT[i]+=-1
-                                    piece_index = all_white_pieces.index(PIECES[i])
+                                    piece_index = all_white_pieces.index(whitePiece)
 
                                 action_to_perform = Action(type = "set",
-                                                final_x = cell[0],
-                                                final_y = cell[1],
+                                                final_x = cell[1],
+                                                final_y = cell[0],
                                                 piece_index = piece_index)
                                     
-                                turn = (turn + 1) % 2
+                            
 
                                 ################################
 
                             elif sum(CLICKED_PIECES_ON_HAND)==0:
                                 unit = m.units.get(cell, None)                            
                                 if unit:
-                                    if unit.playerBlack == turn:
+                                    if unit.playerBlack ==(turn % 2):
                                         if not unit.selected and sum([x.selected for x in m.units.values()]) >= 1:
                                             for x in m.units.values():
                                                 x.selected = False
@@ -504,8 +504,8 @@ def run():
                                             from_x,from_y = index
 
                                             action_to_perform = Action(type="move",
-                                                            final_x=cell[0],
-                                                            final_y=cell[1],
+                                                            final_x=cell[1],
+                                                            final_y=cell[0],
                                                             from_x=from_x,
                                                             from_y = from_y)
 
@@ -518,14 +518,14 @@ def run():
             window.fill(ORANGE)
             grid.draw()
             units.draw()
-            if turn:
+            if(turn % 2):
                 piecesBlack.draw(window)
                 turnColor = BLACK
                 
             else:
                 piecesWhite.draw(window)
                 turnColor = WHITE
-            playerText = "Player Black" if turn else "Player White"
+            playerText = "Player Black" if(turn % 2) else "Player White"
             turnText = smallFont.render(
                 f"{playerText}", True, turnColor)
 
