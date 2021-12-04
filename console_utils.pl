@@ -1,6 +1,6 @@
 :- module(console_utils, [print_board/1, print_pieces/1, read_position/2, 
-            read_with_headline/2, print_game_state/3, print_game_feedback/6,
-            default_if_empty/4]).
+            read_with_headline/2, print_game_state/3, print_game_state/1, 
+            print_game_feedback/6, default_if_empty/4]).
 
 print_board(Board) :- 
     write('Board'), nl,
@@ -25,6 +25,9 @@ default_if_empty(Value, Value2, _, Value) :- Value \= Value2.
 
 % print_game_state(Game, PlayerColor, ExtraGameConfig)
 print_game_state(Game, _, _) :- 
+    print_game_state(Game).
+
+print_game_state(Game) :- 
     game(Board, CurrentPlayer, [PlayerPieces|_]) = Game,
     print_board(Board), nl,
     print_pieces(PlayerPieces), nl,

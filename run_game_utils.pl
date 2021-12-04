@@ -1,5 +1,5 @@
 :- module(run_game_utils,[make_a_play/5, get_game_GameHistory/2, get_game_Turn/2,
-                    get_game_PiecesInfo/2, get_game_Players/2]).
+                    get_game_PiecesInfo/2, get_game_Players/2, update_game_state/4]).
 :- use_module(add_piece_rules). 
 :- use_module(game_rules). 
 :- use_module(move_piece_rules). 
@@ -29,7 +29,13 @@ get_piece_type_to_play(Player, PiecePosition, PiecesToSet, PieceType, NewPiecesT
     element_at(Pieces, PiecePosition, PieceType),
     remove_at(Pieces, PiecePosition, NewPlayersPieces),
     exchange_elements(PiecesToSet, PieceInfo, pieces_info(Player, NewPlayersPieces), NewPiecesToSet).
-    
+
+% update_game_state(Game, NewBoard, NewPiecesToSet, NewGame) Next turn update to Game in NewGame
+update_game_state(Game, NewBoard, NewPiecesToSet, NewGame) :-
+    game(Board, CurrentPlayer, [PiecesToSet, GameHistory, Turn|Extra]) = Game,
+    switch_player(CurrentPlayer, NewCurrentPlayer),
+    NewTurn is Turn + 1,
+    game(NewBoard, NewCurrentPlayer, [NewPiecesToSet, [Game|GameHistory], NewTurn|Extra]) = NewGame.
 
 % set_piece(PiecePosition, PosX, PosY, Game, NewGame)
 set_piece(PiecePosition, PosX, PosY, Game, NewGame) :- 
@@ -39,9 +45,7 @@ set_piece(PiecePosition, PosX, PosY, Game, NewGame) :-
     build_piece(PosX, PosY, CurrentPlayer, [PieceType, 0], Piece),
     add_piece(Board, Piece, NewBoard),
 
-    switch_player(CurrentPlayer, NewCurrentPlayer),
-    NewTurn is Turn + 1,
-    game(NewBoard, NewCurrentPlayer, [NewPiecesToSet, [Game|GameHistory], NewTurn|Extra]) = NewGame.
+    update_game_state(Game, NewBoard, NewPiecesToSet, NewGame).
 
 % move_piece(PosX, PosY, DestPosX, DestPosY, Game, NewGame) 
 move_piece(PosX, PosY, DestPosX, DestPosY, Game, NewGame) :- 
@@ -51,9 +55,7 @@ move_piece(PosX, PosY, DestPosX, DestPosY, Game, NewGame) :-
 
     move(Board, PieceToMove, DestPosX, DestPosY, _, NewBoard),
 
-    switch_player(CurrentPlayer, NewCurrentPlayer),
-    NewTurn is Turn + 1,
-    game(NewBoard, NewCurrentPlayer, [PiecesToSet, [Game|GameHistory], NewTurn|Extra]) = NewGame.
+    update_game_state(Game, NewBoard, NewPiecesToSet, NewGame).
 
 end_turn_feedback(Game, Feedback, GameStatus) :-
 

@@ -3,6 +3,7 @@
 :- use_module(players).
 :- use_module(console_utils).
 :- use_module(http_utils).
+:- use_module('AI/ai_utils').
 
 % TEST PLAYER
 select_player(t, console_human_player, http_game_state, http_game_feedback, http_player_extra_config).
@@ -51,6 +52,14 @@ init_game() :-
         [player(white, [Player1Functor]), player(black,[Player2Functor])]).
 
 run_game(Game, GameConfig, Players) :- 
+    game(Board, CurrentPlayer, [PiecesToSet, GameHistory, Turn|Extra]) = Game,
+    not((Board = [], ! ; next_game_step(Game, _))),
+    update_game_state(Game, Board, PiecesToSet, NewGame),
+    !,
+    write('No valid move for '), write(CurrentPlayer), nl,
+    run_game(NewGame, GameConfig, Players).
+
+run_game(Game, GameConfig, Players) :- 
     % Showing State Functions
     game_config(GameFeedbackList, ExtraGameConfig) = GameConfig,
     game(_, CurrentPlayer, _) = Game,
@@ -68,10 +77,16 @@ run_game(Game, GameConfig, Players) :-
     call(PlayF), !,
     
     % Play
-    write('Action'),nl,
+    write('Action '), write(CurrentPlayer),nl,
     write(Action),nl,
     write('End Action'),nl,
     make_a_play(Action, Game, NewGame, Feedback, GameStatus),
+
+    write('Game Status'),nl,
+    write(GameStatus),nl,
+    write('Game Feedback'),nl,
+    write(Feedback),nl,
+    print_game_state(Game),
 
     % Play's Feedback
     findall(X, (
