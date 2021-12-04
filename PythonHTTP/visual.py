@@ -513,8 +513,8 @@ def run():
                                             action_to_perform = Action(type="move",
                                                             final_x=cell[1],
                                                             final_y=cell[0],
-                                                            from_x=from_x,
-                                                            from_y = from_y)
+                                                            from_x=from_y,
+                                                            from_y = from_x)
 
                                         x.selected = False
                             
