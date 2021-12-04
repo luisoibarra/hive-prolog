@@ -353,8 +353,12 @@ def run():
 
         for piece in game_instance.board:
             cell =  (piece.y,piece.x)
+            heigth = piece.height
+            label = piece.type[0].upper()
+            for i in range(heigth):
+                label += "*"
             player = 1 if piece.color == "black" else 0
-            map.units[cell] = Unit(map, piece.type[0].upper(), None, player)
+            map.units[cell] = Unit(map, label, None, player)
 
     global window
     global turn
@@ -477,7 +481,7 @@ def run():
                                 
                                 #################################
                                 # PLACE A PIECE 
-                                m.units[cell] = Unit(m, PIECES[i] , None,(turn % 2))
+                                m.units[cell] = Unit(m, PIECES[i][0].upper() , None,(turn % 2))
                                 
                                 if(turn % 2):
                                     #BLACKPIECES_AMOUNT[i]+=-1
