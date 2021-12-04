@@ -53,6 +53,9 @@ largeFont = pygame.font.Font(OPEN_SANS, 40)
 # Pieces
 PIECES = ['Queen', 'Spider', 'Ant', 'Beetle', 'Cricket']
 
+ALL_BLACK_PIECES = []
+ALL_WHITE_PIECES = []
+
 PIECES_ON_GRID = ["Q", "S", "A", "B", "C"]
 
 # PIECES_IMAGES = [queen,spider,ant,beetle,cricket]
@@ -327,17 +330,19 @@ def run():
 
         turn = game_instance.turn - 1
 
-        all_black_pieces = []
-        all_white_pieces = []
+        global ALL_BLACK_PIECES 
+        global ALL_WHITE_PIECES 
+
+        
 
         for pieces in game_instance.remaining_pieces:
             if pieces.player.lower() == "white":
-                all_white_pieces = pieces.pieces
+                ALL_WHITE_PIECES = pieces.pieces
             else:
-                all_black_pieces = pieces.pieces
+                ALL_BLACK_PIECES = pieces.pieces
 
-        BLACKPIECES_AMOUNT = [all_black_pieces.count(piece) for piece in PIECES]
-        WHITEPIECES_AMOUNT = [all_white_pieces.count(piece) for piece in PIECES]
+        BLACKPIECES_AMOUNT = [ALL_BLACK_PIECES.count(piece) for piece in PIECES]
+        WHITEPIECES_AMOUNT = [ALL_WHITE_PIECES.count(piece) for piece in PIECES]
 
     def fill_map(game_instance: Game, map: Map):
 
@@ -400,16 +405,16 @@ def run():
     
     # ADDED ADDED ADDED ADDED ADDED
     
-    all_black_pieces = []
-    all_white_pieces = []
+    global ALL_BLACK_PIECES
+    global ALL_WHITE_PIECES
 
     for pieces in game_instance.remaining_pieces:
         if pieces.player.lower() == "white":
-            all_white_pieces = pieces.pieces
+            ALL_WHITE_PIECES = pieces.pieces
         else:
-            all_black_pieces = pieces.pieces
+            ALL_BLACK_PIECES = pieces.pieces
     
-    PIECES = list(dict.fromkeys(all_black_pieces).keys())
+    PIECES = list(dict.fromkeys(ALL_BLACK_PIECES).keys())
     #PIECES.sort()
     PIECES_ON_GRID = [string.upper()[0] for string in PIECES]
     CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
@@ -445,7 +450,7 @@ def run():
                     if event.pos[1]<radius*2:
                         print("Clicked on white piece")
                         whitePiece,i = piecesWhite.get_cell(event.pos, window)
-                        print(whitePiece)
+                        print(whitePiece,i)
                         
                         if(turn % 2) == 0 and WHITEPIECES_AMOUNT[i] != 0:
                             if not CLICKED_PIECES_ON_HAND[i] and sum(CLICKED_PIECES_ON_HAND) >= 1:
@@ -456,7 +461,7 @@ def run():
                     elif event.pos[1]>window.get_height()-pieceRadius - 8:
                         print("Clicked on black piece")
                         blackPiece,i = piecesBlack.get_cell(event.pos, window)
-                        print(blackPiece)
+                        print(blackPiece,i)
                         
                         if(turn % 2) == 1 and BLACKPIECES_AMOUNT[i]!=0:
                             if not CLICKED_PIECES_ON_HAND[i] and sum(CLICKED_PIECES_ON_HAND) >= 1:
@@ -476,10 +481,12 @@ def run():
                                 
                                 if(turn % 2):
                                     #BLACKPIECES_AMOUNT[i]+=-1
-                                    piece_index = all_black_pieces.index(blackPiece)
+                                    piece_index = ALL_BLACK_PIECES.index(blackPiece)
                                 else:
                                     #WHITEPIECES_AMOUNT[i]+=-1
-                                    piece_index = all_white_pieces.index(whitePiece)
+                                    piece_index = ALL_WHITE_PIECES.index(whitePiece)
+
+                                print(piece_index)
 
                                 action_to_perform = Action(type = "set",
                                                 final_x = cell[1],
