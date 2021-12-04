@@ -480,22 +480,24 @@ def run():
                                 CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
                                 
                                 #################################
-                                # PLACE A PIECE 
-                                m.units[cell] = Unit(m, PIECES[i][0].upper() , None,(turn % 2))
+                                # PLACE A PIECE ON THE GRID
+                                #################################
+                                if m.units[cell] is None:
+                                    m.units[cell] = Unit(m, PIECES[i][0].upper() , None,(turn % 2))
                                 
-                                if(turn % 2):
-                                    #BLACKPIECES_AMOUNT[i]+=-1
-                                    piece_index = ALL_BLACK_PIECES.index(blackPiece)
-                                else:
-                                    #WHITEPIECES_AMOUNT[i]+=-1
-                                    piece_index = ALL_WHITE_PIECES.index(whitePiece)
+                                    if(turn % 2):
+                                        #BLACKPIECES_AMOUNT[i]+=-1
+                                        piece_index = ALL_BLACK_PIECES.index(blackPiece)
+                                    else:
+                                        #WHITEPIECES_AMOUNT[i]+=-1
+                                        piece_index = ALL_WHITE_PIECES.index(whitePiece)
 
-                                print(piece_index)
+                                    print(piece_index)
 
-                                action_to_perform = Action(type = "set",
-                                                final_x = cell[1],
-                                                final_y = cell[0],
-                                                piece_index = piece_index)
+                                    action_to_perform = Action(type = "set",
+                                                    final_x = cell[1],
+                                                    final_y = cell[0],
+                                                    piece_index = piece_index)
                                     
                             
 
