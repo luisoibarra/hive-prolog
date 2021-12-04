@@ -347,7 +347,7 @@ def run():
     def fill_map(game_instance: Game, map: Map):
 
         board = game_instance.board
-        #board.sort(lambda x: (x.x,x.y,x.height))
+        board.sort(key = lambda x: (x.x,x.y,x.height))
 
         map.units.clear()
 
@@ -505,6 +505,19 @@ def run():
                                             for x in m.units.values():
                                                 x.selected = False
                                         unit.selected = not unit.selected
+                                    else:
+                                        for index, x in m.units.items():
+                                            if x.selected:
+                                                from_x, from_y = index
+
+                                                action_to_perform = Action(type="move",
+                                                                        final_x=cell[1],
+                                                                        final_y=cell[0],
+                                                                        from_x=from_y,
+                                                                        from_y=from_x)
+
+                                            x.selected = False
+
                                 else:
                                     for index , x in m.units.items():
                                         if x.selected:
