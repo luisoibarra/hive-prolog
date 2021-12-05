@@ -367,6 +367,8 @@ def run():
     global action_to_perform
     global play_feedback
     global play_status
+
+    global smallFont
     
     global PIECES 
 
@@ -402,6 +404,9 @@ def run():
     PIECES = list(dict.fromkeys(ALL_BLACK_PIECES).keys())
     PIECES_ON_GRID = [string.upper()[0] for string in PIECES]
     CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
+
+    smallFont = pygame.font.Font(OPEN_SANS, 20 - len(PIECES)) # LUISO AJUSTA AQUI EL TAMAÑO DE LA FUENTE
+
     update_variables(game_instance,m)
     fill_map(game_instance,m)
 
