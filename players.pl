@@ -1,7 +1,6 @@
 :- module(players, [random_player/3, console_human_player/3, 
                     ai_player/3, http_player/3, 
-                    empty_player_extra_config/2,
-                    http_player_extra_config/2]).
+                    empty_player_extra_config/2]).
 :- use_module(list_utils). 
 :- use_module('AI/ai_utils'). 
 :- use_module('AI/minmax'). 
@@ -58,12 +57,3 @@ console_human_player(_, _, Action) :-
 % http_player(Game, ExtraGameConfig, Action) Implements a HTTP player interface
 http_player(Game, ExtraGameConfig, Action) :-
     http_get_action(Game, ExtraGameConfig, Action).
-
-http_player_extra_config(ColorPlayer, ExtraGameConfig) :-
-    write('Player '), write(ColorPlayer), nl,
-    read_with_headline('Host (d if localhost):', HostPrev),
-    default_if_empty(HostPrev, d, '127.0.0.1', Host),
-    read_with_headline('Port (d if 9001):', PortPrev),
-    default_if_empty(PortPrev, d, 9001, Port),
-    concat('/player_',ColorPlayer, PrefixPath),
-    ExtraGameConfig = [http_player_config(Host, Port, PrefixPath)].

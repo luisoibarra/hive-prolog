@@ -1,6 +1,7 @@
 :- module(console_utils, [print_board/1, print_pieces/1, read_position/2, 
             read_with_headline/2, print_game_state/3, print_game_state/1, 
-            print_game_feedback/6, default_if_empty/4]).
+            print_game_feedback/6, default_if_empty/4, select_option_console/6]).
+:- use_module(list_utils).
 
 print_board(Board) :- 
     write('Board'), nl,
@@ -38,3 +39,20 @@ print_game_feedback(_, Action, _, Feedback, Status, _) :-
     write(Action),nl,
     write(Status),nl,
     write(Feedback),nl.
+
+select_option_console(Header, ReadHeader, Labels, Options, _, Result) :-
+    write(Header),nl,
+    zip(Labels, Options, Zipped),
+    findall(_,(
+        member([Label, Option], Zipped),
+        write(Option), write(': '), write(Label), nl
+    ),_),
+    read_with_headline(ReadHeader, PrevResult),
+    (
+        member(PrevResult, Options),
+        Result = PrevResult, !
+        ;
+        write('Invalid option. Choose again'), nl,
+        !,
+        select_option_console(Header, ReadHeader, Labels, Options, _, Result)
+    ).

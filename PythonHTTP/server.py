@@ -38,8 +38,25 @@ def update_visual_play_feedback(feedback: GameFeedback):
     visual.play_feedback = feedback.feedback
     visual.play_status = feedback.status
 
+def console_question_answer(question:Question) -> QuestionResponse:
+    print(question.header)
+    for option, label in zip(question.options, question.labels):
+        print(f"{option}: {label}")
+    answer = None
+    while True:
+        print(question.header)
+        answer = input('>> ')
+        if not answer in question.options:
+            print("Invalid option")
+        else:
+            break
+    return QuestionResponse(answer = answer)
+
+def visual_question_answer(question:Question) -> QuestionResponse:
+    raise NotImplementedError # TODO
+
 @app.post("/player_{player}")
-async def player(player:str, param: Union[GameFeedback, Game, ActionRequest]):
+async def player(player:str, param: Union[GameFeedback, Game, ActionRequest, Question]):
     print(player)    
     if isinstance(param, Game):
         print("Instancia de juego:")
@@ -55,4 +72,7 @@ async def player(player:str, param: Union[GameFeedback, Game, ActionRequest]):
         print("Feedback de jugada")
         print(param)
         update_visual_play_feedback(param)
-        
+    if isinstance(param, Question):
+        answer = console_question_answer(param)
+        # answer = visual_question_answer(param)
+        return answer

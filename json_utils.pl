@@ -1,7 +1,8 @@
 :- module(json_utils, [
     convert_action_to_json/2, convert_action_from_json/2,
     convert_game_to_json/2, convert_pieces_to_json/2,
-    convert_piece_to_json/2, convert_players_remaining_pieces_to_json/2
+    convert_piece_to_json/2, convert_players_remaining_pieces_to_json/2,
+    convert_question_response_from_json/2, convert_question_to_json/5
     ]).
 
 % CONVERT FROM JSON %
@@ -21,6 +22,9 @@ convert_action_from_json(ActionJson, Action) :-
     member(final_x=NewPosX, Properties),
     member(final_y=NewPosY, Properties),
     Action = move_play(PosX, PosY, NewPosX, NewPosY).
+
+convert_question_response_from_json(QuestionResponse, Result) :-
+    json([answer=Result]) = QuestionResponse.
 
 
 % CONVERT FROM JSON %
@@ -53,5 +57,8 @@ convert_action_to_json(Action, ActionJson) :-
 convert_action_to_json(Action, ActionJson) :-
     set_play(PiecePos, PosX, PosY) = Action,
     ActionJson = json([type=set, final_x=PosX, final_y=PosY, piece_index=PiecePos]).
+
+convert_question_to_json(Header, ReadHeader, Labels, Options, QuestionJson) :-
+    json([header=Header, read_header=ReadHeader, labels=Labels, options=Options]) = QuestionJson.
 
 % CONVERT TO JSON %

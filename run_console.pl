@@ -6,16 +6,27 @@
 :- use_module(list_utils).
 :- use_module('AI/ai_utils').
 
+% PLAYERS CONFIGURATIONS
+
 % TEST PLAYER
 select_player(t, console_human_player, http_game_state, http_game_feedback, http_player_extra_config).
 % TEST PLAYER
 select_player(0, http_player, http_game_state, http_game_feedback, http_player_extra_config).
 select_player(1, console_human_player, print_game_state, print_game_feedback, empty_player_extra_config).
-% select_player(2, ai_player, print_game_state, print_game_feedback, empty_player_extra_config).
 select_player(2, ai_player, http_game_state, http_game_feedback, empty_player_extra_config).
-% select_player(3, random_player, print_game_state, print_game_feedback, empty_player_extra_config).
 select_player(3, random_player, http_game_state, http_game_feedback, empty_player_extra_config).
 
+select_player('0', http_player, http_game_state, http_game_feedback, http_player_extra_config).
+select_player('1', console_human_player, print_game_state, print_game_feedback, empty_player_extra_config).
+select_player('2', ai_player, http_game_state, http_game_feedback, empty_player_extra_config).
+select_player('3', random_player, http_game_state, http_game_feedback, empty_player_extra_config).
+
+
+% CONSOLE VERSIONS
+% select_player(2, ai_player, print_game_state, print_game_feedback, empty_player_extra_config).
+% select_player(3, random_player, print_game_state, print_game_feedback, empty_player_extra_config).
+
+% INITIAL HIVE PIECES
 pieces_for_hive(c, [queen, cricket, cricket, cricket, beetle, beetle, spider, spider, ant, ant, ant], 'Classic').
 pieces_for_hive(e, Pieces, 'Extended') :- 
     pieces_for_hive(c, ClassicPieces, _),
@@ -23,51 +34,76 @@ pieces_for_hive(e, Pieces, 'Extended') :-
 pieces_for_hive(_, Pieces, 'Defaults to Classic') :-
     pieces_for_hive(c, Pieces, _).
 
-initial_game(Game) :- 
+% Initial Interface
+% interface_functor(select_option_console).
+interface_functor(select_option_http).
+
+% Initial config setup
+% default_game_config(empty_player_extra_config).
+default_game_config(http_player_extra_config).
+
+initial_game(Game, ExtraGameConfig) :- 
     Game = game([],white,[
         [pieces_info(white,Pieces),
          pieces_info(black,Pieces)],
         [],
         1
     ]),
-    write('Hive Version:'),nl,
-    write('c: Classic'),nl,
-    write('e: Expended'),nl,
-    read_with_headline('Select version:', Version),
+    interface_functor(Functor),
+    
+    InterfaceFunction =.. [Functor, 'Hive Version', 'Select Mode', 
+        ['Classic', 'Expanded'], 
+        ['c','e'], ExtraGameConfig, Version],
+    call(InterfaceFunction),
+
     pieces_for_hive(Version, Pieces, Name), !,
     write('Selected: '), write(Name), nl.
 
+get_default_extra_config(DefaultExtraConfig) :- 
+    % Base interface configuration
+    default_game_config(DefaultExtraConfigFunctor),
+    DefaultExtraConfigFun =.. [DefaultExtraConfigFunctor, none, DefaultExtraConfig],
+    call(DefaultExtraConfigFun).
+
 init_game() :-
+    get_default_extra_config(DefaultExtraConfig),
+
     % Initial game instance
-    initial_game(Game),
-    % Selecting players
-    write('Players:'),nl,
-    write('t: HTTP Visual, Console interaction'),nl, % <- TEST PLAYER DELETE
-    write('0: HTTP'),nl,
-    write('1: Human'),nl,
-    write('2: AI'),nl,
-    write('3: Random'),nl,
-    read_with_headline('Select player 1:', Player1),
+    initial_game(Game, DefaultExtraConfig),
     
+    interface_functor(Functor),
+    % Selecting players
+    Player1InterfaceFunction =.. [Functor, 'Players', 'Select a player', 
+        ['HTTP Visual, Console interaction', 'HTTP', 'Human', 'AI', 'Random'], 
+        [t,0,1,2,3], DefaultExtraConfig, Player1],
+    call(Player1InterfaceFunction),
+    Player2InterfaceFunction =.. [Functor, 'Players', 'Select a player', 
+    ['HTTP Visual, Console interaction', 'HTTP', 'Human', 'AI', 'Random'], 
+    [t,0,1,2,3], DefaultExtraConfig, Player2],
+    call(Player2InterfaceFunction),
+
     % Initializing players
     select_player(Player1, Player1Functor, StartGameStateUserFeedback1, EndGameStateUserFeedback1, Player1ExtraConfigFunctor),
-    read_with_headline('Select player 2:', Player2),
     select_player(Player2, Player2Functor, StartGameStateUserFeedback2, EndGameStateUserFeedback2, Player2ExtraConfigFunctor),
+    
     Player1ExtraConfigFun =.. [Player1ExtraConfigFunctor, white, ExtraConfigPlayer1],
     call(Player1ExtraConfigFun),
     Player2ExtraConfigFun =.. [Player2ExtraConfigFunctor, black, ExtraConfigPlayer2],
     call(Player2ExtraConfigFun),
+
+    ExtraGameConfig = [
+        extra_info(white, ExtraConfigPlayer1), 
+        extra_info(black, ExtraConfigPlayer2)
+    ],
 
     % Run game
     run_game(Game,
         game_config([
             feedback_info(white, StartGameStateUserFeedback1, EndGameStateUserFeedback1),
             feedback_info(black, StartGameStateUserFeedback2, EndGameStateUserFeedback2)
-        ], 
-        [
-            extra_info(white, ExtraConfigPlayer1), 
-            extra_info(black, ExtraConfigPlayer2)
-        ]), 
+        ],
+        ExtraGameConfig 
+        ), 
         [player(white, [Player1Functor]), player(black,[Player2Functor])]).
 
 % game([piece(4,3,black,[queen,0]),piece(4,3,white,[beetle,1]),piece(3,2,white,[queen,0])],black,[[pieces_info(white,[cricket,cricket,pillbug,ladybug,ant,ant,beetle,spider,spider]),pieces_info(black,[cricket,cricket,pillbug,ladybug,ant,ant,beetle,beetle,spider,spider])],[],5]), game_config([feedback_info(white,print_game_state,print_game_feedback),feedback_info(black,print_game_state,print_game_feedback)],[extra_info(white,[]),extra_info(black,[])]), [player(white,[console_human_player]),player(black,[console_human_player])]
@@ -143,7 +179,8 @@ run_game(Game, GameConfig, Players) :-
         ;
         member(GameStatus, [over, tie]),
         !,
-        initial_game(NewInitialGame),
+        get_default_extra_config(DefaultExtraConfig),
+        initial_game(NewInitialGame, DefaultExtraConfig),
         run_game(NewInitialGame, GameConfig, Players)
         ;
         run_game(Game, GameConfig, Players)

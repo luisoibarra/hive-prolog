@@ -36,4 +36,12 @@ class GameFeedback(BaseModel):
     action:Action
     feedback:str
     status:str
-      
+
+class Question(BaseModel):
+    header:str
+    read_header:str
+    labels:List[str]
+    options:List[str]
+
+class QuestionResponse(BaseModel):
+    answer:str
