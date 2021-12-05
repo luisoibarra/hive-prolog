@@ -51,12 +51,12 @@ largeFont = pygame.font.Font(OPEN_SANS, 40)
 
 
 # Pieces
-PIECES = ['Queen', 'Spider', 'Ant', 'Beetle', 'Cricket']
+PIECES = []
 
 ALL_BLACK_PIECES = []
 ALL_WHITE_PIECES = []
 
-PIECES_ON_GRID = ["Q", "S", "A", "B", "C"]
+PIECES_ON_GRID = []
 
 # PIECES_IMAGES = [queen,spider,ant,beetle,cricket]
 
@@ -384,25 +384,6 @@ def run():
 
 
     m = Map((6, 8))
-    
-    # ADDED ADDED ADDED ADDED ADDED
-
-    # game_instance = Game(turn=0,
-    #                      board = [],
-    #                      player="white",
-    #                      remaining_pieces=[
-    #                          RemainingPiece(
-    #                             player="white",
-    #                             pieces = ['Queen',"Queen", 'Spider',
-    #                                      'Ant', 'Beetle', 'Cricket']
-    #                             ),
-    #                          RemainingPiece(
-    #                              player="black",
-    #                              pieces=['Queen', "Queen", 'Spider',
-    #                                      'Ant', 'Beetle', 'Cricket',"Cricket"]
-    #                          )
-    #                         ]
-    #                         )
 
     while not game_instance:
         time.sleep(.5)
@@ -419,7 +400,6 @@ def run():
             ALL_BLACK_PIECES = pieces.pieces
     
     PIECES = list(dict.fromkeys(ALL_BLACK_PIECES).keys())
-    #PIECES.sort()
     PIECES_ON_GRID = [string.upper()[0] for string in PIECES]
     CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
     update_variables(game_instance,m)
