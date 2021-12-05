@@ -3,6 +3,7 @@
 :- use_module(players).
 :- use_module(console_utils).
 :- use_module(http_utils).
+:- use_module(list_utils).
 :- use_module('AI/ai_utils').
 
 % TEST PLAYER
@@ -10,15 +11,31 @@ select_player(t, console_human_player, http_game_state, http_game_feedback, http
 % TEST PLAYER
 select_player(0, http_player, http_game_state, http_game_feedback, http_player_extra_config).
 select_player(1, console_human_player, print_game_state, print_game_feedback, empty_player_extra_config).
-select_player(2, ai_player, print_game_state, print_game_feedback, empty_player_extra_config).
-select_player(3, random_player, print_game_state, print_game_feedback, empty_player_extra_config).
+% select_player(2, ai_player, print_game_state, print_game_feedback, empty_player_extra_config).
+select_player(2, ai_player, http_game_state, http_game_feedback, empty_player_extra_config).
+% select_player(3, random_player, print_game_state, print_game_feedback, empty_player_extra_config).
+select_player(3, random_player, http_game_state, http_game_feedback, empty_player_extra_config).
 
-initial_game(game([],white,[
-    [pieces_info(white,[queen, cricket, cricket, pillbug, ladybug, ant, ant, beetle, beetle, spider, spider]),
-     pieces_info(black,[queen, cricket, cricket, pillbug, ladybug, ant, ant, beetle, beetle, spider, spider])],
-    [],
-    1
-])).
+pieces_for_hive(c, [queen, cricket, cricket, cricket, beetle, beetle, spider, spider, ant, ant, ant], 'Classic').
+pieces_for_hive(e, Pieces, 'Extended') :- 
+    pieces_for_hive(c, ClassicPieces, _),
+    concat_list(ClassicPieces, [mosquito, ladybug, pillbug], Pieces).
+pieces_for_hive(_, Pieces, 'Defaults to Classic') :-
+    pieces_for_hive(c, Pieces, _).
+
+initial_game(Game) :- 
+    Game = game([],white,[
+        [pieces_info(white,Pieces),
+         pieces_info(black,Pieces)],
+        [],
+        1
+    ]),
+    write('Hive Version:'),nl,
+    write('c: Classic'),nl,
+    write('e: Expended'),nl,
+    read_with_headline('Select version:', Version),
+    pieces_for_hive(Version, Pieces, Name), !,
+    write('Selected: '), write(Name), nl.
 
 init_game() :-
     % Initial game instance
@@ -58,7 +75,7 @@ init_game() :-
 run_game(Game, GameConfig, Players) :- 
 
     game_config(GameFeedbackList, ExtraGameConfig) = GameConfig,
-    game(Board, CurrentPlayer, [PiecesToSet, GameHistory, Turn|Extra]) = Game,
+    game(Board, CurrentPlayer, [PiecesToSet|_]) = Game,
 
     % Show Game State
     findall(X, (
@@ -110,7 +127,7 @@ run_game(Game, GameConfig, Players) :-
     write(GameStatus),nl,
     write('Game Feedback'),nl,
     write(Feedback),nl,
-    print_game_state(Game),
+    print_game_state(NewGame),
 
     % Play's Feedback
     findall(X, (

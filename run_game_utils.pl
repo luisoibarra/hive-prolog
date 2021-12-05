@@ -41,7 +41,7 @@ update_game_state(Game, NewBoard, NewPiecesToSet, NewGame) :-
 
 % set_piece(PiecePosition, PosX, PosY, Game, NewGame)
 set_piece(PiecePosition, PosX, PosY, Game, NewGame) :- 
-    game(Board, CurrentPlayer, [PiecesToSet, GameHistory, Turn|Extra]) = Game,
+    game(Board, CurrentPlayer, [PiecesToSet|_]) = Game,
     
     get_piece_type_to_play(CurrentPlayer, PiecePosition, PiecesToSet, PieceType, NewPiecesToSet),
     build_piece(PosX, PosY, CurrentPlayer, [PieceType, 0], Piece),
@@ -51,7 +51,7 @@ set_piece(PiecePosition, PosX, PosY, Game, NewGame) :-
 
 % move_piece(PosX, PosY, DestPosX, DestPosY, Game, NewGame) 
 move_piece(PosX, PosY, DestPosX, DestPosY, Game, NewGame) :- 
-    game(Board, CurrentPlayer, [PiecesToSet, GameHistory, Turn|Extra]) = Game,
+    game(Board, CurrentPlayer, [PiecesToSet|_]) = Game,
     get_top_piece_at(Board, PosX, PosY, PieceToMove),
     get_piece_Color(PieceToMove, CurrentPlayer),
 
@@ -76,7 +76,7 @@ end_turn_feedback(Game, Feedback, GameStatus) :-
         Amount >= 3,
         Feedback = 'Game Over, repeated positions detected. Tie',
         GameStatus = tie
-        ; % TODO Missing no possible moves
+        ;
         Feedback = '',
         GameStatus = continue
     ).

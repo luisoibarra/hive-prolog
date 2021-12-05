@@ -2,6 +2,7 @@
 :- use_module(board_utils). 
 :- use_module(piece_utils). 
 
+max_repetitions_allowed(3).
 
 % queen_surrounded(Board, Color) Succeed if any queen of Color is surrounded
 queen_surrounded(Board, Color) :-
@@ -17,23 +18,42 @@ queen_surrounded(Board, Color) :-
 
 % repeated_game_positions(GameHistory, Amount) Return the Amount of repeated turn position assuming two players only
 repeated_game_positions([], 0).
-repeated_game_positions([_], 0).
-repeated_game_positions([_,_], 0).
-repeated_game_positions([_,_,_], 0).
-repeated_game_positions([Game1,Game2,Game3,Game4|GameHistory], Amount) :- 
-    game(Board1, _, _) = Game1,
-    game(Board2, _, _) = Game2,
-    game(Board3, _, _) = Game3,
-    game(Board4, _, _) = Game4,
+repeated_game_positions([Game|GameHistory], Amount) :-
+    max_repetitions_allowed(MaxRep),
+    equal_set_games(Game, GameHistory, MaxRep, Amount).
+
+% equal_set_boards(Game, Games, MaxAmount, Amount) Returns the Amount of equal Board in Boards up to MaxAmount
+equal_set_games(Game, Games, MaxAmount, Amount) :-
+    equal_set_games(Game, Games, 0, MaxAmount, Amount).
+
+equal_set_games(_, [], CurrentAmount, _, CurrentAmount).
+equal_set_games(Game, [HistoryGame|Games], CurrentAmount, MaxAmount, Amount) :-
+    CurrentAmount >= MaxAmount,
+    Amount = CurrentAmount,
+    !
+    ;
     (
-        equal_set_board(Board1, Board3),
-        equal_set_board(Board2, Board4),
-        repeated_game_positions(GameHistory, ReturnedAmount),
-        Amount is ReturnedAmount + 1
-        ;
-        Amount is 0
+        game(CurrentBoard, CurrentPlayer, _) = Game,
+        game(HistoryBoard, HistoryPlayer, _) = HistoryGame,
+        (
+            CurrentPlayer = HistoryPlayer,
+            (
+                equal_set_board(CurrentBoard, HistoryBoard),
+                NewCurrentAmount is CurrentAmount + 1,
+                !
+                ;
+                NewCurrentAmount is CurrentAmount,
+                !
+            ),
+            !
+            ;
+            CurrentPlayer \= HistoryPlayer,
+            NewCurrentAmount is CurrentAmount,
+            !
+        ),
+        equal_set_games(Game, Games, NewCurrentAmount, MaxAmount, Amount)
     ).
-    
+
 % equal_set_board(Board1, Board2) Succeed if the boards as sets are equal
 equal_set_board([], []).
 equal_set_board(Board1, Board2) :- 

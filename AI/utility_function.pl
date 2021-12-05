@@ -185,15 +185,15 @@ normalize_score_function(State, Metrics, Score) :-
     normalize(PiecesPlacedAdvantange, 1/50, 0, Turn, NormalizedPiecesPlacedAdvantange), 
     normalize(EnemyQueenThreat, 2/8, 0, Turn, NormalizedEnemyQueenThreat), 
     normalize(AlliedQueenThreat, -1/8, 0, Turn, NormalizedAlliedQueenThreat),
-
-    sum_list([
-            NormalizedSetStepsLength,
-            NormalizedMoveStepsLength,
-            NormalizedPiecesPlacedDanger,
-            NormalizedPiecesPlacedAdvantange,
-            NormalizedEnemyQueenThreat,
-            NormalizedAlliedQueenThreat
-    ], Score).
+    Normalized = [
+        NormalizedSetStepsLength,
+        NormalizedMoveStepsLength,
+        NormalizedPiecesPlacedDanger,
+        NormalizedPiecesPlacedAdvantange,
+        NormalizedEnemyQueenThreat,
+        NormalizedAlliedQueenThreat
+    ],
+    sum_list(Normalized, Score).
 
 
 % normalize(Value, MultParam, ExpParam, Turn, NormalizedResult) 
