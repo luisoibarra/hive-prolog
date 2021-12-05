@@ -483,7 +483,7 @@ def run():
                                 # PLACE A PIECE ON THE GRID
                                 #################################
                                 if m.units[cell] is None:
-                                    m.units[cell] = Unit(m, PIECES[i][0].upper() , None,(turn % 2))
+                                    #m.units[cell] = Unit(m, PIECES[i][0].upper() , None,(turn % 2))
                                 
                                     if(turn % 2):
                                         #BLACKPIECES_AMOUNT[i]+=-1
