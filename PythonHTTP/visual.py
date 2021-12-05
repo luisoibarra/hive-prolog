@@ -491,23 +491,37 @@ def run():
                             elif sum(CLICKED_PIECES_ON_HAND)==0:
                                 unit = m.units.get(cell, None)                            
                                 if unit:
-                                    # if unit.playerBlack ==(turn % 2):
-                                    #     if not unit.selected and sum([x.selected for x in m.units.values()]) >= 1:
-                                    #         for x in m.units.values():
-                                    #             x.selected = False
-                                    #     unit.selected = not unit.selected
-                                    # else:
-                                    for index, x in m.units.items():
-                                        if x.selected:
-                                            from_x, from_y = index
+                                    if unit.playerBlack ==(turn % 2):
+                                        if not unit.selected and sum([x.selected for x in m.units.values()]) >= 1:
+                                            for index, x in m.units.items():
+                                                if x.selected:
+                                                    if x==unit:
+                                                        unit.selected = not unit.selected
+                                                    else:
+                                                        from_x, from_y = index
 
-                                            action_to_perform = Action(type="move",
-                                                                    final_x=cell[1],
-                                                                    final_y=cell[0],
-                                                                    from_x=from_y,
-                                                                    from_y=from_x)
+                                                        action_to_perform = Action(type="move",
+                                                                                final_x=cell[1],
+                                                                                final_y=cell[0],
+                                                                                from_x=from_y,
+                                                                                from_y=from_x)
 
-                                        x.selected = False
+                                                        x.selected = False
+                                        else :
+                                            unit.selected = not unit.selected
+                                        
+                                    else:
+                                        for index, x in m.units.items():
+                                            if x.selected:
+                                                from_x, from_y = index
+
+                                                action_to_perform = Action(type="move",
+                                                                        final_x=cell[1],
+                                                                        final_y=cell[0],
+                                                                        from_x=from_y,
+                                                                        from_y=from_x)
+
+                                            x.selected = False
 
                                 else:
                                     for index , x in m.units.items():
