@@ -6,7 +6,7 @@
 % queen_surrounded(Board, Color) Succeed if any queen of Color is surrounded
 queen_surrounded(Board, Color) :-
     queen_surrounding_pieces(Board, Color, AllSurroundingPieces),
-    get_all_pieces(Board, piece(_,_,Color,[queen|_]), [Queen|_]),
+    get_first_piece(Board, piece(_,_,Color,[queen|_]), Queen),
     get_piece_Height(Queen, Height),
     findall(X, 
         (member(X, AllSurroundingPieces),

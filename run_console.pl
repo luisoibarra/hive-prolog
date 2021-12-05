@@ -13,14 +13,16 @@ select_player(1, console_human_player, print_game_state, print_game_feedback, em
 select_player(2, ai_player, print_game_state, print_game_feedback, empty_player_extra_config).
 select_player(3, random_player, print_game_state, print_game_feedback, empty_player_extra_config).
 
+initial_game(game([],white,[
+    [pieces_info(white,[queen, cricket, cricket, pillbug, ladybug, ant, ant, beetle, beetle, spider, spider]),
+     pieces_info(black,[queen, cricket, cricket, pillbug, ladybug, ant, ant, beetle, beetle, spider, spider])],
+    [],
+    1
+])).
+
 init_game() :-
     % Initial game instance
-    game([],white,[
-        [pieces_info(white,[queen, cricket, cricket, pillbug, ladybug, ant, ant, beetle, beetle, spider, spider]),
-         pieces_info(black,[queen, cricket, cricket, pillbug, ladybug, ant, ant, beetle, beetle, spider, spider])],
-        [],
-        1
-    ]) = Game,
+    initial_game(Game),
     % Selecting players
     write('Players:'),nl,
     write('t: HTTP Visual, Console interaction'),nl, % <- TEST PLAYER DELETE
@@ -51,11 +53,33 @@ init_game() :-
         ]), 
         [player(white, [Player1Functor]), player(black,[Player2Functor])]).
 
+% game([piece(4,3,black,[queen,0]),piece(4,3,white,[beetle,1]),piece(3,2,white,[queen,0])],black,[[pieces_info(white,[cricket,cricket,pillbug,ladybug,ant,ant,beetle,spider,spider]),pieces_info(black,[cricket,cricket,pillbug,ladybug,ant,ant,beetle,beetle,spider,spider])],[],5]), game_config([feedback_info(white,print_game_state,print_game_feedback),feedback_info(black,print_game_state,print_game_feedback)],[extra_info(white,[]),extra_info(black,[])]), [player(white,[console_human_player]),player(black,[console_human_player])]
+
 run_game(Game, GameConfig, Players) :- 
+
+    game_config(GameFeedbackList, ExtraGameConfig) = GameConfig,
     game(Board, CurrentPlayer, [PiecesToSet, GameHistory, Turn|Extra]) = Game,
+
+    % Show Game State
+    findall(X, (
+        member(feedback_info(PlayerColor, ShowGameStateFunc, _),GameFeedbackList), 
+        CallShowGameStateFunc =.. [ShowGameStateFunc, Game, PlayerColor, ExtraGameConfig],
+        call(CallShowGameStateFunc)
+    ), _),
+
     not((Board = [], ! ; next_game_step(Game, _))),
     update_game_state(Game, Board, PiecesToSet, NewGame),
+    end_turn_feedback(NewGame, Feedback, GameStatus),
+
+    % Play's Feedback
+    findall(X, (
+        member(feedback_info(PlayerColor, _, ShowGameFeedbackFunc),GameFeedbackList), 
+        CallShowGameFeedbackFunc =.. [ShowGameFeedbackFunc, PlayerColor, none, NewGame, Feedback, GameStatus, ExtraGameConfig],
+        call(CallShowGameFeedbackFunc)
+    ), _),
+    
     !,
+
     write('No valid move for '), write(CurrentPlayer), nl,
     run_game(NewGame, GameConfig, Players).
 
@@ -99,6 +123,11 @@ run_game(Game, GameConfig, Players) :-
         GameStatus = continue,
         run_game(NewGame, GameConfig, Players),
         !
+        ;
+        member(GameStatus, [over, tie]),
+        !,
+        initial_game(NewInitialGame),
+        run_game(NewInitialGame, GameConfig, Players)
         ;
         run_game(Game, GameConfig, Players)
     ).

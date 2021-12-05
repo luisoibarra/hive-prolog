@@ -10,7 +10,7 @@
 top_at_position(OldBoard, Piece) :-
     piece(PosX, PosY, _, _) = Piece,
     get_piece_Height(Piece, Height), 
-    not((get_all_pieces(OldBoard, piece(PosX, PosY, _, _), piece(PosX, PosY, _, [_, Height2|_])), Height < Height2)).
+    not((get_first_piece(OldBoard, piece(PosX, PosY, _, _), piece(PosX, PosY, _, [_, Height2|_])), Height < Height2)).
 
 % queen_present(Board, Piece) Succeed if there is a queen of the piece color in Board. 
 queen_present(Board, Piece) :- 

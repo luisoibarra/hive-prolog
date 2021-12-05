@@ -1,5 +1,6 @@
 :- module(run_game_utils,[make_a_play/5, get_game_GameHistory/2, get_game_Turn/2,
-                    get_game_PiecesInfo/2, get_game_Players/2, update_game_state/4]).
+                    get_game_PiecesInfo/2, get_game_Players/2, update_game_state/4,
+                    end_turn_feedback/3]).
 :- use_module(add_piece_rules). 
 :- use_module(game_rules). 
 :- use_module(move_piece_rules). 
@@ -35,7 +36,8 @@ update_game_state(Game, NewBoard, NewPiecesToSet, NewGame) :-
     game(Board, CurrentPlayer, [PiecesToSet, GameHistory, Turn|Extra]) = Game,
     switch_player(CurrentPlayer, NewCurrentPlayer),
     NewTurn is Turn + 1,
-    game(NewBoard, NewCurrentPlayer, [NewPiecesToSet, [Game|GameHistory], NewTurn|Extra]) = NewGame.
+    game(Board, CurrentPlayer, [PiecesToSet, [], Turn|Extra]) = HistoryGame, % Removes History from old game instance
+    game(NewBoard, NewCurrentPlayer, [NewPiecesToSet, [HistoryGame|GameHistory], NewTurn|Extra]) = NewGame.
 
 % set_piece(PiecePosition, PosX, PosY, Game, NewGame)
 set_piece(PiecePosition, PosX, PosY, Game, NewGame) :- 
@@ -55,7 +57,7 @@ move_piece(PosX, PosY, DestPosX, DestPosY, Game, NewGame) :-
 
     move(Board, PieceToMove, DestPosX, DestPosY, _, NewBoard),
 
-    update_game_state(Game, NewBoard, NewPiecesToSet, NewGame).
+    update_game_state(Game, NewBoard, PiecesToSet, NewGame).
 
 end_turn_feedback(Game, Feedback, GameStatus) :-
 
@@ -78,7 +80,6 @@ end_turn_feedback(Game, Feedback, GameStatus) :-
         Feedback = '',
         GameStatus = continue
     ).
-
 
 % make_a_play(Play, Game, NewGame, Feedback, GameStatus)
 make_a_play(set_play(PositionSelectedPieceToSet, PosX, PosY), Game, NewGame, Feedback, GameStatus) :-

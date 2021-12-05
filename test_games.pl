@@ -80,7 +80,29 @@ test_games('Queen surrounded', Game, Movements, ExpectedResults) :-
                        continue, continue,
                        continue, continue,
                        continue, over].
+
+test_games('QueenSurrounded', Game, Movements, ExpectedResults) :- 
+    game(Board, CurrentPlayer, [PiecesToSet, GameHistory, Turn|_]) = Game,
+    Board = [],
+    CurrentPlayer = white,
+    WhiteTypePieces = pieces_info(white,[queen, ant, ant, ant, ant, ant]),
+    BlackTypePieces = pieces_info(black,[queen, ant, ant, ant, ant, ant]),
+    PiecesToSet = [WhiteTypePieces, BlackTypePieces],
+    GameHistory = [],
+    Turn = 1,
+    Movements =[set_play(0, 3, 3), set_play(0, 4, 3),
+                set_play(0, 2, 3), set_play(0, 4, 2),
+                set_play(0, 2, 4), set_play(0, 5, 3),
+                set_play(0, 3, 4), move_play(5, 3, 4, 4), 
+                set_play(0, 1, 4), move_play(4, 2, 3, 2)],
+    ExpectedResults = [continue, continue,
+                        continue, continue,
+                        continue, continue,
+                        continue, continue,
+                        continue, continue,
+                        continue].
                     
+
 simulate_game_test(TestName, _, [], _) :- 
     write('SUCCEED '), write(TestName), !. 
 
@@ -107,3 +129,21 @@ run_game_tests() :-
     test_games(TestName, Game, Movements, ExpectedResults),
     write(TestName), nl,nl,
     simulate_game_test(TestName, Game, Movements, ExpectedResults).
+
+
+
+return_simulation(Game, [], Game).
+return_simulation(Game, [Move|Movements], ReturnedGame) :-
+    make_a_play(Move, Game, NewGame, _, Status),!,
+    write(Status), nl,
+    return_simulation(NewGame, Movements, ReturnedGame).
+
+% run_game_tests('QueenSurrounded', set_play(0,5,2)).
+% run_game_tests('QueenSurrounded', move_play(1, 4, 2, 5)).
+run_game_tests(TestNameToRun, NextAction) :-
+    test_games(TestNameToRun, Game, Movements, ExpectedResults),
+    write(TestNameToRun), nl,
+    return_simulation(Game, Movements, ResultGame),
+    write(ResultGame), nl,
+    make_a_play(NextAction, ResultGame, FinalGame, Feedback, Status),
+    write(Status).

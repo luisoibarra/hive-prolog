@@ -1,6 +1,6 @@
 :- module(board_utils, 
     [remove_board_piece/3, is_place_taken/4, connected_board/1, positions_next_to/5,
-    pieces_together/3, can_slide_into/5, can_slide_into_height/9, get_all_pieces/3, exist_queen/1, color_played_list/3,
+    pieces_together/3, can_slide_into/5, can_slide_into_height/9, get_first_piece/3, exist_queen/1, color_played_list/3,
     placed_around_of/3, get_all_pieces_list/3, get_all_pieces_at/4, get_top_piece_at/4, get_position_max_Height_or_default/5,
     queen_surrounding_pieces/3]).
 :- use_module(list_utils). 
@@ -37,7 +37,7 @@ is_place_taken([_|Board], PosX, PosY, Height) :- is_place_taken(Board, PosX, Pos
 % get_top_piece_at(Board, PosX, PosY, Piece) Return the heighest piece at given position  
 get_top_piece_at(Board, PosX, PosY, Piece) :- 
     get_position_max_Height_or_default(Board, PosX, PosY, 0, Height),
-    get_all_pieces(Board, piece(PosX, PosY, _,[_,Height|_]), Piece).
+    get_first_piece(Board, piece(PosX, PosY, _,[_,Height|_]), Piece).
 
 % connected_board(Board) Succeed if Board is connected
 connected_board([]).
@@ -117,7 +117,7 @@ exist_queen([_|Pieces]) :- exist_queen(Pieces).
 
 % queen_surrounding_pieces(Board, Color, Pieces) Returns all the Pieces in the surroundings of Color queen
 queen_surrounding_pieces(Board, Color, Pieces) :-
-    get_all_pieces(Board, piece(_,_,Color,[queen|_]), Queen),
+    get_first_piece(Board, piece(_,_,Color,[queen|_]), Queen),
     !,
     get_piece_Height(Queen, Height),
     piece(PosX, PosY, _, _) = Queen,
@@ -128,9 +128,9 @@ queen_surrounding_pieces(Board, Color, Pieces) :-
         ), Pieces).
 queen_surrounding_pieces(_, _, []). % Queen doesn't exist
 
-% get_all_pieces(Pieces, Pattern, Result): Succeed if a piece in Pieces unifies with Pattern
-get_all_pieces([First|_], PiecePatter, First) :- findall(X, PiecePatter = X, [First]).
-get_all_pieces([_|Pieces], PiecePatter, Result) :- get_all_pieces(Pieces, PiecePatter, Result).
+% get_first_piece(Pieces, Pattern, Result): Succeed if a piece in Pieces unifies with Pattern
+get_first_piece([First|_], PiecePatter, First) :- findall(X, PiecePatter = X, [First]).
+get_first_piece([_|Pieces], PiecePatter, Result) :- get_first_piece(Pieces, PiecePatter, Result).
 
 % get_all_pieces_list(Pieces, Pattern, ListResult): Succeed if ListResult is the list of all pieces that unifies with with Pattern in Pieces
 get_all_pieces_list(List, Pattern, Result) :- 
