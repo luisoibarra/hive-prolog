@@ -243,9 +243,11 @@ class RenderPieces:
 
         # Identify the piece grid the click is in.
         col = math.floor((x /window.get_width())*len(self.pieces))
-
-        return PIECES[col],col
-
+        if PIECES:
+            return PIECES[col],col
+        else:
+            return None, col
+            
 class RenderGrid(Render):
     def draw(self):
         """
@@ -327,6 +329,8 @@ def run():
         global BLACKPIECES_AMOUNT
         global WHITEPIECES_AMOUNT
         global turn
+        global PIECES_ON_GRID
+        global CLICKED_PIECES_ON_HAND
 
         turn = game_instance.turn - 1
 
@@ -340,9 +344,19 @@ def run():
                 ALL_WHITE_PIECES = pieces.pieces
             else:
                 ALL_BLACK_PIECES = pieces.pieces
+                
+        PIECES = list(dict.fromkeys(ALL_BLACK_PIECES).keys())
+        PIECES_ON_GRID = [string.upper()[0] for string in PIECES]
+        CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
 
         BLACKPIECES_AMOUNT = [ALL_BLACK_PIECES.count(piece) for piece in PIECES]
         WHITEPIECES_AMOUNT = [ALL_WHITE_PIECES.count(piece) for piece in PIECES]
+        
+        smallFont = pygame.font.Font(OPEN_SANS, 20 - len(PIECES)) # LUISO AJUSTA AQUI EL TAMAÑO DE LA FUENTE
+        piecesBlack = RenderPieces(pieceRadius, [Piece(piece) for piece in PIECES], playerBlack=True)
+        piecesWhite = RenderPieces(pieceRadius, [Piece(piece) for piece in PIECES], playerBlack=False)
+
+        return smallFont, piecesBlack, piecesWhite
 
     def fill_map(game_instance: Game, map: Map):
 
@@ -397,25 +411,20 @@ def run():
     global ALL_BLACK_PIECES
     global ALL_WHITE_PIECES
 
-    for pieces in game_instance.remaining_pieces:
-        if pieces.player.lower() == "white":
-            ALL_WHITE_PIECES = pieces.pieces
-        else:
-            ALL_BLACK_PIECES = pieces.pieces
+    # for pieces in game_instance.remaining_pieces:
+    #     if pieces.player.lower() == "white":
+    #         ALL_WHITE_PIECES = pieces.pieces
+    #     else:
+    #         ALL_BLACK_PIECES = pieces.pieces
     
-    PIECES = list(dict.fromkeys(ALL_BLACK_PIECES).keys())
-    PIECES_ON_GRID = [string.upper()[0] for string in PIECES]
-    CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
+    # PIECES = list(dict.fromkeys(ALL_BLACK_PIECES).keys())
+    # PIECES_ON_GRID = [string.upper()[0] for string in PIECES]
+    # CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
 
-    smallFont = pygame.font.Font(OPEN_SANS, 20 - len(PIECES)) # LUISO AJUSTA AQUI EL TAMAÑO DE LA FUENTE
 
-    update_variables(game_instance,m)
+    smallFont, piecesBlack, piecesWhite = update_variables(game_instance,m)
     fill_map(game_instance,m)
 
-    
-    piecesBlack = RenderPieces(pieceRadius, [Piece(piece) for piece in PIECES], playerBlack=True)
-    piecesWhite = RenderPieces(
-        pieceRadius, [Piece(piece) for piece in PIECES], playerBlack=False)
     grid = RenderGrid(m, radius)
     units = RenderUnits(m, radius)
 
@@ -444,22 +453,22 @@ def run():
                         print("Clicked on white piece")
                         whitePiece,i = piecesWhite.get_cell(event.pos, window)
                         print(whitePiece,i)
-                        
-                        if(turn % 2) == 0 and WHITEPIECES_AMOUNT[i] != 0:
-                            if not CLICKED_PIECES_ON_HAND[i] and sum(CLICKED_PIECES_ON_HAND) >= 1:
-                                CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
-                            CLICKED_PIECES_ON_HAND[i] = not CLICKED_PIECES_ON_HAND[i]
+                        if whitePiece is not None:
+                            if(turn % 2) == 0 and WHITEPIECES_AMOUNT[i] != 0:
+                                if not CLICKED_PIECES_ON_HAND[i] and sum(CLICKED_PIECES_ON_HAND) >= 1:
+                                    CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
+                                CLICKED_PIECES_ON_HAND[i] = not CLICKED_PIECES_ON_HAND[i]
 
                         
                     elif event.pos[1]>height-pieceRadius - 8:
                         print("Clicked on black piece")
                         blackPiece,i = piecesBlack.get_cell(event.pos, window)
                         print(blackPiece,i)
-                        
-                        if(turn % 2) == 1 and BLACKPIECES_AMOUNT[i]!=0:
-                            if not CLICKED_PIECES_ON_HAND[i] and sum(CLICKED_PIECES_ON_HAND) >= 1:
-                                CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
-                            CLICKED_PIECES_ON_HAND[i] = not CLICKED_PIECES_ON_HAND[i]
+                        if blackPiece is not None:
+                            if(turn % 2) == 1 and BLACKPIECES_AMOUNT[i]!=0:
+                                if not CLICKED_PIECES_ON_HAND[i] and sum(CLICKED_PIECES_ON_HAND) >= 1:
+                                    CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
+                                CLICKED_PIECES_ON_HAND[i] = not CLICKED_PIECES_ON_HAND[i]
                     else:
                         print("Clicked on grid")
                         cell = units.get_cell(event.pos)
@@ -617,14 +626,21 @@ def run():
 
             if question:
                 # print buttons for each choice
-
+                buttonText = mediumFont.render(question.header, True, BLACK)
+                buttonTextRect = buttonText.get_rect()
+                buttonRect = pygame.Rect(
+                        width - radius*7, radius*3.5 + 2*buttonTextRect.height+10, buttonTextRect.width, buttonTextRect.height)
+                pygame.draw.rect(window, WHITE, buttonRect)
+                window.blit(buttonText, buttonTextRect)
+                pygame.display.flip()
+                
                 for i, (choice, label) in enumerate(zip(question.options, question.labels)):
                     # Play game button
                     buttonText = mediumFont.render(label, True, BLACK)
                     buttonTextRect = buttonText.get_rect()
 
                     buttonRect = pygame.Rect(
-                        width - radius*7, radius*3.5 + i*buttonTextRect.height + 1, buttonTextRect.width, buttonTextRect.height)
+                        width - radius*7, radius*3.5 + (i+3)*buttonTextRect.height + 10, buttonTextRect.width, buttonTextRect.height)
                     
                     buttonTextRect.center = buttonRect.center
                     pygame.draw.rect(window, WHITE, buttonRect)
@@ -649,7 +665,7 @@ def run():
             window.blit(units, (radius*2 , radius*2 ))
             if game_instance:
                 print("Game instance exist")
-                update_variables(game_instance,m)
+                smallFont, piecesBlack, piecesWhite = update_variables(game_instance,m)
                 fill_map(game_instance,m)
                 game_instance = None
                 # action_to_perform = "Something"
