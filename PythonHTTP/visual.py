@@ -386,7 +386,7 @@ def run():
     global WHITEPIECES_AMOUNT 
 
 
-    m = Map((6, 8))
+    m = Map((8, 10))
 
     while not game_instance:
         time.sleep(.5)
@@ -424,7 +424,7 @@ def run():
         
         
         fpsClock = pygame.time.Clock()
-        window = pygame.display.set_mode((640, 480), 1)
+        window = pygame.display.set_mode((800,600), 1)
         from pygame.locals import QUIT, MOUSEBUTTONDOWN
 
         
@@ -556,20 +556,20 @@ def run():
                 f"{playerText}", True, turnColor)
 
             turnTextRect = turnText.get_rect()
-            turnRect = pygame.Rect(window.get_width() - radius*4, radius*2.5,turnTextRect.width,turnTextRect.height)
+            turnRect = pygame.Rect(window.get_width() - radius*7, radius*2.5,turnTextRect.width,turnTextRect.height)
             turnTextRect.center = turnRect.center
             pygame.draw.rect(window, ORANGE, turnRect)
             window.blit(turnText, turnTextRect)
 
 
             if play_feedback:
-                feedbackText = largeFont.render(
+                feedbackText = mediumFont.render(
                     f"{play_feedback.upper()}", True, turnColor)
 
 
                 feedbackTextRect = feedbackText.get_rect()
                 feedbackRect = pygame.Rect(window.get_width(
-                )/8.0, window.get_height()/2.0, feedbackTextRect.width, feedbackTextRect.height)
+                ) - radius*7, radius*3.5, feedbackTextRect.width, feedbackTextRect.height)
                 feedbackTextRect.center = feedbackRect.center
                 pygame.draw.rect(window, ORANGE, feedbackRect)
                 window.blit(feedbackText, feedbackTextRect)
