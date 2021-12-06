@@ -636,7 +636,7 @@ def run():
                 #pygame.display.flip()
 
                 # select header
-                select_headerText = mediumFont.render("Select an option :", True, BLACK)
+                select_headerText = mediumFont.render(question.read_header, True, BLACK)
                 select_headerTextRect = select_headerText.get_rect()
 
                 select_headerRect = pygame.Rect(

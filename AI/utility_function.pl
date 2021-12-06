@@ -179,21 +179,26 @@ normalize_score_function(State, Metrics, Score) :-
 
     % TODO Find Better Params
 
-    normalize(SetStepsLength, -1/20, 0, Turn, NormalizedSetStepsLength), 
-    normalize(MoveStepsLength, -1/50, 0, Turn, NormalizedMoveStepsLength), 
-    normalize(PiecesPlacedDanger, -1/50, 0, Turn, NormalizedPiecesPlacedDanger), 
-    normalize(PiecesPlacedAdvantange, 1/50, 0, Turn, NormalizedPiecesPlacedAdvantange), 
-    normalize(EnemyQueenThreat, 2/8, 0, Turn, NormalizedEnemyQueenThreat), 
-    normalize(AlliedQueenThreat, -1/8, 0, Turn, NormalizedAlliedQueenThreat),
-    Normalized = [
-        NormalizedSetStepsLength,
-        NormalizedMoveStepsLength,
-        NormalizedPiecesPlacedDanger,
-        NormalizedPiecesPlacedAdvantange,
-        NormalizedEnemyQueenThreat,
-        NormalizedAlliedQueenThreat
+    Params = [
+        [SetStepsLength,        -1/20, 0, Turn, NormalizedSetStepsLength],
+        [MoveStepsLength,       -1/50, 0, Turn, NormalizedMoveStepsLength],
+        [PiecesPlacedDanger,    -1/50, 0, Turn, NormalizedPiecesPlacedDanger],
+        [PiecesPlacedAdvantange, 1/50, 0, Turn, NormalizedPiecesPlacedAdvantange],
+        [EnemyQueenThreat,       2/8,  0, Turn, NormalizedEnemyQueenThreat],
+        [AlliedQueenThreat,     -1/8,  0, Turn, NormalizedAlliedQueenThreat]        
     ],
+
+    findall(X, (
+        member(P, Params),
+        last(P, X),
+        concat_list([normalize], P, FunParams),
+        F =.. FunParams,
+        call(F)
+    ), Normalized),
+
+    write(Normalized),nl,
     sum_list(Normalized, Score).
+    % sum_list(Normalized, Score). TODO Maybe is better to return the value with highest abs value? 
 
 
 % normalize(Value, MultParam, ExpParam, Turn, NormalizedResult) 

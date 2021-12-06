@@ -51,7 +51,7 @@ initial_game(Game, ExtraGameConfig) :-
     ]),
     interface_functor(Functor),
     
-    InterfaceFunction =.. [Functor, 'Hive Version', 'Select Mode', 
+    InterfaceFunction =.. [Functor, 'Hive Version', 'Select Mode:', 
         ['Classic', 'Expanded'], 
         ['c','e'], ExtraGameConfig, Version],
     call(InterfaceFunction),
@@ -73,13 +73,13 @@ init_game() :-
     
     interface_functor(Functor),
     % Selecting players
-    Player1InterfaceFunction =.. [Functor, 'Players', 'Select a player', 
-        ['HTTP Visual, Console interaction', 'HTTP', 'Human', 'AI', 'Random'], 
-        [t,0,1,2,3], DefaultExtraConfig, Player1],
+    Player1InterfaceFunction =.. [Functor, 'Players', 'Select white player:', 
+        ['Human', 'AI', 'Random'], 
+        [0,2,3], DefaultExtraConfig, Player1],
     call(Player1InterfaceFunction),
-    Player2InterfaceFunction =.. [Functor, 'Players', 'Select a player', 
-    ['HTTP Visual, Console interaction', 'HTTP', 'Human', 'AI', 'Random'], 
-    [t,0,1,2,3], DefaultExtraConfig, Player2],
+    Player2InterfaceFunction =.. [Functor, 'Players', 'Select black player:', 
+    ['Human', 'AI', 'Random'], 
+    [0,2,3], DefaultExtraConfig, Player2],
     call(Player2InterfaceFunction),
 
     % Initializing players
