@@ -3,7 +3,7 @@ import time
 import pygame
 import math
 from hexmap.Map import Grid
-from models import Game, Action, RemainingPiece
+from models import Game, Action, Question, QuestionResponse, RemainingPiece
 import os
 
 SQRT3 = math.sqrt(3)
@@ -21,11 +21,14 @@ play_feedback:str = None
 # String that gives information about the state of the play and game, can be [continue, invalid, tie, over]
 play_status:str = None
 # Rendered game instance 
-game_instance:Game = None
+game_instance:Game = Game.empty()
 # Action to perform 
 action_to_perform:Action = None
 # Question to ask the user LUISO CHECKEA LOS COMENTARIOS QUE DIGAN LUISO
-question:str = None
+question:Question = None
+# Response to the current question
+question_response: QuestionResponse = None
+
 
 BLACK = (0, 0, 0)
 GRAY = (180, 180, 180)
@@ -200,7 +203,10 @@ class RenderPieces:
         """Draw the pieces at the bottom of the window"""
         width = window.get_width()
         height = window.get_height()
-        width_of_piece = width / len(self.pieces)
+        if len(self.pieces) == 0:
+            width_of_piece = width
+        else:
+            width_of_piece = width / len(self.pieces)
         height_of_piece = self.radius * SQRT3
 
         if self.playerBlack:
@@ -361,6 +367,8 @@ def run():
     global action_to_perform
     global play_feedback
     global play_status
+    global question_response
+    global question
 
     global smallFont
     
@@ -607,16 +615,16 @@ def run():
             # RENDER QUESTION CHOICES BUTTONS
             ##############################################################
 
-            if questions:
+            if question:
                 # print buttons for each choice
-                
-                for i, choice in enumerate(questions):
+
+                for i, (choice, label) in enumerate(zip(question.options, question.labels)):
                     # Play game button
-                    buttonText = mediumFont.render(choice, True, BLACK)
+                    buttonText = mediumFont.render(label, True, BLACK)
                     buttonTextRect = buttonText.get_rect()
 
                     buttonRect = pygame.Rect(
-                        width - radius*7, radius*3.5, buttonTextRect.width, buttonTextRect.height)
+                        width - radius*7, radius*3.5 + i*buttonTextRect.height + 1, buttonTextRect.width, buttonTextRect.height)
                     
                     buttonTextRect.center = buttonRect.center
                     pygame.draw.rect(window, WHITE, buttonRect)
@@ -628,6 +636,7 @@ def run():
                         mouse = pygame.mouse.get_pos()
                         if buttonRect.collidepoint(mouse):
                             # choice selected LUISO
+                            question_response = QuestionResponse(answer=choice)
                             time.sleep(0.3)
 
                     pygame.display.flip()

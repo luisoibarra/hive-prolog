@@ -18,6 +18,10 @@ class Game(BaseModel):
     board: List[Piece]
     player:str
     remaining_pieces:List[RemainingPiece]
+    
+    @staticmethod
+    def empty() -> 'Game':
+        return Game(turn=0, board=[], player="", remaining_pieces=[])
 
 class ActionRequest(BaseModel):
     action:str

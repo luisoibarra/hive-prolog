@@ -1,5 +1,6 @@
 from typing import List, Optional, Union
 from fastapi import FastAPI
+from starlette.routing import Host
 from models import *
 import visual
 import time
@@ -53,7 +54,13 @@ def console_question_answer(question:Question) -> QuestionResponse:
     return QuestionResponse(answer = answer)
 
 def visual_question_answer(question:Question) -> QuestionResponse:
-    raise NotImplementedError # TODO
+    visual.question = question
+    while not visual.question_response:
+        time.sleep(.3)
+    response = visual.question_response
+    visual.question = None
+    visual.question_response = None
+    return response
 
 @app.post("/player_{player}")
 async def player(player:str, param: Union[GameFeedback, Game, ActionRequest, Question]):
@@ -73,6 +80,10 @@ async def player(player:str, param: Union[GameFeedback, Game, ActionRequest, Que
         print(param)
         update_visual_play_feedback(param)
     if isinstance(param, Question):
-        answer = console_question_answer(param)
-        # answer = visual_question_answer(param)
+        # answer = console_question_answer(param)
+        answer = visual_question_answer(param)
         return answer
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=9001)
