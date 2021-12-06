@@ -24,6 +24,8 @@ play_status:str = None
 game_instance:Game = None
 # Action to perform 
 action_to_perform:Action = None
+# Question to ask the user LUISO CHECKEA LOS COMENTARIOS QUE DIGAN LUISO
+question:str = None
 
 BLACK = (0, 0, 0)
 GRAY = (180, 180, 180)
@@ -36,19 +38,6 @@ smallFont = pygame.font.Font(OPEN_SANS, 16)
 mediumFont = pygame.font.Font(OPEN_SANS, 20)
 mediumFontPieces = pygame.font.Font(OPEN_SANS, 28)
 largeFont = pygame.font.Font(OPEN_SANS, 40)
-
-# Add images
-
-# queen = pygame.image.load(os.path.join("assets/images/queen.png"))
-# queen = pygame.transform.scale(queen, (int(radius*SQRT3), radius * 2))
-# spider = pygame.image.load(os.path.join("assets/images/spider.png"))
-# spider = pygame.transform.scale(spider, (int(radius*SQRT3), radius * 2))
-# ant = pygame.image.load(os.path.join("assets/images/ant.png"))
-# ant = pygame.transform.scale(ant, (int(radius*SQRT3), radius * 2))
-# beetle = pygame.image.load(os.path.join("assets/images/beetle.png"))
-# beetle = pygame.transform.scale(beetle, (int(radius*SQRT3), radius * 2))
-# cricket = pygame.image.load(os.path.join("assets/images/cricket.png"))
-# cricket = pygame.transform.scale(cricket, (int(radius*SQRT3), radius * 2))
 
 
 # Pieces
@@ -169,9 +158,11 @@ class Render(pygame.Surface):
         return (row, col) if self.map.valid_cell((row, col)) else None
 
     def fit_window(self, window):
-       top = max(window.get_height() - self.height, 0)
-       left = max(window.get_width() - self.width, 0)
-       return (top, left)
+        width = window.get_width()
+        height = window.get_height()
+        top = max(height - self.height, 0)
+        left = max(width - self.width, 0)
+        return (top, left)
 
 class RenderUnits(Render):
     """
@@ -207,11 +198,13 @@ class RenderPieces:
 
     def draw(self, window):
         """Draw the pieces at the bottom of the window"""
-        width_of_piece = window.get_width() / len(self.pieces)
+        width = window.get_width()
+        height = window.get_height()
+        width_of_piece = width / len(self.pieces)
         height_of_piece = self.radius * SQRT3
 
         if self.playerBlack:
-            location = window.get_height() - height_of_piece
+            location = height - height_of_piece
         else:
             location = 0
 
@@ -426,6 +419,8 @@ def run():
         fpsClock = pygame.time.Clock()
         window = pygame.display.set_mode((800,600), 1)
         from pygame.locals import QUIT, MOUSEBUTTONDOWN
+        width = window.get_width()
+        height = window.get_height()
 
         
 
@@ -448,7 +443,7 @@ def run():
                             CLICKED_PIECES_ON_HAND[i] = not CLICKED_PIECES_ON_HAND[i]
 
                         
-                    elif event.pos[1]>window.get_height()-pieceRadius - 8:
+                    elif event.pos[1]>height-pieceRadius - 8:
                         print("Clicked on black piece")
                         blackPiece,i = piecesBlack.get_cell(event.pos, window)
                         print(blackPiece,i)
@@ -539,11 +534,36 @@ def run():
                             
                             else:
                                 raise Exception("Multiple clicked pieces")
+            
 
-
+            ##############################################################
+            # RENDER WINDOW BASE COLOR
+            ##############################################################
             window.fill(ORANGE)
+
+            ##############################################################
+            
+
+            ##############################################################
+            # RENDER GRID
+            ##############################################################
             grid.draw()
+
+            ##############################################################
+
+
+            ##############################################################
+            # RENDER UNITS
+            ##############################################################
             units.draw()
+
+            ##############################################################
+
+
+            ##############################################################
+            # RENDER PLAYER TURN
+            ##############################################################
+
             if(turn % 2):
                 piecesBlack.draw(window)
                 turnColor = BLACK
@@ -556,11 +576,17 @@ def run():
                 f"{playerText}", True, turnColor)
 
             turnTextRect = turnText.get_rect()
-            turnRect = pygame.Rect(window.get_width() - radius*7, radius*2.5,turnTextRect.width,turnTextRect.height)
+            turnRect = pygame.Rect(width - radius*7, radius*2.5,turnTextRect.width,turnTextRect.height)
             turnTextRect.center = turnRect.center
             pygame.draw.rect(window, ORANGE, turnRect)
             window.blit(turnText, turnTextRect)
 
+            ##############################################################
+
+
+            ##############################################################
+            # RENDER FEEDBACK 
+            ##############################################################
 
             if play_feedback:
                 feedbackText = mediumFont.render(
@@ -568,11 +594,45 @@ def run():
 
 
                 feedbackTextRect = feedbackText.get_rect()
-                feedbackRect = pygame.Rect(window.get_width(
-                ) - radius*7, radius*3.5, feedbackTextRect.width, feedbackTextRect.height)
+                feedbackRect = pygame.Rect(
+                    width - radius*7, radius*3.5, feedbackTextRect.width, feedbackTextRect.height)
                 feedbackTextRect.center = feedbackRect.center
                 pygame.draw.rect(window, ORANGE, feedbackRect)
                 window.blit(feedbackText, feedbackTextRect)
+            
+            ##############################################################
+
+            
+            ##############################################################
+            # RENDER QUESTION CHOICES BUTTONS
+            ##############################################################
+
+            if questions:
+                # print buttons for each choice
+                
+                for i, choice in enumerate(questions):
+                    # Play game button
+                    buttonText = mediumFont.render(choice, True, BLACK)
+                    buttonTextRect = buttonText.get_rect()
+
+                    buttonRect = pygame.Rect(
+                        width - radius*7, radius*3.5, buttonTextRect.width, buttonTextRect.height)
+                    
+                    buttonTextRect.center = buttonRect.center
+                    pygame.draw.rect(window, WHITE, buttonRect)
+                    window.blit(buttonText, buttonTextRect)
+
+                    # Check if play button clicked
+                    click, _, _ = pygame.mouse.get_pressed()
+                    if click == 1:
+                        mouse = pygame.mouse.get_pos()
+                        if buttonRect.collidepoint(mouse):
+                            # choice selected LUISO
+                            time.sleep(0.3)
+
+                    pygame.display.flip()
+
+            ##############################################################
 
 
            
