@@ -337,7 +337,9 @@ def run():
         global ALL_BLACK_PIECES 
         global ALL_WHITE_PIECES 
 
-        
+        ######################################################################################
+        # ESTE CACHO NO ESTA MALA LA IDEA PERO SI JUEGAS UN POCO VERAS COMO
+        # LAS PIEZAS BLANCAS EN LA MANO EMPIEZAN A DESAPARECER EN DEPENDENCIA DE LAS NEGRAS
 
         for pieces in game_instance.remaining_pieces:
             if pieces.player.lower() == "white":
@@ -348,6 +350,8 @@ def run():
         PIECES = list(dict.fromkeys(ALL_BLACK_PIECES).keys())
         PIECES_ON_GRID = [string.upper()[0] for string in PIECES]
         CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
+
+        #######################################################################################
 
         BLACKPIECES_AMOUNT = [ALL_BLACK_PIECES.count(piece) for piece in PIECES]
         WHITEPIECES_AMOUNT = [ALL_WHITE_PIECES.count(piece) for piece in PIECES]
@@ -410,6 +414,9 @@ def run():
     
     global ALL_BLACK_PIECES
     global ALL_WHITE_PIECES
+
+    # LUISO ESTE HACE FALTA PARA QUE LAS PIEZAS DEL PRINCIPIO NO CAMBIEN
+    # PIECES ESTA CAMBIANDO EN CADA UPDATE Y NO DEBERIA XQ DEPENDE SOLO DE LAS NEGRAS AL PRINCIPIO
 
     # for pieces in game_instance.remaining_pieces:
     #     if pieces.player.lower() == "white":
@@ -625,6 +632,7 @@ def run():
             ##############################################################
 
             if question:
+                
                 # print buttons for each choice
                 question_headerText = mediumFont.render(question.header, True, BLACK)
                 question_headerTextRect = question_headerText.get_rect()
