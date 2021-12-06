@@ -33,7 +33,8 @@ ORANGE = pygame.Color('orange')
 # Fonts
 OPEN_SANS ="assets/fonts/OpenSans-Regular.ttf"
 smallFont = pygame.font.Font(OPEN_SANS, 16)
-mediumFont = pygame.font.Font(OPEN_SANS, 28)
+mediumFont = pygame.font.Font(OPEN_SANS, 20)
+mediumFontPieces = pygame.font.Font(OPEN_SANS, 28)
 largeFont = pygame.font.Font(OPEN_SANS, 40)
 
 # Add images
@@ -287,7 +288,7 @@ def run():
             else:
                 color1 = WHITE
             radius = unitRect.width/ 2
-            pieceText = mediumFont.render(f"{self.label}", True, color1)
+            pieceText = mediumFontPieces.render(f"{self.label}", True, color1)
             pieceTextRect = unitRect
             center = pieceTextRect.center
             center=(center[0]+ (radius/1.5),center[1]+(radius/4))
@@ -551,7 +552,7 @@ def run():
                 piecesWhite.draw(window)
                 turnColor = WHITE
             playerText = "Player Black" if(turn % 2) else "Player White"
-            turnText = smallFont.render(
+            turnText = mediumFont.render(
                 f"{playerText}", True, turnColor)
 
             turnTextRect = turnText.get_rect()
@@ -559,6 +560,19 @@ def run():
             turnTextRect.center = turnRect.center
             pygame.draw.rect(window, ORANGE, turnRect)
             window.blit(turnText, turnTextRect)
+
+
+            if play_feedback:
+                feedbackText = largeFont.render(
+                    f"{play_feedback.upper()}", True, turnColor)
+
+
+                feedbackTextRect = feedbackText.get_rect()
+                feedbackRect = pygame.Rect(window.get_width(
+                )/8.0, window.get_height()/2.0, feedbackTextRect.width, feedbackTextRect.height)
+                feedbackTextRect.center = feedbackRect.center
+                pygame.draw.rect(window, ORANGE, feedbackRect)
+                window.blit(feedbackText, feedbackTextRect)
 
 
            
