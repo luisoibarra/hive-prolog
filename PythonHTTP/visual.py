@@ -626,36 +626,48 @@ def run():
 
             if question:
                 # print buttons for each choice
-                buttonText = mediumFont.render(question.header, True, BLACK)
-                buttonTextRect = buttonText.get_rect()
-                buttonRect = pygame.Rect(
-                        width - radius*7, radius*3.5 + 2*buttonTextRect.height+10, buttonTextRect.width, buttonTextRect.height)
-                pygame.draw.rect(window, WHITE, buttonRect)
-                window.blit(buttonText, buttonTextRect)
-                pygame.display.flip()
+                question_headerText = mediumFont.render(question.header, True, BLACK)
+                question_headerTextRect = question_headerText.get_rect()
+                question_headerRect = pygame.Rect(
+                        width - radius*7, radius*3.5 + 2*question_headerTextRect.height+10, question_headerTextRect.width, question_headerTextRect.height)
+                question_headerTextRect.center = question_headerRect.center
+                pygame.draw.rect(window, WHITE, question_headerRect)
+                window.blit(question_headerText, question_headerTextRect)
+                #pygame.display.flip()
+
+                # select header
+                select_headerText = mediumFont.render("Select an option :", True, BLACK)
+                select_headerTextRect = select_headerText.get_rect()
+
+                select_headerRect = pygame.Rect(
+                    width - radius*7, radius*3.5 + (4)*select_headerTextRect.height + 10, select_headerTextRect.width, select_headerTextRect.height)
+
+                select_headerTextRect.center = select_headerRect.center
+                pygame.draw.rect(window, WHITE, select_headerRect)
+                window.blit(select_headerText, select_headerTextRect)
                 
                 for i, (choice, label) in enumerate(zip(question.options, question.labels)):
-                    # Play game button
-                    buttonText = mediumFont.render(label, True, BLACK)
-                    buttonTextRect = buttonText.get_rect()
+                    # choice button
+                    choiceText = mediumFont.render(label, True, BLACK)
+                    choiceTextRect = choiceText.get_rect()
 
-                    buttonRect = pygame.Rect(
-                        width - radius*7, radius*3.5 + (i+3)*buttonTextRect.height + 10, buttonTextRect.width, buttonTextRect.height)
+                    choiceRect = pygame.Rect(
+                        width - radius*7, radius*3.5 + (i+6)*choiceTextRect.height + 10, choiceTextRect.width, choiceTextRect.height)
                     
-                    buttonTextRect.center = buttonRect.center
-                    pygame.draw.rect(window, WHITE, buttonRect)
-                    window.blit(buttonText, buttonTextRect)
+                    choiceTextRect.center = choiceRect.center
+                    pygame.draw.rect(window, WHITE, choiceRect)
+                    window.blit(choiceText, choiceTextRect)
 
-                    # Check if play button clicked
+                    # Check if choice button clicked
                     click, _, _ = pygame.mouse.get_pressed()
                     if click == 1:
                         mouse = pygame.mouse.get_pos()
-                        if buttonRect.collidepoint(mouse):
-                            # choice selected LUISO
+                        if choiceRect.collidepoint(mouse):
+                            # choice selected 
                             question_response = QuestionResponse(answer=choice)
                             time.sleep(0.3)
 
-                    pygame.display.flip()
+                    #pygame.display.flip()
 
             ##############################################################
 
