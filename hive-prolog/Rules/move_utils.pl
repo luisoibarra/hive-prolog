@@ -1,8 +1,19 @@
 :- module(move_utils, [first_empty_place_from/7, border_move/3, 
-    move_above_and_finish_down/5, pillbug_translate/4]).
+    move_above_and_finish_down/5, pillbug_translate/4,
+    slide_one_step/6]).
 :- use_module('../Utils/board_utils'). 
 :- use_module('../Utils/piece_utils').
 :- use_module('../Utils/list_utils').
+
+slide_one_step(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :- 
+    piece(PosX, PosY,_,_) = Piece,
+    get_piece_Height(Piece, PieceHeight),
+    positions_next_to(PosX, PosY, NewPosX, NewPosY,_),
+    not(is_place_taken(Board, NewPosX, NewPosY,_)),
+    can_slide_into(Board, Piece, NewPosX, NewPosY, NewPiece),
+    get_piece_Height(NewPiece, PieceHeight),
+    remove_board_piece(Board, Piece, RemovedBoard),
+    [NewPiece|RemovedBoard] = NewBoard.
 
 % first_empty_place_from(Board, PosX, PosY, Dir, Length, NewPosX, NewPosY) 
 % Succeed if NewPosX and NewPosY are the coordinates of the first empty
