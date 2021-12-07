@@ -2,7 +2,7 @@
                     get_game_PiecesInfo/2, get_game_Players/2, update_game_state/4,
                     end_turn_feedback/3]).
 :- use_module('../Rules/add_piece_rules'). 
-:- use_module('../Rules/game_rules'). 
+:- use_module('../Rules/end_game_rules'). 
 :- use_module('../Rules/move_piece_rules'). 
 :- use_module('../Utils/board_utils'). 
 :- use_module('../Utils/list_utils'). 

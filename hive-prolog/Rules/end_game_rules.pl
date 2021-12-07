@@ -1,4 +1,4 @@
-:- module(game_rules, [queen_surrounded/2,repeated_game_positions/2]).
+:- module(end_game_rules, [queen_surrounded/2,repeated_game_positions/2]).
 :- use_module('../Utils/board_utils'). 
 :- use_module('../Utils/piece_utils'). 
 

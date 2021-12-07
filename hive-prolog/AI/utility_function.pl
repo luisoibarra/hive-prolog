@@ -1,6 +1,6 @@
 :- module(utility_function,[player_utility_function/3, piece_to_advantage/4, piece_to_danger/4]).
 :- use_module('../Run/run_game_utils').
-:- use_module('../Rules/game_rules').
+:- use_module('../Rules/end_game_rules').
 :- use_module('../Utils/list_utils').
 :- use_module('../Utils/piece_utils').
 :- use_module('../Utils/board_utils').
