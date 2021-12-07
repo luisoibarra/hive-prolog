@@ -47,47 +47,85 @@ Una vez se tenga el visual y el servidor corriendo se debe seleccionar al menos 
 
 ## Implementación
 
+El proyecto propuso diferentes dificultades:
+
+- Tener una forma extensible de comunicarse con el usuario en dependencia de la interfaz que se quiera usar consola, http u alguna otra.
+- Tener una manera sencilla y extensible de representar las reglas del juego.
+- Tener una manera extensible de representar a los jugadores independientemente de que si es humano o no.
+- Realizar un jugador inteligente autónomo que sea capaz de poder jugar contra un humano.
+
+Lo primero a tener en cuenta son las principales estructuras que se usaron en la implementación
+
 ### Estructuras
 
-- piece(PosX, PosY, PlayerOwner, \[PieceType,Height\])
-  - PosX, PosY: Coordenadas en el grid hexagonal
-  - PlayerOwner: white, black, etc.
-  - PieceType: queen, beetle, spider, cricket, etc.
-  - Height: Altura de la  pieza en el tablero
-- pieces_info(PlayerOwner, PiecesTypesLeftToSet)
-  - PlayerOwner: white, black, etc.
-  - PiecesTypesLeftToSet: Lista de tipos de piezas, ej: \[queen, spider\]
-- game(Board,CurrentTurnPlayer,\[PlayersPiecesToSet,GameHistory,CurrentTurn\])
-  - Board: Lista de `piece`
-  - CurrentTurnPlayer: white, black, etc.
-  - PlayersPiecesToSet: Lista de `pieces_info`
-  - CurrentTurn: entero indicando el turno
-- set_play(PositionSelectedPieceToSet, PosX, PosY)
-  - PositionSelectedPieceToSet: Index en PiecesTypesLeftToSet de `pieces_info` de la ficha que se quiere poner
-  - PosX, PosY: Posición de la ficha
-- move_play(PosX, PosY, NewPosX, NewPosY)
-  - PosX, PosY: Posición de la ficha en el tablero a mover
-  - NewPosX, NewPosYÑ Nueva posición de la ficha
-- step(Action, Game, Feedback, Status)
-  - Action: Movimiento que se hizo en el paso ej: `set_play`, `move_play`.
-  - Game: Instancia del `game` generada en el paso.
-  - Feedback: String con un mensaje sobre el estado del paso
-  - Status: Indica el estado del paso ej: invalid, continue, over, tie.
-- game_config(FeedbackPlayerInfoList, ExtraPlayerInfoList)
-  - FeedbackPlayerInfoList: Lista que contiene `feedback_info` con los functors a llamar para la actualización del estado de los usuarios
-  - ExtraPlayerInfoList: Lista que contiene `extra_info` sobre la configuración de los usuarios.
-- feedback_info(PlayerColor, StartGameStateUserFeedback, EndGameStateUserFeedback)
-  - StartGameStateUserFeedback: Functor a llamar para mostrar y actualizar el estado del juego en el cliente
-  - EndGameStateUserFeedback: Functor a llamar para mostrar y actualizar el estado del juego luego de que se haya hecho una jugada
-- extra_info(Player, ExtraConfigInfo)
-  - ExtraConfigInfo: Lista que contiene información adicional sobre el jugador necesaria para hacer los updates. Por ejemplo se usa para guardar la dirección de los jugadores HTTP conteniendo un `http_player_config(Host, Port, BasePath)`.
-- player(CurrentPlayer, \[PlayerFunctor\])
-  - CurrentPlayer: white, black, etc.
-  - PlayerFunctor: Functor a una función que devuelve la acción del jugador
+1. Básicas
 
-### Estrategia
+  - piece(PosX, PosY, PlayerOwner, \[PieceType,Height\])
+    - PosX, PosY: Coordenadas en el grid hexagonal
+    - PlayerOwner: white, black, etc.
+    - PieceType: queen, beetle, spider, cricket, etc.
+    - Height: Altura de la  pieza en el tablero
+  - pieces_info(PlayerOwner, PiecesTypesLeftToSet)
+    - PlayerOwner: white, black, etc.
+    - PiecesTypesLeftToSet: Lista de tipos de piezas, ej: \[queen, spider\]
+  - game(Board,CurrentTurnPlayer,\[PlayersPiecesToSet,GameHistory,CurrentTurn\])
+    - Board: Lista de `piece`
+    - CurrentTurnPlayer: white, black, etc.
+    - PlayersPiecesToSet: Lista de `pieces_info`
+    - CurrentTurn: entero indicando el turno
 
-#### Generales
+2. Acciones hechas por jugadores
+
+  - set_play(PositionSelectedPieceToSet, PosX, PosY)
+    - PositionSelectedPieceToSet: Index en PiecesTypesLeftToSet de `pieces_info` de la ficha que se quiere poner
+    - PosX, PosY: Posición de la ficha
+  - move_play(PosX, PosY, NewPosX, NewPosY)
+    - PosX, PosY: Posición de la ficha en el tablero a mover
+    - NewPosX, NewPosYÑ Nueva posición de la ficha
+
+3. Flujo de juego
+
+  - step(Action, Game, Feedback, Status)
+    - Action: Movimiento que se hizo en el paso ej: `set_play`, `move_play`.
+    - Game: Instancia del `game` generada en el paso.
+    - Feedback: String con un mensaje sobre el estado del paso
+    - Status: Indica el estado del paso ej: invalid, continue, over, tie.
+  - feedback_info(PlayerColor, StartGameStateUserFeedback, EndGameStateUserFeedback)
+    - StartGameStateUserFeedback: Functor a llamar para mostrar y actualizar el estado del juego en el cliente
+    - EndGameStateUserFeedback: Functor a llamar para mostrar y actualizar el estado del juego luego de que se haya hecho una jugada
+
+4. Configuración
+
+  - player_info(CurrentPlayer, \[PlayerFunctor\])
+    - CurrentPlayer: white, black, etc.
+    - PlayerFunctor: Functor a una función que devuelve la acción del jugador
+  - game_config(FeedbackPlayerInfoList, ExtraPlayerInfoList)
+    - FeedbackPlayerInfoList: Lista que contiene `feedback_info` con los functors a llamar para la actualización del estado de los usuarios
+    - ExtraPlayerInfoList: Lista que contiene `extra_info` sobre la configuración de los usuarios.
+  - extra_info(Player, ExtraConfigInfo)
+    - ExtraConfigInfo: Lista que contiene información adicional sobre el jugador necesaria para hacer los updates. Por ejemplo se usa para guardar la dirección de los jugadores HTTP conteniendo un `http_player_config(Host, Port, BasePath)`.
+
+### Interfaz extensible
+
+Este problema fue resuelto mediante el uso de functors. En la configuración por defecto del juego se guarda el functor que se utilizará para la interacción con el usuario. Lo anterior se puede observar en `run_console.pl` en el hecho *interface_functor* el cual tiene como valor asignado el functor usado para la comunicación con el usuario en términos de configuración del juego, por ejemplo que tipo de juego quiere jugar o que tipo de jugador quiere ser.
+
+La interacción del jugador con la interfaz también es modelada mediante functors, lo cual permite abstraer la acción que se quiere hacer de cómo se hace, permitiendo una gran versatilidad. Las acciones que hacen los jugadores al interactar con la interfaz son las de mostrar el estado actual del juego y mostrar el resultado luego de un movimiento. Esta asignación de jugador a acción se puede ver en `run_console.pl` en los hechos *select_player*, los cuales tienen asignados los functors que realizarán las acciones correspondientes, aquí se crearon 3 tipos de jugadores: *Human*, *AI* y *Random*.
+
+Una vez se tiene toda esta configuración se tiene un mismo código para correr el juego independientemente de cuál sea esta, permitiendo poder agregar o cambiar solamente los functors y manteniendo la lógica del flujo del juego.
+
+### Lógica del juego
+
+Básicamente el juego consiste en dos acciones posibles, poner una pieza y mover una pieza. Estas acciones se expresan mediante las cláusulas `add_piece` en `add_piece_rules.pl` y `move` en `move_piece_rules.pl` respectivamente. Las otras reglas más generales se van manteniendo a medida de que se hacen las jugadas, tales como la conectitud del tablero y la existencia de una reina del color que desea mover entre otras. Al estar estas acciones en solo dos cláusulas permite que agregar más reglas relacionadas con ellas sean tarea sencilla y también provee una manera simple de añadir los diferentes tipos de bichos presentes en el juego. Los nuevos bichos se pueden agregar al definir cómo se mueven y agregar el correspondiente `bug_movement_functor` en `bug_movement.pl`.
+
+### Flujo del juego
+
+El flujo del juego empieza en la cláusula `init_game` en donde se configuran las características del juego como el tipo de juego que se va a jugar y el tipo de jugadores que se va a elegir. Una vez elegido esto se genera un ciclo por un llamado recursivo de cola de la cláusula `run_game`. En esta cláusula ocurre todo lo relacionado con las acciones de los jugadores, la actualización de la interfaz con la representación actual del juego, etc.
+
+### Jugador Inteligente
+
+Para la creación del jugador inteligente se recurrió al uso del algoritmo minimax usando el método de poda `alpha-beta` este puede ser encotrado en `minimax.pl`. La función de decisión de la acción a tomar por este jugador es `ai_player` que se encuentra en `players.pl`.
+
+Para la función de utilidad de dicho algoritmo se tuvieron en cuenta los siguientes criterios:
 
 - Cantidad de moviemientos que se pueden hacer por jugador
 - Cantidad de fichas alrededor de la reina
@@ -95,21 +133,19 @@ Una vez se tenga el visual y el servidor corriendo se debe seleccionar al menos 
 - Cantidad de lugares en donde se puede poner fichas
 - Tipo de fichas en el tablero
 
-#### Poner piezas
-
-- Las Piezas tienen una ganancia por ponerlas que puede variar de acuerdo el juego
-  - Al principio se potencian las fichas que son menos potentes en moviemiento ya que la primera ficha que se pone generalmente se mantiene ahí. Por ejemplo la araña
-  - La reina se potencia para colocarla en el 3ro y 4to turno
+Estos criterios luego son normalizados y multiplicados por un peso que depende del turno en donde se encuentre el juego, de esta manera se pueden potenciar ciertos movimientos al principio o ya en el medio o largo juego. La función puede ser encontrada en `utility_function.pl`.
 
 ### Test
 
-Los testing en `test_boards.pl` son para probar movimientos y el añadido de piezas con más flexibilidad de que se tiene en el juego original. Para correrlos cargar el archivo y ejecutar `run_board_test().`
+A medida que se aumentó la complejidad del proyecto se hicieron pequeños scripts para probar las diferentes mecánicas del juego que se estaban implementando:
 
-Los testing en `test_games.pl` son simulaciones de juegos con todas las reglas. Para correrlos cargar el archivo y ejecutar `run_game_tests().`
+- `test_boards.pl`: Probar movimientos y el añadido de piezas. Para correrlos cargar el archivo y ejecutar `run_board_test().`
+- `test_games.pl`: Simulaciones de juegos con todas las reglas. Para correrlos cargar el archivo y ejecutar `run_game_tests().`
+
 
 ### Interfaz HTTP Prolog
 
-Se hace un POST al host con el puerto establecido al path `player_{COLOR DEL JUGADOR}`. Por ejemplo un pseudo HEADER podría ser `POST http://localhost:9001/player_white`.
+Para poder conectar la lógica del juego en Prolog a cualquier cliente se creó una interfaz HTTP. Para esto se hace un POST al host (default *127.0.0.1*) con el puerto establecido (default *9001*) al path `player_{COLOR DEL JUGADOR}`. Por ejemplo un pseudo HEADER podría ser `POST http://127.0.0.1:9001/player_white`.
 
 Cuerpos del POST:
 
@@ -118,8 +154,7 @@ Cuerpos del POST:
 - Se enviará un JSON con el siguiente formato
 
 ``` json
-// Representación de una instancia de juego. Se usará esta plantilla luego.
-game =
+// Representación de una instancia de juego (game). Se usará esta plantilla luego.
 {
   "turn":1,
   "board":[
@@ -176,8 +211,7 @@ game =
 
 ```json
 // En caso de que se ponga una ficha
-// Representación de una acción de juego. Se usará esta plantilla luego.
-action=
+// Representación de una acción (action) de juego. Se usará esta plantilla luego.
 {
   "type":"set",
   "final_x":2,
@@ -189,8 +223,7 @@ action=
 
 ```json
 // En caso de que se mueva una ficha
-// Representación de una acción de juego. Se usará esta plantilla luego.
-action=
+// Representación de una acción (action) de juego. Se usará esta plantilla luego.
 {
   "type":"move",
   "final_x":3,
@@ -207,12 +240,12 @@ action=
 ```json
 
 {
-  "game":<game>,
-  "action":<action>,
+  "game":"Instancia <game>",
+  "action":"Instancia <action>",
   "feedback":"Game Over",
-  "status": "tie"
+  "status": "tie" // status Puede ser alguno de estos valores: [invalid, continue, tie, over]
 }
-// status Puede ser alguno de estos valores: [invalid, continue, tie, over]
+
 ```
 
 4. Selección de opciones de configuración
@@ -236,6 +269,10 @@ action=
   "answer": "1" // option correspondiente al label seleccionado
 }
 ```
+
+### Interfaz visual
+
+La interfaz visual se creó mediante la unión de los paquetes **FastAPI** y **pygame**. Con el primero se crearon los endpoints y los modelos necesarios para la comunicación con la lógica del juego respetando la interfaz explicada anteriormente. Con el segundo se crearon los visuales necesarios para representar el juego así como la interacción entre el usuario y el juego a través de clicks. 
 
 ## Bibliografía
 
