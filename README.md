@@ -109,7 +109,7 @@ Los testing en `test_games.pl` son simulaciones de juegos con todas las reglas. 
 
 ### Interfaz HTTP Prolog
 
-Se hace un POST al host con el puerto establecido al path `player_{COLOR DEL JUGADOR}`. Por ejemplo un pseudo HEADER podría ser `POST http://localhost:9000/player_white`.
+Se hace un POST al host con el puerto establecido al path `player_{COLOR DEL JUGADOR}`. Por ejemplo un pseudo HEADER podría ser `POST http://localhost:9001/player_white`.
 
 Cuerpos del POST:
 
