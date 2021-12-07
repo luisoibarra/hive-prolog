@@ -4,6 +4,6 @@ RUN mkdir app
 
 WORKDIR /app
 
-COPY . .
+COPY ./hive-prolog .
 
 RUN swipl -o main.out -c main.pl
