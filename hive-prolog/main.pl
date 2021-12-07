@@ -1,4 +1,4 @@
-:- use_module(run_console).
+:- use_module('Run/run_console').
 
 initialization(main,main).
 

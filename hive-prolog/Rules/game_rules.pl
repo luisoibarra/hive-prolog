@@ -1,6 +1,6 @@
 :- module(game_rules, [queen_surrounded/2,repeated_game_positions/2]).
-:- use_module(board_utils). 
-:- use_module(piece_utils). 
+:- use_module('../Utils/board_utils'). 
+:- use_module('../Utils/piece_utils'). 
 
 max_repetitions_allowed(3).
 

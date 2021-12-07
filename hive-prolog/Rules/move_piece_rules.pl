@@ -1,7 +1,7 @@
 :- module(move_piece_rules, [move/6]).
-:- use_module(board_utils). 
-:- use_module(list_utils). 
-:- use_module(piece_utils). 
+:- use_module('../Utils/board_utils'). 
+:- use_module('../Utils/list_utils'). 
+:- use_module('../Utils/piece_utils'). 
 :- use_module(move_utils). 
 
 % Movement Rules

@@ -1,10 +1,10 @@
 :- module(run_console,[init_game/0,run_game/3]).
 :- use_module(run_game_utils).
 :- use_module(players).
-:- use_module(console_utils).
-:- use_module(http_utils).
-:- use_module(list_utils).
-:- use_module('AI/ai_utils').
+:- use_module('../Utils/console_utils').
+:- use_module('../Utils/list_utils').
+:- use_module('../HTTP/http_utils').
+:- use_module('../AI/ai_utils').
 
 % PLAYERS CONFIGURATIONS
 

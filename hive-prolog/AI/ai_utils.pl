@@ -1,5 +1,5 @@
 :- module(ai_utils, [next_game_step/2, all_next_game_steps/2]).
-:- use_module('../run_game_utils').
+:- use_module('../Run/run_game_utils').
 
 % next_game_step(Game, Action, NewGame, Feedback, Status) Given a Game returns a posible Action NewGame Feedback Status
 next_game_step(Game, step(Action, NewGame, Feedback, Status)) :-

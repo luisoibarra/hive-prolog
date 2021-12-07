@@ -1,12 +1,12 @@
 :- module(run_game_utils,[make_a_play/5, get_game_GameHistory/2, get_game_Turn/2,
                     get_game_PiecesInfo/2, get_game_Players/2, update_game_state/4,
                     end_turn_feedback/3]).
-:- use_module(add_piece_rules). 
-:- use_module(game_rules). 
-:- use_module(move_piece_rules). 
-:- use_module(board_utils). 
-:- use_module(list_utils). 
-:- use_module(piece_utils). 
+:- use_module('../Rules/add_piece_rules'). 
+:- use_module('../Rules/game_rules'). 
+:- use_module('../Rules/move_piece_rules'). 
+:- use_module('../Utils/board_utils'). 
+:- use_module('../Utils/list_utils'). 
+:- use_module('../Utils/piece_utils'). 
 
 
 % game(Board, CurrentPlayer, [WhiteTypePieces, BlackTypePieces, GameHistory, Turn]).
@@ -59,6 +59,7 @@ move_piece(PosX, PosY, DestPosX, DestPosY, Game, NewGame) :-
 
     update_game_state(Game, NewBoard, PiecesToSet, NewGame).
 
+% end_turn_feedback(Game, Feedback, GameStatus) Given a Game return the current GameStatus with a Feedback
 end_turn_feedback(Game, Feedback, GameStatus) :-
 
     game(Board, CurrentPlayer, [_, GameHistory|_]) = Game,

@@ -1,19 +1,19 @@
 :- module(piece_utils, [get_piece_X/2, get_piece_Y/2, get_piece_Color/2, 
     get_piece_Type/2, get_piece_Height/2, set_piece_Height/3, build_piece/5]).
 
-% Pieces
-ant.
-queen.
-cricket.
-spider.
-beetle.
-mosquito.
-ladybug.
-pillbug.
+% Type
+% ant.
+% queen.
+% cricket.
+% spider.
+% beetle.
+% mosquito.
+% ladybug.
+% pillbug.
 
 % Color
-white.
-black.
+% white.
+% black.
 
 % Piece Definition
 % piece(PosX, PosY, Color, [Type, Height]).

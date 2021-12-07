@@ -3,7 +3,7 @@
 :- use_module(library(http/http_dispatch)).
 :- use_module(library(http/http_json)).
 :- use_module(library(http/json)).
-:- use_module(players).
+:- use_module('../Run/players').
 :- use_module(json_utils).
 
 % Para probar el json

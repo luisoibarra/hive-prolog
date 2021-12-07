@@ -1,7 +1,7 @@
 :- module(add_piece_rules, [add_piece/3]).
-:- use_module(board_utils). 
-:- use_module(list_utils). 
-:- use_module(piece_utils). 
+:- use_module('../Utils/board_utils'). 
+:- use_module('../Utils/list_utils'). 
+:- use_module('../Utils/piece_utils'). 
 
 
 % Rules

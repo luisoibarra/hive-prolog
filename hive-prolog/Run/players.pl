@@ -1,14 +1,14 @@
 :- module(players, [random_player/3, console_human_player/3, 
                     ai_player/3, http_player/3, 
                     empty_player_extra_config/2]).
-:- use_module(list_utils). 
-:- use_module('AI/ai_utils'). 
-:- use_module('AI/minmax'). 
-:- use_module('AI/minmax_utils'). 
-:- use_module('AI/utility_function'). 
+:- use_module('../AI/ai_utils'). 
+:- use_module('../AI/minmax'). 
+:- use_module('../AI/minmax_utils'). 
+:- use_module('../AI/utility_function'). 
 :- use_module(run_game_utils).
-:- use_module(http_utils).
-:- use_module(console_utils).
+:- use_module('../HTTP/http_utils').
+:- use_module('../Utils/list_utils'). 
+:- use_module('../Utils/console_utils').
 
 % empty_player_extra_config(ColorPlayer, ExtraGameConfig) Returns an empty ExtraGameConfig list
 empty_player_extra_config(_, []).

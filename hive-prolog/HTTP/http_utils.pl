@@ -7,7 +7,7 @@
 :- use_module(library(http/http_json)).
 :- use_module(library(http/json)).
 :- use_module(json_utils).
-:- use_module(console_utils).
+:- use_module('../Utils/console_utils').
 
 send_post(Json, Host, Port, Path, Reply) :- 
     atom_json_term(JsonStr, Json, []),
@@ -44,11 +44,14 @@ http_game_feedback(PlayerColor, Action, NewGame, Feedback, Status, ExtraGameConf
 
 % http_player_extra_config(ColorPlayer, ExtraGameConfig) Given a player, returns the HTTP configuration
 http_player_extra_config(ColorPlayer, ExtraGameConfig) :-
+    % % Uncomment for custom IP:Port address
+
     % write('Player '), write(ColorPlayer), nl,
     % read_with_headline('Host (d if localhost):', HostPrev),
     % default_if_empty(HostPrev, d, '127.0.0.1', Host),
     % read_with_headline('Port (d if 9001):', PortPrev),
     % default_if_empty(PortPrev, d, 9001, Port),
+
     concat('/player_', ColorPlayer, PrefixPath),
     Host = '127.0.0.1', Port = 9001, 
     ExtraGameConfig = [http_player_config(Host, Port, PrefixPath)].

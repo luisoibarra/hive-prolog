@@ -1,8 +1,8 @@
 :- module(move_utils, [first_empty_place_from/7, border_move/3, 
     move_above_and_finish_down/5, pillbug_translate/4]).
-:- use_module(board_utils). 
-:- use_module(piece_utils).
-:- use_module(list_utils).
+:- use_module('../Utils/board_utils'). 
+:- use_module('../Utils/piece_utils').
+:- use_module('../Utils/list_utils').
 
 % first_empty_place_from(Board, PosX, PosY, Dir, Length, NewPosX, NewPosY) 
 % Succeed if NewPosX and NewPosY are the coordinates of the first empty

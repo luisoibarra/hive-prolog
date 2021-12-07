@@ -1,9 +1,9 @@
 :- module(utility_function,[player_utility_function/3, piece_to_advantage/4, piece_to_danger/4]).
-:- use_module('../run_game_utils').
-:- use_module('../game_rules').
-:- use_module('../list_utils').
-:- use_module('../piece_utils').
-:- use_module('../board_utils').
+:- use_module('../Run/run_game_utils').
+:- use_module('../Rules/game_rules').
+:- use_module('../Utils/list_utils').
+:- use_module('../Utils/piece_utils').
+:- use_module('../Utils/board_utils').
 :- use_module(ai_utils).
 
 player_utility_function(State, UtilityPlayer, Vector) :- 
