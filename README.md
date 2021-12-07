@@ -2,28 +2,52 @@
 
 Implementación del juego Hive en Prolog.
 
-## Jugar
+- Luis Ernesto Ibarra Vázquez C411
+- Luis Enrique Dalmau Coopat C411
 
-### Docker
+## Correr juego
+
+### Requerimientos
+
+- Tener de alguna forma **SwiProlog**
+- Tener las dependencias de Python descritas en el **requirements.txt**
+
+#### Opcional
+- Tener docker instalado en caso de no tener **SwiProlog** en la computadora
+
+### Jugar
+
+#### Interfaz visual
+
+Los *requirements.txt* tienen que estar cumplidos, lo que se puede hacer ejecutando **install_requirements.sh**.
+
+Para jugar con interfaz visual ejectar el script **play.sh** estando en la carpeta *hive-python-visual*.
+
+#### Correr servidor de Prolog
+
+##### Docker
 
 Crear imagen de Docker:
 
 1. Abrir consola en la carpeta del proyecto
-2. En la consola ejecutar `docker build -t swipl-hive:v1 .` Notar el punto al final.
-   - Este paso le descargará la imagen de SwiProlog del repositorio de la UCLV `docker.uclv.cu/swipl:8.2.4`.
-   - En caso de ya tener una imagen de prolog en el sistema cambiar el `FROM <Nombre de la imagen>` en el Dockerfile.
+2. En la consola ejecutar `./play_docker.sh`.
+   - Este paso le descargará la imagen de SwiProlog del repositorio de la UCLV `docker.uclv.cu/swipl:8.2.4` si no la tiene en la computadora.
+     - En caso de ya tener una imagen de prolog en el sistema cambiar el `FROM <Nombre de la imagen>` en el Dockerfile.
+   - Luego correrá el container asociado a la imagen del proyecto
+3. En el container ejecutar `main.`
 
-Correr container con el proyecto:
-
-1. En la consola ejecutar `docker run --rm -it --net=host swipl-hive:v1 ./main.out`
-2. Luego ejecutar `main().`
-
-### Sin Docker
+##### Sin Docker
 
 1. En la consola ejecutar `swipl main.pl` o `swipl -o main.out -c main.pl;./main.out`
-2. Luego ejecutar `main().`
+2. Luego ejecutar `main.`
 
-## Estructuras
+#### A tener en cuenta
+
+Una vez se tenga el visual y el servidor corriendo se debe seleccionar al menos un jugador Humano al iniciar el juego y verificar que el puerto `9001` no está siendo usado por otro programa en `127.0.0.1` ya que es por aquí por donde se hace la comunicación entre el visual y la lógica del juego.
+
+## Implementación
+
+### Estructuras
 
 - piece(PosX, PosY, PlayerOwner, \[PieceType,Height\])
   - PosX, PosY: Coordenadas en el grid hexagonal
@@ -37,7 +61,7 @@ Correr container con el proyecto:
   - Board: Lista de `piece`
   - CurrentTurnPlayer: white, black, etc.
   - PlayersPiecesToSet: Lista de `pieces_info`
-  - CurrentTurn: entero
+  - CurrentTurn: entero indicando el turno
 - set_play(PositionSelectedPieceToSet, PosX, PosY)
   - PositionSelectedPieceToSet: Index en PiecesTypesLeftToSet de `pieces_info` de la ficha que se quiere poner
   - PosX, PosY: Posición de la ficha
@@ -61,26 +85,29 @@ Correr container con el proyecto:
   - CurrentPlayer: white, black, etc.
   - PlayerFunctor: Functor a una función que devuelve la acción del jugador
 
-## Test
+### Estrategia
+
+#### Generales
+
+- Cantidad de moviemientos que se pueden hacer por jugador
+- Cantidad de fichas alrededor de la reina
+- Cantidad de fichas que se pueden mover
+- Cantidad de lugares en donde se puede poner fichas
+- Tipo de fichas en el tablero
+
+#### Poner piezas
+
+- Las Piezas tienen una ganancia por ponerlas que puede variar de acuerdo el juego
+  - Al principio se potencian las fichas que son menos potentes en moviemiento ya que la primera ficha que se pone generalmente se mantiene ahí. Por ejemplo la araña
+  - La reina se potencia para colocarla en el 3ro y 4to turno
+
+### Test
 
 Los testing en `test_boards.pl` son para probar movimientos y el añadido de piezas con más flexibilidad de que se tiene en el juego original. Para correrlos cargar el archivo y ejecutar `run_board_test().`
 
 Los testing en `test_games.pl` son simulaciones de juegos con todas las reglas. Para correrlos cargar el archivo y ejecutar `run_game_tests().`
 
-## Bibliografía
-
-Se usará para las posiciones de los hexágonos estilo offset coordinates odd-q de la página https://www.redblobgames.com/grids/hexagons/.
-
-Artificial Inteligence: A Modern Approach, Capítulo 5 pág 161
-
-## TODO
-
-- Hacer que el feedback se pueda dar desde dentro del juego, una opción puede ser codificar el feedback para que luego se pueda decidir el mensaje más fácil.
-- Organizar módulos por carpetas
-- Hacer los bichos resantes, mosquito, cochinilla. En caso de ser posible hacer algo para generalizar los bichos
-- Probar la mecánica de juego una vez la interfaz gráfica esté funcional
-
-## Interfaz HTTP
+### Interfaz HTTP Prolog
 
 Se hace un POST al host con el puerto establecido al path `player_{COLOR DEL JUGADOR}`. Por ejemplo un pseudo HEADER podría ser `POST http://localhost:9001/player_white`.
 
@@ -188,10 +215,29 @@ action=
 // status Puede ser alguno de estos valores: [invalid, continue, tie, over]
 ```
 
-## Pasos restantes
+4. Selección de opciones de configuración
+    - Se enviará un JSON con el siguiente formato
 
-- [x] Ver cómo se puede organizar mejor el proyecto en módulos
-- [x] Movimientos de fichas
-- [x] Jugar en consola entre personas
-- [ ] AI
-- [ ] UI
+```json
+
+{
+  "header": "Header de la pregunta",
+  "read_header": "Subheader, Seleccione un jugador:",
+  "labels": ["Opcion1", "Opcion2"], // Etiquetas que representan las opciones
+  "options": ["1","2"] // Lo que se devuelve en la respuesta en dependencia de lo que se seleccione
+}
+
+```
+
+- Se espera recibir un JSON en respuesta con el siguiente formato
+
+```json
+{
+  "answer": "1" // option correspondiente al label seleccionado
+}
+```
+
+## Bibliografía
+
+- https://www.redblobgames.com/grids/hexagons/ Se usará para las posiciones de los hexágonos estilo offset coordinates odd-q de la página .
+- Artificial Inteligence: A Modern Approach, Capítulo 5 pág 161
