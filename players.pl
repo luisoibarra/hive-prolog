@@ -29,9 +29,10 @@ ai_player(Game, GameConfig, Action) :-
     game([],_,_) = Game,
     random_player(Game, GameConfig, Action).
 ai_player(Game, _, Action) :-
-    two_minimax(step(none, Game, none, continue), -100000000, 100000000,result_selection,next_step_generator,terminal_test,player_utility_function,2,[Step,_]),
+    game(_, Player, _) = Game,
+    two_minimax(step(none, Game, none, continue), 0, Player, -100000000, 100000000,two_result_selection,next_step_generator,terminal_test,player_utility_function,1,[Step,_]),
     % two_minimax(step(none, Game, none, continue), -100000000, 100000000,result_selection,next_step_generator,terminal_test,sample_two_player_utility_function,2,[Step,_]),
-    % minmax(step(none,Game,none,continue),result_selection, next_step_generator, terminal_test, sample_utility_function, 2, [Step,_]),
+    % minmax(step(none,Game,none,continue),result_selection, next_step_generator, terminal_test, player_utility_function, 2, [Step,_]),
     step(Action, _, _, _) = Step.
 
 % console_human_player(Game, GameConfig, Action) Implements the console interface and input for a human player

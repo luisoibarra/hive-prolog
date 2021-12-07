@@ -34,14 +34,15 @@ unzip([[Item1, Item2]|Rest],[Item1|Rest1],[Item2|Rest2]) :- unzip(Rest, Rest1, R
 zip_const([],_,[]).
 zip_const([I1|List1], X, [[I1,X]|Result]) :- zip_const(List1, X, Result).
 
-map(_, _, [],[]).
-map(F, FArgs, [X|Y], [V|R]):- 
-    concat_list(FArgs, [X], Args), 
-    concat_list([F], Args, FuncArgs), 
-    concat_list(FuncArgs, [V], CompleteFunction), 
-    T =.. CompleteFunction, 
-    call(T), 
-    map(F, FArgs, Y,R).
+map(F, FArgs, List, Mapped):- 
+    findall(Q, (
+        member(X, List),
+        concat_list(FArgs, [X], Args),
+        concat_list([F], Args, FuncArgs), 
+        concat_list(FuncArgs, [Q], CompleteFunction), 
+        T =.. CompleteFunction,
+        call(T)
+        ), Mapped).
 
 unification_filter(List, Pattern, Result) :- 
     findall(X, (member(X,List), Pattern=X), Result).

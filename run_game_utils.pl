@@ -103,4 +103,3 @@ make_a_play(move_play(PosX, PosY, NewPosX, NewPosY), Game, NewGame, Feedback, Ga
         Feedback = 'Invalid piece move',
         GameStatus = invalid
     ).
-

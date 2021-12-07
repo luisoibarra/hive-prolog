@@ -1,4 +1,4 @@
-:- module(minmax, [minmax/7, two_minimax/9]).
+:- module(minmax, [minmax/7, two_minimax/11]).
 :- use_module(minmax_utils).
 :- use_module(utility_function).
 
@@ -31,11 +31,11 @@ minmax(InitialState, ResultSelectionFunctor, NextStateGeneratorFunctor, Terminal
     Selector =.. [ResultSelectionFunctor, InitialState, Results, Result],
     call(Selector).
 
-minmax_player(white, max).
-minmax_player(black, min).
+minmax_player(SearchDepth, max) :- 0 is mod(SearchDepth,2).
+minmax_player(SearchDepth, min) :- 1 is mod(SearchDepth,2).
 
 % Specific minmax algorithm for two players with alpha beta pruning
-two_minimax(InitialState, Alpha, Beta, ResultSelectionFunctor, NextStateGeneratorFunctor, TerminalTestFunctor, UtilityFunctor, Depth, Result) :-
+two_minimax(InitialState, _, UtilityPlayer, _, _, _, _, TerminalTestFunctor, UtilityFunctor, Depth, Result) :-
     (
         Depth = 0
         ;
@@ -43,16 +43,17 @@ two_minimax(InitialState, Alpha, Beta, ResultSelectionFunctor, NextStateGenerato
         call(TerminalTest)
     ),
     !,
-    UtilityFun =.. [UtilityFunctor, InitialState, Result],
+    UtilityFun =.. [UtilityFunctor, InitialState, UtilityPlayer, Result],
     call(UtilityFun).
+    % write('Terminal'), write(Result), nl. % DEBUG
 
-two_minimax(InitialState, Alpha, Beta, ResultSelectionFunctor, NextStateGeneratorFunctor, TerminalTestFunctor, UtilityFunctor, Depth, Result) :-
-    step(_, game(_,Player,_), _, _) = InitialState,
-    minmax_player(Player, MaxMinState),
+two_minimax(InitialState, SearchDepth, UtilityPlayer, Alpha, Beta, ResultSelectionFunctor, NextStateGeneratorFunctor, TerminalTestFunctor, UtilityFunctor, Depth, Result) :-
+    minmax_player(SearchDepth, MaxMinState),
 
     GenerateAll =.. [NextStateGeneratorFunctor, InitialState, AllNextStates],
     call(GenerateAll),
     NextDepth is Depth - 1,
+    NextSearchDepth is SearchDepth + 1,
     (
         (
             MaxMinState = max,
@@ -67,7 +68,7 @@ two_minimax(InitialState, Alpha, Beta, ResultSelectionFunctor, NextStateGenerato
                     two_mm_state(InitialState, Depth, MaxMinState, CurrentAlpha), % Get Current Alpha
                     two_mm_continue(InitialState, Depth, MaxMinState), % If the evaluation should continue
 
-                    two_minimax(State, CurrentAlpha, Beta, ResultSelectionFunctor, NextStateGeneratorFunctor, TerminalTestFunctor, UtilityFunctor, NextDepth, X),
+                    two_minimax(State, NextSearchDepth, UtilityPlayer, CurrentAlpha, Beta, ResultSelectionFunctor, NextStateGeneratorFunctor, TerminalTestFunctor, UtilityFunctor, NextDepth, X),
                     retract(two_mm_state(InitialState, Depth, MaxMinState, CurrentAlpha)),
                     X = [_,Value],
                     max(Value, CurrentAlpha, NewAlpha),
@@ -88,8 +89,9 @@ two_minimax(InitialState, Alpha, Beta, ResultSelectionFunctor, NextStateGenerato
                 ;
                 true
             ),
-            Selector =.. [ResultSelectionFunctor, InitialState, States, Result],
+            Selector =.. [ResultSelectionFunctor, InitialState, MaxMinState, States, Result],
             call(Selector)
+            % write(MaxMinState), write(' choice: '), write(Result), nl % DEBUG
         )
         ;
         (
@@ -105,7 +107,7 @@ two_minimax(InitialState, Alpha, Beta, ResultSelectionFunctor, NextStateGenerato
                     two_mm_state(InitialState, Depth, MaxMinState, CurrentBeta), % Get Current Alpha
                     two_mm_continue(InitialState, Depth, MaxMinState), % If the evaluation should continue
 
-                    two_minimax(State, Alpha, CurrentBeta, ResultSelectionFunctor, NextStateGeneratorFunctor, TerminalTestFunctor, UtilityFunctor, NextDepth, X),
+                    two_minimax(State, NextSearchDepth, UtilityPlayer, Alpha, CurrentBeta, ResultSelectionFunctor, NextStateGeneratorFunctor, TerminalTestFunctor, UtilityFunctor, NextDepth, X),
                     retract(two_mm_state(InitialState, Depth, MaxMinState, CurrentBeta)),
                     X = [_,Value],
                     min(Value, CurrentBeta, NewBeta),
@@ -125,8 +127,9 @@ two_minimax(InitialState, Alpha, Beta, ResultSelectionFunctor, NextStateGenerato
                 ;
                 true
             ),
-            Selector =.. [ResultSelectionFunctor, InitialState, States, Result],
+            Selector =.. [ResultSelectionFunctor, InitialState, MaxMinState, States, Result],
             call(Selector)
+            % write(MaxMinState), write(' choice: '), write(Result), nl % DEBUG
 
         )
     ).

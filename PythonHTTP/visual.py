@@ -346,8 +346,12 @@ def run():
                 ALL_WHITE_PIECES = pieces.pieces
             else:
                 ALL_BLACK_PIECES = pieces.pieces
-                
-        PIECES = list(dict.fromkeys(ALL_BLACK_PIECES).keys())
+        
+        if game_instance.player.lower() == "white":
+            PIECES = list(dict.fromkeys(ALL_WHITE_PIECES).keys())
+        else:
+            PIECES = list(dict.fromkeys(ALL_BLACK_PIECES).keys())
+
         PIECES_ON_GRID = [string.upper()[0] for string in PIECES]
         CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
 

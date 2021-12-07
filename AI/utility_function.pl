@@ -1,4 +1,4 @@
-:- module(utility_function,[player_utility_function/2, piece_to_advantage/4, piece_to_danger/4]).
+:- module(utility_function,[player_utility_function/3, piece_to_advantage/4, piece_to_danger/4]).
 :- use_module('../run_game_utils').
 :- use_module('../game_rules').
 :- use_module('../list_utils').
@@ -6,26 +6,25 @@
 :- use_module('../board_utils').
 :- use_module(ai_utils).
 
-player_utility_function(State, Vector) :- 
-    step(Action,Game, _, _) = State,
-    game(_,Player, _) = Game,
-    player_utility_function(State, Player, Value),
+player_utility_function(State, UtilityPlayer, Vector) :- 
+    step(Action,_, _, _) = State,
+    priv_player_utility_function(State, UtilityPlayer, Value),
     Vector = [Action, Value].
 
-% player_utility_function(State, Player, Value) Returns in Value the utility value for Player given the State
-player_utility_function(State, UtilityPlayer, Value) :-
+% priv_player_utility_function(State, Player, Value) Returns in Value the utility value for Player given the State
+priv_player_utility_function(State, UtilityPlayer, Value) :-
     lost_game(State, UtilityPlayer),
     Value = -100, !.
 
-player_utility_function(State, UtilityPlayer, Value) :-
+priv_player_utility_function(State, UtilityPlayer, Value) :-
     won_game(State, UtilityPlayer),
     Value = 100, !.
 
-player_utility_function(State, _, Value) :-
+priv_player_utility_function(State, _, Value) :-
     tie_game(State),
     Value = 0, !.
 
-player_utility_function(State, UtilityPlayer, Score) :-
+priv_player_utility_function(State, UtilityPlayer, Score) :-
     step(_, Game, _, _) = State,
     all_next_game_steps(Game, Steps),
     
@@ -106,10 +105,18 @@ board_pieces_danger(State, UtilityPlayer, PiecesPlacedDangers) :-
     step(_, Game, _, _) = State,
     game(Board, _, _) = Game,
     get_game_Turn(Game, Turn),
-    map(piece_to_danger, [UtilityPlayer, Turn], Board, IndividualDangers),
+    unification_filter(Board, piece(_,_,UtilityPlayer, _), PlayerBoard),
+    list_difference(Board, PlayerBoard, NoPlayerBoard),
+    map(piece_to_danger, [UtilityPlayer, Turn], NoPlayerBoard, IndividualDangers),
     sum_list(IndividualDangers, SumPiecesPlacedDangers),
     length(IndividualDangers, Length),
-    PiecesPlacedDangers is SumPiecesPlacedDangers / Length.
+    (
+        Length = 0,
+        PiecesPlacedDangers = 0
+        ;
+        Length \= 0,
+        PiecesPlacedDangers is SumPiecesPlacedDangers / Length
+    ).
 
 % TODO Use Turn to add more advantage to pieces in different game stages
 piece_to_advantage(UtilityPlayer, Turn, Piece, Advantage) :-
@@ -129,10 +136,17 @@ board_pieces_advantage(State, UtilityPlayer, PiecesPlacedAdvantage) :-
     step(_, Game, _, _) = State,
     game(Board, _, _) = Game,
     get_game_Turn(Game, Turn),
-    map(piece_to_advantage, [UtilityPlayer, Turn], Board, IndividualAdvantages),
+    unification_filter(Board, piece(_,_,UtilityPlayer, _), PlayerBoard),
+    map(piece_to_advantage, [UtilityPlayer, Turn], PlayerBoard, IndividualAdvantages),
     sum_list(IndividualAdvantages, SumPiecesPlacedAdvantage),
     length(IndividualAdvantages, Length),
-    PiecesPlacedAdvantage is SumPiecesPlacedAdvantage / Length.
+    (
+        Length = 0,
+        PiecesPlacedAdvantage = 0
+        ;
+        Length \= 0,
+        PiecesPlacedAdvantage is SumPiecesPlacedAdvantage / Length
+    ).
 
 % enemy_queen_threat(State, UtilityPlayer, EnemyQueenThreat) Returns the Threat level of the enemy queen
 % EnemyQueenThreat is a number between 0 and 8 give or take
@@ -166,7 +180,7 @@ allied_queen_threat(State, UtilityPlayer, AlliedQueenThreat) :-
 normalize_score_function(State, Metrics, Score) :- 
     
     Metrics = [
-        SetStepsLength, % Amount of piece enemies placements 0 <= x < ? Can be medium apprx 20
+        SetStepsLength, % Amount of piece enemies placements 0 <= x < ? Can be medium apprx 85 +-
         MoveStepsLength, % Amount of piece enemies movements 0 <= x < ? Can be big apprx 100
         PiecesPlacedDanger, % Danger level of placed enemy pieces 0 <= x <= 50
         PiecesPlacedAdvantange, % Andvantage level of placed allied pieces 0 <= x <= 50
@@ -178,14 +192,16 @@ normalize_score_function(State, Metrics, Score) :-
     get_game_Turn(Game, Turn),
 
     % TODO Find Better Params
-
+    % write('PiecesPlacedAdvantange '), write(PiecesPlacedAdvantange), % DEBUG
+    % game(Board, _, _) = Game,
+    % write('Board '), write(Board), % DEBUG
     Params = [
-        [SetStepsLength,        -1/20, 0, Turn, NormalizedSetStepsLength],
-        [MoveStepsLength,       -1/50, 0, Turn, NormalizedMoveStepsLength],
-        [PiecesPlacedDanger,    -1/50, 0, Turn, NormalizedPiecesPlacedDanger],
-        [PiecesPlacedAdvantange, 1/50, 0, Turn, NormalizedPiecesPlacedAdvantange],
-        [EnemyQueenThreat,       2/8,  0, Turn, NormalizedEnemyQueenThreat],
-        [AlliedQueenThreat,     -1/8,  0, Turn, NormalizedAlliedQueenThreat]        
+        [SetStepsLength,        -1/85, -1/25, 0, Turn, NormalizedSetStepsLength],
+        [MoveStepsLength,       1/100, -1/10,-1, Turn, NormalizedMoveStepsLength],
+        [PiecesPlacedDanger,    -1/50, -1/25, 0, Turn, NormalizedPiecesPlacedDanger],
+        [PiecesPlacedAdvantange, 1/50, -1/30, 0, Turn, NormalizedPiecesPlacedAdvantange],
+        [EnemyQueenThreat,       2/8,      0, 0, Turn, NormalizedEnemyQueenThreat],
+        [AlliedQueenThreat,     -2/8,      0, 0, Turn, NormalizedAlliedQueenThreat]        
     ],
 
     findall(X, (
@@ -196,15 +212,22 @@ normalize_score_function(State, Metrics, Score) :-
         call(F)
     ), Normalized),
 
-    write(Normalized),nl,
+    % write(Normalized),nl, % DEBUG
     sum_list(Normalized, Score).
     % sum_list(Normalized, Score). TODO Maybe is better to return the value with highest abs value? 
 
 
 % normalize(Value, MultParam, ExpParam, Turn, NormalizedResult) 
-% NormalizedResult = Value * MultParam * 3 ** (ExpParam * Turn) 
-normalize(Value, MultParam, ExpParam, Turn, NormalizedResult) :- 
+% NormalizedResult = Value * MultParam * (3 ** (ExpParam * Turn) + SumValue) 
+normalize(Value, MultParam, ExpParam, SumValue, Turn, NormalizedResult) :- 
     Arg is Turn * ExpParam,
-    Mod is 3 ** Arg,
+    Mod is 3 ** Arg + SumValue,
     Mod2 is MultParam * Mod,
-    NormalizedResult is Mod2 * Value.
+    RawNormalizedResult is Mod2 * Value,
+    (
+        RawNormalizedResult < 0,
+        NormalizedResult is max(RawNormalizedResult, -1)
+        ;
+        RawNormalizedResult >= 0,
+        NormalizedResult is min(RawNormalizedResult, 1)
+    ).

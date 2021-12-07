@@ -1,6 +1,6 @@
 :- module(minmax_utils, [result_selection/3, next_step_generator/2, terminal_test/1,
     utility_function/3, utility_for_player/4, sample_utility_function/2, maxim_fuc/3,
-    max/3, min/3, sample_two_player_utility_function/2]).
+    max/3, min/3, sample_two_player_utility_function/2, two_maxim_fuc/2, two_result_selection/4]).
 :- use_module('../list_utils').
 :- use_module('../run_game_utils').
 :- use_module(ai_utils).
@@ -28,6 +28,24 @@ result_selection(State, VectorList, Result) :-
     maxim(VectorList, maxim_fuc, [Player], [Step,[_,Vector]]),
     [Step,Vector] = Result.
 
+two_maxim_fuc([_,[_,V1]], [_,[_,V2]]) :-
+    V1 > V2.
+
+two_minim_fuc([_,[_,V1]], [_,[_,V2]]) :-
+    V1 < V2.
+
+% two_result_selection(State, VectorList, Result) Returns the maxim value in VectorList according maxin_fun
+two_result_selection(_, MaxMinState, VectorList, Result) :- 
+    (
+        MaxMinState = min,
+        maxim(VectorList, two_minim_fuc, [], [Step,[_,Vector]])
+        ;
+        MaxMinState = max,
+        maxim(VectorList, two_maxim_fuc, [], [Step,[_,Vector]])
+    ),
+    [Step,Vector] = Result.
+
+
 % next_step_generator(State, NextStates) Returns all posible NextStates from State
 next_step_generator(State, NextStates) :- 
     step(_, Game, _, _) = State,
@@ -37,8 +55,13 @@ next_step_generator(State, NextStates) :-
 % terminal_test(State) Succeed if State is a final game state
 terminal_test(State) :- 
     step(_,Game, _, _) = State,
-    next_game_step(Game, step(_, _, _, Status)),
-    Status \= continue, Status \= invalid.
+    (
+        not(next_game_step(Game, step(_, _, _, Status))),
+        !
+        ;
+        next_game_step(Game, step(_, _, _, Status)),
+        Status \= continue, Status \= invalid
+    ).
 
 % utility_function(State, UtilityFunctor, Vector) Return a Vector corresponding to the UtilityFunctor resutl for each player
 % Used as an auxiliary function that calculates the utility vector
