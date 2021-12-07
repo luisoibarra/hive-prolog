@@ -528,7 +528,8 @@ def run():
                                                                                 final_x=cell[1],
                                                                                 final_y=cell[0],
                                                                                 from_x=from_y,
-                                                                                from_y=from_x)
+                                                                                from_y=from_x,
+                                                                                args=[]) # TODO HACER LO DE LOS ARGUMENTOS EXTRAS PARA EL PILLBUG
 
                                                         x.selected = False
                                         else :
@@ -543,7 +544,9 @@ def run():
                                                                         final_x=cell[1],
                                                                         final_y=cell[0],
                                                                         from_x=from_y,
-                                                                        from_y=from_x)
+                                                                        from_y=from_x,
+                                                                        args=[]) # TODO HACER LO DE LOS ARGUMENTOS EXTRAS PARA EL PILLBUG
+
 
                                             x.selected = False
 
@@ -556,7 +559,8 @@ def run():
                                                             final_x=cell[1],
                                                             final_y=cell[0],
                                                             from_x=from_y,
-                                                            from_y = from_x)
+                                                            from_y = from_x,
+                                                            args=[]) # TODO HACER LO DE LOS ARGUMENTOS EXTRAS PARA EL PILLBUG
 
                                         x.selected = False
                             

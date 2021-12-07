@@ -21,7 +21,8 @@ convert_action_from_json(ActionJson, Action) :-
     member(from_y=PosY, Properties),
     member(final_x=NewPosX, Properties),
     member(final_y=NewPosY, Properties),
-    Action = move_play(PosX, PosY, NewPosX, NewPosY).
+    member(args=ExtraArgs, Properties),
+    Action = move_play(PosX, PosY, NewPosX, NewPosY, ExtraArgs).
 
 convert_question_response_from_json(QuestionResponse, Result) :-
     json([answer=Result]) = QuestionResponse.
@@ -52,8 +53,8 @@ convert_players_remaining_pieces_to_json([PieceInfo|PlayerPieces], [PieceInfJson
     convert_players_remaining_pieces_to_json(PlayerPieces, PlayerPiecesJson).
 
 convert_action_to_json(Action, ActionJson) :-
-    move_play(PosX, PosY, NewPosX, NewPosY) = Action,
-    ActionJson = json([type=move, from_x=PosX, from_y=PosY, final_x=NewPosX, final_y=NewPosY]).
+    move_play(PosX, PosY, NewPosX, NewPosY, ExtraArgs) = Action,
+    ActionJson = json([type=move, from_x=PosX, from_y=PosY, final_x=NewPosX, final_y=NewPosY, args=ExtraArgs]).
 convert_action_to_json(Action, ActionJson) :-
     set_play(PiecePos, PosX, PosY) = Action,
     ActionJson = json([type=set, final_x=PosX, final_y=PosY, piece_index=PiecePos]).

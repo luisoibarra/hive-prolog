@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 from pydantic.types import OptionalInt
 
@@ -34,6 +34,7 @@ class Action(BaseModel):
     piece_index:OptionalInt
     from_x:OptionalInt
     from_y:OptionalInt
+    args:Optional[List[int]]
     
 class GameFeedback(BaseModel):
     game:Game

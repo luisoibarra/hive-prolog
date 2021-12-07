@@ -31,7 +31,7 @@ priv_player_utility_function(State, UtilityPlayer, Score) :-
     unification_filter(Steps, step(set_play(_,_,_),_,_,_), SetSteps),
     length(SetSteps, SetStepsLength),
     
-    unification_filter(Steps, step(move_play(_,_,_,_),_,_,_), MoveSteps),
+    unification_filter(Steps, step(move_play(_,_,_,_,_),_,_,_), MoveSteps),
     length(MoveSteps, MoveStepsLength),
 
     board_pieces_danger(State, UtilityPlayer, PiecesPlacedDanger),

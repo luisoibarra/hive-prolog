@@ -1,13 +1,13 @@
 :- module(bug_movement, [
         bug_movement_functor/2,
-        queen_moves_position/6,
-        cricket_moves_position/6,
-        beetle_moves_position/6,
-        spider_moves_position/6,
-        ant_moves_position/6,
-        mosquito_moves_position/6,
-        ladybug_moves_position/6,
-        pillbug_moves_position/6
+        queen_moves_position/7,
+        cricket_moves_position/7,
+        beetle_moves_position/7,
+        spider_moves_position/7,
+        ant_moves_position/7,
+        mosquito_moves_position/7,
+        ladybug_moves_position/7,
+        pillbug_moves_position/7
     ]).
 :- use_module('../Utils/board_utils'). 
 :- use_module('../Utils/list_utils'). 
@@ -25,11 +25,11 @@ bug_movement_functor(ladybug_moves_position, ladybug).
 bug_movement_functor(pillbug_moves_position, pillbug).
 
 % Queen Movement
-queen_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :- 
+queen_moves_position(Board, Piece, [], NewPosX, NewPosY, NewPiece, NewBoard) :- 
     slide_one_step(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard).
 
 % Cricket Movement
-cricket_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :-
+cricket_moves_position(Board, Piece, [], NewPosX, NewPosY, NewPiece, NewBoard) :-
   
     piece(PosX, PosY,Color,Extra) = Piece,
     first_empty_place_from(Board, PosX, PosY, _, Length, NewPosX, NewPosY),
@@ -39,7 +39,7 @@ cricket_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :-
     [NewPiece|RemovedBoard] = NewBoard.
 
 % Beetle Movement
-beetle_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :- 
+beetle_moves_position(Board, Piece, [], NewPosX, NewPosY, NewPiece, NewBoard) :- 
     piece(PosX, PosY,_,_) = Piece,
     positions_next_to(PosX, PosY, NewPosX, NewPosY,_),
     can_slide_into(Board, Piece, NewPosX, NewPosY, NewPiece),
@@ -47,7 +47,7 @@ beetle_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :-
     NewBoard = [NewPiece|RemovedBoard].
 
 % Spider Movement
-spider_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :- 
+spider_moves_position(Board, Piece, [], NewPosX, NewPosY, NewPiece, NewBoard) :- 
     border_move(Board, Piece, BorderMoves),
     get_all_pieces_list(BorderMoves, [_,3], SpiderMovesWithDistance),
     unzip(SpiderMovesWithDistance, SpiderMoves, _),
@@ -58,7 +58,7 @@ spider_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :-
     NewBoard = [NewPiece|RemovedBoard].
 
 % Ant Movement
-ant_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :- 
+ant_moves_position(Board, Piece, [], NewPosX, NewPosY, NewPiece, NewBoard) :- 
     border_move(Board, Piece, BorderMoves),
     unzip(BorderMoves, AntMoves, _),
     !,
@@ -68,7 +68,7 @@ ant_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :-
     NewBoard = [NewPiece|RemovedBoard].
 
 % Mosquito Movement
-mosquito_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :-
+mosquito_moves_position(Board, Piece, ExtraArgs, NewPosX, NewPosY, NewPiece, NewBoard) :-
     piece(PosX, PosY, _, _) = Piece,
     findall(pos(X,Y), positions_next_to(PosX, PosY, X, Y, _), AroundPositions),
     findall(P, (member(pos(X,Y), AroundPositions), get_top_piece_at(Board, X, Y, P)), TopPiecesAround),
@@ -89,11 +89,11 @@ mosquito_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :-
         FunctorList = InitialFunctorList
     ),
     member(Functor, FunctorList),
-    Function =.. [Functor, Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard],
+    Function =.. [Functor, Board, Piece, ExtraArgs, NewPosX, NewPosY, NewPiece, NewBoard],
     call(Function).
 
 % Ladybug Movement
-ladybug_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :-
+ladybug_moves_position(Board, Piece, [], NewPosX, NewPosY, NewPiece, NewBoard) :-
     piece(_, _, Color, [Type, _|Extra]) = Piece,
     remove_board_piece(Board, Piece, BoardWithNoLadybug),
     move_above_and_finish_down(Piece, 2, BoardWithNoLadybug, NewPosX, NewPosY),
@@ -103,12 +103,14 @@ ladybug_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :-
     NewBoard = [NewPiece|BoardWithNoLadybug].
 
 % Pillbug Movement
-pillbug_moves_position(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard) :-
+pillbug_moves_position(Board, Piece, ExtraArgs, NewPosX, NewPosY, NewPiece, NewBoard) :-
     (
+        ExtraArgs = [],
         slide_one_step(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard)
         ;
-        pillbug_translate(Piece, Board, _, NewBoard),
-        NewPiece = Piece,
-        piece(NewPosX, NewPosY, _, _) = NewPiece
-
+        ExtraArgs = [PieceToMoveX, PieceToMoveY],
+        pillbug_translate(Piece, Board, PieceToMoveX, PieceToMoveY, MovedPiece, NewBoard),
+        piece(NewPosX, NewPosY, _, _) = MovedPiece,
+        NewPiece = Piece
+        % piece(NewPosX, NewPosY, _, _) = NewPiece
     ).

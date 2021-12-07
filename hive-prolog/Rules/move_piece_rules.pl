@@ -1,4 +1,4 @@
-:- module(move_piece_rules, [move/6]).
+:- module(move_piece_rules, [move/7]).
 :- use_module('../Utils/board_utils'). 
 :- use_module('../Utils/list_utils'). 
 :- use_module('../Utils/piece_utils'). 
@@ -41,11 +41,11 @@ post_move_rules(_, _, _, NewBoard) :-
     connected_board(NewBoard). % Single Hive Simplified
     % single_hive_after(OldBoard, OldPiece, NewPiece).
 
-% move(Board, OldPiece, NewPiece, NewBoard) Return the NewBoard after the move is made.
-move(Board, OldPiece, NewPosX, NewPosY, NewPiece, NewBoard) :- 
+% move(Board, OldPiece, ExtraArgs, NewPosX, NewPosY, NewPiece, NewBoard) Return the NewBoard after the move is made.
+move(Board, OldPiece, ExtraArgs, NewPosX, NewPosY, NewPiece, NewBoard) :- 
     get_piece_Type(OldPiece, Type),
     bug_movement_functor(Functor, Type),
     pre_move_rules(Board, OldPiece),
-    Function =.. [Functor, Board, OldPiece, NewPosX, NewPosY, NewPiece, NewBoard],
+    Function =.. [Functor, Board, OldPiece, ExtraArgs, NewPosX, NewPosY, NewPiece, NewBoard],
     call(Function),
     post_move_rules(Board, OldPiece, NewPiece, NewBoard).

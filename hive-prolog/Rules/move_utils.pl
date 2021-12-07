@@ -1,5 +1,5 @@
 :- module(move_utils, [first_empty_place_from/7, border_move/3, 
-    move_above_and_finish_down/5, pillbug_translate/4,
+    move_above_and_finish_down/5, pillbug_translate/6,
     slide_one_step/6]).
 :- use_module('../Utils/board_utils'). 
 :- use_module('../Utils/piece_utils').
@@ -138,8 +138,8 @@ tuple_aux(Item, List2, Result) :-
     Result = [Item, Item2].
 
 
-% pillbug_translate(Piece, Board, PieceMoved, NewBoard) Pillbug  
-pillbug_translate(Piece, Board, PieceMoved, NewBoard) :- 
+% pillbug_translate(Piece, Board, OldPieceToMove, NewBoard) Pillbug  
+pillbug_translate(Piece, Board, PosXToMove, PosYToMove, PieceMoved, NewBoard) :- 
     piece(PosX, PosY, _, _) = Piece,
     get_piece_Height(Piece, Height),
 
@@ -150,15 +150,17 @@ pillbug_translate(Piece, Board, PieceMoved, NewBoard) :-
             get_piece_Height(P, PieceHeight),
             Height = PieceHeight,
             Board = [LastPieceMoved|_],
-            P \=  LastPieceMoved
+            P \=  LastPieceMoved,
+            PosXToMove = NextX,
+            PosYToMove = NextY
         ), AroundPieces),
 
     findall(pos(NextX, NextY), (positions_next_to(PosX, PosY, NextX, NextY, _), not(is_place_taken(Board, NextX, NextY, Height))), FreePositions),
-    tuple_combination(AroundPieces, FreePositions, PieceToMove, pos(NewX, NewY)),
+    tuple_combination(AroundPieces, FreePositions, OldPieceToMove, pos(NewX, NewY)),
     SlideHeight is Height + 1,
     can_slide_into_height(Board, PosX, PosY, SlideHeight, _, _, NewX, NewY, _),
-    remove_board_piece(Board, PieceToMove, PrevBoard),
-    piece(_, _, Type, Extra) = PieceToMove,
+    remove_board_piece(Board, OldPieceToMove, PrevBoard),
+    piece(_, _, Type, Extra) = OldPieceToMove,
     build_piece(NewX, NewY, Type, Extra, PieceMoved),
     NewBoard = [PieceMoved|PrevBoard].
 

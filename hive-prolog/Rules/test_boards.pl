@@ -99,12 +99,12 @@ simulate_test_boards(_, [], ExpectedResult, false) :- ExpectedResult \= true.
 % Move Piece Simulation
 simulate_test_boards(InitialBoard, [[PieceToMove, [NewPosX, NewPosY]]|_], ExpectedResult, true) :- 
     false == ExpectedResult,
-    not(move(InitialBoard, PieceToMove, NewPosX, NewPosY, _, _)), !.
+    not(move(InitialBoard, PieceToMove, [], NewPosX, NewPosY, _, _)), !.
 simulate_test_boards(InitialBoard, [[PieceToMove, [NewPosX, NewPosY]]|_], ExpectedResult, false) :- 
     false \= ExpectedResult, 
-    not(move(InitialBoard, PieceToMove, NewPosX, NewPosY, _, _)), !.
+    not(move(InitialBoard, PieceToMove, [], NewPosX, NewPosY, _, _)), !.
 simulate_test_boards(InitialBoard, [[PieceToMove, [NewPosX, NewPosY]]|Pieces], ExpectedResult, Result) :- 
-    move(InitialBoard, PieceToMove, NewPosX, NewPosY, _, NewBoard),
+    move(InitialBoard, PieceToMove, [], NewPosX, NewPosY, _, NewBoard),
     !, simulate_test_boards(NewBoard, Pieces, ExpectedResult, Result).
 
 % Add Piece Simulation

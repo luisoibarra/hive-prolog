@@ -50,12 +50,12 @@ set_piece(PiecePosition, PosX, PosY, Game, NewGame) :-
     update_game_state(Game, NewBoard, NewPiecesToSet, NewGame).
 
 % move_piece(PosX, PosY, DestPosX, DestPosY, Game, NewGame) 
-move_piece(PosX, PosY, DestPosX, DestPosY, Game, NewGame) :- 
+move_piece(PosX, PosY, DestPosX, DestPosY, ExtraArgs, Game, NewGame) :- 
     game(Board, CurrentPlayer, [PiecesToSet|_]) = Game,
     get_top_piece_at(Board, PosX, PosY, PieceToMove),
     get_piece_Color(PieceToMove, CurrentPlayer),
 
-    move(Board, PieceToMove, DestPosX, DestPosY, _, NewBoard),
+    move(Board, PieceToMove, ExtraArgs, DestPosX, DestPosY, _, NewBoard),
 
     update_game_state(Game, NewBoard, PiecesToSet, NewGame).
 
@@ -94,9 +94,9 @@ make_a_play(set_play(PositionSelectedPieceToSet, PosX, PosY), Game, NewGame, Fee
         GameStatus = invalid
     ).
 
-make_a_play(move_play(PosX, PosY, NewPosX, NewPosY), Game, NewGame, Feedback, GameStatus) :-
+make_a_play(move_play(PosX, PosY, NewPosX, NewPosY, ExtraArgs), Game, NewGame, Feedback, GameStatus) :-
     (
-        move_piece(PosX, PosY, NewPosX, NewPosY, Game, NewGame),
+        move_piece(PosX, PosY, NewPosX, NewPosY, ExtraArgs, Game, NewGame),
         end_turn_feedback(NewGame, Feedback, GameStatus)
         ;
         % If HERE move_piece is false

@@ -54,7 +54,7 @@ test_games('Move when queen is placed', Game, Movements, ExpectedResults) :-
     GameHistory = [],
     Turn = 1,
     Movements = [set_play(0, 3, 3), set_play(0, 4, 3),
-                 move_play(3, 3, 4, 2)],
+                 move_play(3, 3, 4, 2, [])],
     ExpectedResults = [continue, continue,
                        invalid].
 
@@ -72,8 +72,8 @@ test_games('Queen surrounded', Game, Movements, ExpectedResults) :-
                  set_play(0, 2, 4), set_play(0, 5, 2),
                  set_play(0, 1, 4), set_play(0, 6, 2),
                  set_play(0, 0, 5), set_play(0, 7, 1),
-                 move_play(0, 5, 2, 3), move_play(7, 1, 1, 3),
-                 set_play(0, 2, 5), move_play(6, 2, 3, 4)],
+                 move_play(0, 5, 2, 3, []), move_play(7, 1, 1, 3, []),
+                 set_play(0, 2, 5), move_play(6, 2, 3, 4, [])],
     ExpectedResults = [continue, continue,
                        continue, continue,
                        continue, continue,
@@ -93,8 +93,8 @@ test_games('QueenSurrounded', Game, Movements, ExpectedResults) :-
     Movements =[set_play(0, 3, 3), set_play(0, 4, 3),
                 set_play(0, 2, 3), set_play(0, 4, 2),
                 set_play(0, 2, 4), set_play(0, 5, 3),
-                set_play(0, 3, 4), move_play(5, 3, 4, 4), 
-                set_play(0, 1, 4), move_play(4, 2, 3, 2)],
+                set_play(0, 3, 4), move_play(5, 3, 4, 4, []), 
+                set_play(0, 1, 4), move_play(4, 2, 3, 2, [])],
     ExpectedResults = [continue, continue,
                         continue, continue,
                         continue, continue,
@@ -139,7 +139,7 @@ return_simulation(Game, [Move|Movements], ReturnedGame) :-
     return_simulation(NewGame, Movements, ReturnedGame).
 
 % run_game_tests('QueenSurrounded', set_play(0,5,2)).
-% run_game_tests('QueenSurrounded', move_play(1, 4, 2, 5)).
+% run_game_tests('QueenSurrounded', move_play(1, 4, 2, 5, [])).
 run_game_tests(TestNameToRun, NextAction) :-
     test_games(TestNameToRun, Game, Movements, ExpectedResults),
     write(TestNameToRun), nl,

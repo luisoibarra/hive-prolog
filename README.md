@@ -79,9 +79,10 @@ Lo primero a tener en cuenta son las principales estructuras que se usaron en la
   - set_play(PositionSelectedPieceToSet, PosX, PosY)
     - PositionSelectedPieceToSet: Index en PiecesTypesLeftToSet de `pieces_info` de la ficha que se quiere poner
     - PosX, PosY: Posición de la ficha
-  - move_play(PosX, PosY, NewPosX, NewPosY)
+  - move_play(PosX, PosY, NewPosX, NewPosY, ExtraArgs)
     - PosX, PosY: Posición de la ficha en el tablero a mover
-    - NewPosX, NewPosYÑ Nueva posición de la ficha
+    - NewPosX, NewPosY: Nueva posición de la ficha
+    - ExtraArgs: Argumentos para cualquier otro tipo de jugada
 
 3. Flujo de juego
 
@@ -229,7 +230,8 @@ Cuerpos del POST:
   "final_x":3,
   "final_y":3,
   "from_x":2,
-  "from_y":3
+  "from_y":3,
+  "args": [] // Argumentos para algún otro tipo de jugadas, por ejemplo la jugada especial del pillbug
 }
 
 ```

@@ -21,7 +21,14 @@ def console_action_input() -> Optional[Action]:
         src_pos_y = input("Desde Pos y: ")
         dest_pos_x = input("Para Pos x: ")
         dest_pos_y = input("Para Pos y: ")
-        return Action(type="move", from_x=int(src_pos_x), from_y=int(src_pos_y),final_x=int(dest_pos_x),final_y=int(dest_pos_y))
+        args = []
+        more_args = True
+        while more_args:
+            extra = input("Movement extra args: ")
+            more_args = bool(extra)
+            if more_args:
+                args.append(int(extra))
+        return Action(type="move", from_x=int(src_pos_x), from_y=int(src_pos_y),final_x=int(dest_pos_x),final_y=int(dest_pos_y), args=args)
     return None
 
 def visual_action_input() -> Optional[Action]:

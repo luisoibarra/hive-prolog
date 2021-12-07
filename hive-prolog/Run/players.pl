@@ -52,7 +52,8 @@ console_human_player(_, _, Action) :-
         read_position(PosX, PosY),
         write('Write the detination position'), nl,
         read_position(DestPosX, DestPosY),
-        Action = move_play(PosX, PosY,DestPosX, DestPosY)
+        read_extra_args('Write extra args:', ExtraArgs),
+        Action = move_play(PosX, PosY,DestPosX, DestPosY, ExtraArgs)
     ).
 
 % http_player(Game, ExtraGameConfig, Action) Implements a HTTP player interface
