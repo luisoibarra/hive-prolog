@@ -32,7 +32,9 @@ question_response: QuestionResponse = None
 
 BLACK = (0, 0, 0)
 GRAY = (180, 180, 180)
+BERMELLION = (227, 66, 51)
 WHITE = (255, 255, 255)
+
 ORANGE = pygame.Color('orange')
 
 # Fonts
@@ -280,10 +282,12 @@ def run():
             self.image = image
             self.playerBlack = playerBlack
             self.selected = False
+            self.effect = False
 
 
         def paint(self, unitRect,playerBlack):
             color2 = GRAY
+            color3 = BERMELLION
             if playerBlack:
                 color1 = BLACK
             else:
@@ -297,6 +301,9 @@ def run():
             if self.selected:
                 center = (pieceTextRect.center[0]-radius/2,pieceTextRect.center[1]-radius/4)
                 pygame.draw.circle(window, color2, center, radius/1.5)
+            if self.effect:
+                center = (pieceTextRect.center[0]-radius/2,pieceTextRect.center[1]-radius/4)
+                pygame.draw.circle(window, color3, center, radius/1.5)
             window.blit(pieceText, pieceTextRect)
 
     class Piece:
@@ -578,7 +585,10 @@ def run():
                         if cell:
                             print("Clicked on grid")
                             if sum(CLICKED_PIECES_ON_HAND) == 0 and sum([x.selected for x in m.units.values()]) == 1:
-                                args = [cell[1],cell[0]]  # TODO HACER LO DE LOS ARGUMENTOS EXTRAS PARA EL PILLBUG
+                                unit = m.units.get(cell, None)
+                                if unit:
+                                    unit.effect = not unit.effect
+                                    args = [cell[1],cell[0]]  # TODO HACER LO DE LOS ARGUMENTOS EXTRAS PARA EL PILLBUG
 
                                       
             
