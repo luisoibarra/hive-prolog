@@ -276,19 +276,39 @@ Cuerpos del POST:
 
 La interfaz visual se creó mediante la unión de los paquetes **FastAPI** y **pygame**. Con el primero se crearon los endpoints y los modelos necesarios para la comunicación con la lógica del juego respetando la interfaz explicada anteriormente. Con el segundo se crearon los visuales necesarios para representar el juego así como la interacción entre el usuario y el juego a través de clicks. 
 
-Se adaptó la idea de un tablero hexagonal publico de pygame ajustando las coordenadas correctas para nuestro tablero hexagonal. De ahi proviene el codigo de la carpeta hexmap.
+Se adaptó la idea de un tablero hexagonal público de pygame ajustando las coordenadas correctas para nuestro tablero hexagonal. De ahí proviene el código de la carpeta hexmap.
 
-Con **pygame** obtuvimos informacion de que clicks eran presionados y dentro de la clase visual.py se crearon los eventos que se deben manejar para el juego.
+Con **pygame** obtuvimos información de que clicks eran presionados y dentro de la módulo *visual.py* se crearon los eventos que se deben manejar para el juego.
 
-Se crearon las clases Render (que hereda de **pygame.Surface**) y sus herederas RenderGrid y  RenderUnits
+Se crearon las clases **Render** (que hereda de **pygame.Surface**) y sus herederas **RenderGrid** y  **RenderUnits**
 
-La clase RenderPieces pese a no heredar de Render se creo para poder manejar las piezas del juego.
+La clase **RenderPieces**, pese a no heredar de **Render**, se creó para poder manejar las piezas del juego.
 
-Todas las clases de render se dedican a dibujar sobre la ventana creada por **pygame**.
+Todas las clases de **Render** se dedican a dibujar sobre la ventana creada por **pygame**.
 
-Para las piezas se creo una clase Piece la cual posee una posicion , un tipo y un color.
+Para las piezas se creó una clase **Piece** la cual posee una posición, un tipo y un color.
 
-Para las unidades se creo una clase Unit la cual posee un label, una imagen, una propiedad que indica el turno, una para saber si esta seleccionada y otra para saber si es el objetivo de un efecto.
+Para las unidades se creó una clase **Unit** la cual posee un label, una imagen, una propiedad que indica el turno, una para saber si está seleccionada y otra para saber si es el objetivo de un efecto.
+
+#### Movimientos
+
+- Poner ficha:
+  1. Seleccionar el tipo de ficha que se quiere poner
+  2. Seleccionar una casilla válida en donde ponerla
+- Mover ficha:
+  1. Seleccionar la ficha a mover
+  2. Seleccionar la casilla válida hacia donde moverla
+- Movimiento especial:
+  1. Seleccionar la ficha a hacer el movimiento especial
+  2. Click derecho sobre la ficha en la que se va a hacer el movimiento especial
+  3. Seleccionar la casilla hacia donde se dirije el movimiento especial
+
+El movimiento especial se aplica sobre los pillbugs o sobre los mosquitos adyacentes a uno. 
+
+#### Detalles sobre jugabilidad
+
+- En caso de trabarse el juego probar realizar una jugada cualquiera.
+- En caso de que al dar click en una opción esta no se seleccione probar darle click de nuevo.
 
 ## Bibliografía
 
