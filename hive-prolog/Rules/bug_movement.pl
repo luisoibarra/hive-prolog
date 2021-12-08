@@ -103,12 +103,12 @@ ladybug_moves_position(Board, Piece, [], NewPosX, NewPosY, NewPiece, NewBoard) :
     NewBoard = [NewPiece|BoardWithNoLadybug].
 
 % Pillbug Movement
-pillbug_moves_position(Board, Piece, ExtraArgs, PieceToMoveX, PieceToMoveY, NewPiece, NewBoard) :-
+pillbug_moves_position(Board, Piece, ExtraArgs, NewPosX, NewPosY, NewPiece, NewBoard) :-
     (
         ExtraArgs = [],
         slide_one_step(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard)
         ;
-        ExtraArgs = [NewPosX, NewPosY],
+        ExtraArgs = [PieceToMoveX, PieceToMoveY],
         pillbug_translate(Piece, Board, PieceToMoveX, PieceToMoveY, MovedPiece, NewBoard),
         piece(NewPosX, NewPosY, _, _) = MovedPiece,
         NewPiece = Piece

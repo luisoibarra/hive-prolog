@@ -542,6 +542,7 @@ def run():
                                                                                     from_x=from_y,
                                                                                     from_y=from_x,
                                                                                     args=args) # TODO HACER LO DE LOS ARGUMENTOS EXTRAS PARA EL PILLBUG
+                                                            args = []
 
                                                             x.selected = False
                                             else :
@@ -557,8 +558,8 @@ def run():
                                                                             final_y=cell[0],
                                                                             from_x=from_y,
                                                                             from_y=from_x,
-                                                                            args=args) # TODO HACER LO DE LOS ARGUMENTOS EXTRAS PARA EL PILLBUG
-
+                                                                            args=args)
+                                                    args = []
 
                                                 x.selected = False
 
@@ -572,7 +573,8 @@ def run():
                                                                 final_y=cell[0],
                                                                 from_x=from_y,
                                                                 from_y = from_x,
-                                                                args=args) # TODO HACER LO DE LOS ARGUMENTOS EXTRAS PARA EL PILLBUG
+                                                                args=args)
+                                                args = []
 
                                             x.selected = False
                                 
@@ -588,7 +590,7 @@ def run():
                                 unit = m.units.get(cell, None)
                                 if unit:
                                     unit.effect = not unit.effect
-                                    args = [cell[1],cell[0]]  # TODO HACER LO DE LOS ARGUMENTOS EXTRAS PARA EL PILLBUG
+                                    args = [cell[1],cell[0]]
 
                                       
             
