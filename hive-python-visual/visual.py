@@ -408,6 +408,7 @@ def run():
 
     global WHITEPIECES_AMOUNT 
 
+    args = []
 
     m = Map((8, 10))
 
@@ -460,112 +461,126 @@ def run():
                     pygame.quit()
                     sys.exit()
                 if event.type == MOUSEBUTTONDOWN:
-                    if event.pos[1]<radius*2:
-                        print("Clicked on white piece")
-                        whitePiece,i = piecesWhite.get_cell(event.pos, window)
-                        print(whitePiece,i)
-                        if whitePiece is not None:
-                            if(turn % 2) == 0 and WHITEPIECES_AMOUNT[i] != 0:
-                                if not CLICKED_PIECES_ON_HAND[i] and sum(CLICKED_PIECES_ON_HAND) >= 1:
-                                    CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
-                                CLICKED_PIECES_ON_HAND[i] = not CLICKED_PIECES_ON_HAND[i]
+                    left, _, right = pygame.mouse.get_pressed()
+                    if left == 1:
+                        print("Left click")
+                        if event.pos[1]<radius*2:
+                            print("Clicked on white piece")
+                            whitePiece,i = piecesWhite.get_cell(event.pos, window)
+                            print(whitePiece,i)
+                            if whitePiece is not None:
+                                if(turn % 2) == 0 and WHITEPIECES_AMOUNT[i] != 0:
+                                    if not CLICKED_PIECES_ON_HAND[i] and sum(CLICKED_PIECES_ON_HAND) >= 1:
+                                        CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
+                                    CLICKED_PIECES_ON_HAND[i] = not CLICKED_PIECES_ON_HAND[i]
 
-                        
-                    elif event.pos[1]>height-pieceRadius - 8:
-                        print("Clicked on black piece")
-                        blackPiece,i = piecesBlack.get_cell(event.pos, window)
-                        print(blackPiece,i)
-                        if blackPiece is not None:
-                            if(turn % 2) == 1 and BLACKPIECES_AMOUNT[i]!=0:
-                                if not CLICKED_PIECES_ON_HAND[i] and sum(CLICKED_PIECES_ON_HAND) >= 1:
+                            
+                        elif event.pos[1]>height-pieceRadius - 8:
+                            print("Clicked on black piece")
+                            blackPiece,i = piecesBlack.get_cell(event.pos, window)
+                            print(blackPiece,i)
+                            if blackPiece is not None:
+                                if(turn % 2) == 1 and BLACKPIECES_AMOUNT[i]!=0:
+                                    if not CLICKED_PIECES_ON_HAND[i] and sum(CLICKED_PIECES_ON_HAND) >= 1:
+                                        CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
+                                    CLICKED_PIECES_ON_HAND[i] = not CLICKED_PIECES_ON_HAND[i]
+                        else:
+                            
+                            cell = units.get_cell(event.pos)
+                            print(cell)
+                            if cell:
+                                print("Clicked on grid")
+                                if sum(CLICKED_PIECES_ON_HAND)==1:
                                     CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
-                                CLICKED_PIECES_ON_HAND[i] = not CLICKED_PIECES_ON_HAND[i]
-                    else:
-                        print("Clicked on grid")
+                                    
+                                    #################################
+                                    # PLACE A PIECE ON THE GRID
+                                    #################################
+                                    if m.units[cell] is None:
+                                        #m.units[cell] = Unit(m, PIECES[i][0].upper() , None,(turn % 2))
+                                    
+                                        if(turn % 2):
+                                            #BLACKPIECES_AMOUNT[i]+=-1
+                                            piece_index = ALL_BLACK_PIECES.index(blackPiece)
+                                        else:
+                                            #WHITEPIECES_AMOUNT[i]+=-1
+                                            piece_index = ALL_WHITE_PIECES.index(whitePiece)
+
+                                        print(piece_index)
+
+                                        action_to_perform = Action(type = "set",
+                                                        final_x = cell[1],
+                                                        final_y = cell[0],
+                                                        piece_index = piece_index)
+                                        
+                                
+
+                                    ################################
+
+                                elif sum(CLICKED_PIECES_ON_HAND)==0:
+                                    unit = m.units.get(cell, None)                            
+                                    if unit:
+                                        if unit.playerBlack ==(turn % 2):
+                                            if not unit.selected and sum([x.selected for x in m.units.values()]) >= 1:
+                                                for index, x in m.units.items():
+                                                    if x.selected:
+                                                        if x==unit:
+                                                            unit.selected = not unit.selected
+                                                        else:
+                                                            from_x, from_y = index
+
+                                                            action_to_perform = Action(type="move",
+                                                                                    final_x=cell[1],
+                                                                                    final_y=cell[0],
+                                                                                    from_x=from_y,
+                                                                                    from_y=from_x,
+                                                                                    args=args) # TODO HACER LO DE LOS ARGUMENTOS EXTRAS PARA EL PILLBUG
+
+                                                            x.selected = False
+                                            else :
+                                                unit.selected = not unit.selected
+                                            
+                                        else:
+                                            for index, x in m.units.items():
+                                                if x.selected:
+                                                    from_x, from_y = index
+
+                                                    action_to_perform = Action(type="move",
+                                                                            final_x=cell[1],
+                                                                            final_y=cell[0],
+                                                                            from_x=from_y,
+                                                                            from_y=from_x,
+                                                                            args=args) # TODO HACER LO DE LOS ARGUMENTOS EXTRAS PARA EL PILLBUG
+
+
+                                                x.selected = False
+
+                                    else:
+                                        for index , x in m.units.items():
+                                            if x.selected:
+                                                from_x,from_y = index
+
+                                                action_to_perform = Action(type="move",
+                                                                final_x=cell[1],
+                                                                final_y=cell[0],
+                                                                from_x=from_y,
+                                                                from_y = from_x,
+                                                                args=args) # TODO HACER LO DE LOS ARGUMENTOS EXTRAS PARA EL PILLBUG
+
+                                            x.selected = False
+                                
+                                else:
+                                    raise Exception("Multiple clicked pieces")
+                    elif right == 1:
+                        print("Rigth click")
                         cell = units.get_cell(event.pos)
                         print(cell)
                         if cell:
-                            if sum(CLICKED_PIECES_ON_HAND)==1:
-                                CLICKED_PIECES_ON_HAND = [0 for _ in range(len(PIECES))]
-                                
-                                #################################
-                                # PLACE A PIECE ON THE GRID
-                                #################################
-                                if m.units[cell] is None:
-                                    #m.units[cell] = Unit(m, PIECES[i][0].upper() , None,(turn % 2))
-                                
-                                    if(turn % 2):
-                                        #BLACKPIECES_AMOUNT[i]+=-1
-                                        piece_index = ALL_BLACK_PIECES.index(blackPiece)
-                                    else:
-                                        #WHITEPIECES_AMOUNT[i]+=-1
-                                        piece_index = ALL_WHITE_PIECES.index(whitePiece)
+                            print("Clicked on grid")
+                            if sum(CLICKED_PIECES_ON_HAND) == 0 and sum([x.selected for x in m.units.values()]) == 1:
+                                args = [cell[1],cell[0]]  # TODO HACER LO DE LOS ARGUMENTOS EXTRAS PARA EL PILLBUG
 
-                                    print(piece_index)
-
-                                    action_to_perform = Action(type = "set",
-                                                    final_x = cell[1],
-                                                    final_y = cell[0],
-                                                    piece_index = piece_index)
-                                    
-                            
-
-                                ################################
-
-                            elif sum(CLICKED_PIECES_ON_HAND)==0:
-                                unit = m.units.get(cell, None)                            
-                                if unit:
-                                    if unit.playerBlack ==(turn % 2):
-                                        if not unit.selected and sum([x.selected for x in m.units.values()]) >= 1:
-                                            for index, x in m.units.items():
-                                                if x.selected:
-                                                    if x==unit:
-                                                        unit.selected = not unit.selected
-                                                    else:
-                                                        from_x, from_y = index
-
-                                                        action_to_perform = Action(type="move",
-                                                                                final_x=cell[1],
-                                                                                final_y=cell[0],
-                                                                                from_x=from_y,
-                                                                                from_y=from_x,
-                                                                                args=[]) # TODO HACER LO DE LOS ARGUMENTOS EXTRAS PARA EL PILLBUG
-
-                                                        x.selected = False
-                                        else :
-                                            unit.selected = not unit.selected
-                                        
-                                    else:
-                                        for index, x in m.units.items():
-                                            if x.selected:
-                                                from_x, from_y = index
-
-                                                action_to_perform = Action(type="move",
-                                                                        final_x=cell[1],
-                                                                        final_y=cell[0],
-                                                                        from_x=from_y,
-                                                                        from_y=from_x,
-                                                                        args=[]) # TODO HACER LO DE LOS ARGUMENTOS EXTRAS PARA EL PILLBUG
-
-
-                                            x.selected = False
-
-                                else:
-                                    for index , x in m.units.items():
-                                        if x.selected:
-                                            from_x,from_y = index
-
-                                            action_to_perform = Action(type="move",
-                                                            final_x=cell[1],
-                                                            final_y=cell[0],
-                                                            from_x=from_y,
-                                                            from_y = from_x,
-                                                            args=[]) # TODO HACER LO DE LOS ARGUMENTOS EXTRAS PARA EL PILLBUG
-
-                                        x.selected = False
-                            
-                            else:
-                                raise Exception("Multiple clicked pieces")
+                                      
             
 
             ##############################################################
