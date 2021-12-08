@@ -128,7 +128,7 @@ Para la creación del jugador inteligente se recurrió al uso del algoritmo mini
 
 Para la función de utilidad de dicho algoritmo se tuvieron en cuenta los siguientes criterios:
 
-- Cantidad de moviemientos que se pueden hacer por jugador
+- Cantidad de movimientos que se pueden hacer por jugador
 - Cantidad de fichas alrededor de la reina
 - Cantidad de fichas que se pueden mover
 - Cantidad de lugares en donde se puede poner fichas
@@ -275,6 +275,20 @@ Cuerpos del POST:
 ### Interfaz visual
 
 La interfaz visual se creó mediante la unión de los paquetes **FastAPI** y **pygame**. Con el primero se crearon los endpoints y los modelos necesarios para la comunicación con la lógica del juego respetando la interfaz explicada anteriormente. Con el segundo se crearon los visuales necesarios para representar el juego así como la interacción entre el usuario y el juego a través de clicks. 
+
+Se adaptó la idea de un tablero hexagonal publico de pygame ajustando las coordenadas correctas para nuestro tablero hexagonal. De ahi proviene el codigo de la carpeta hexmap.
+
+Con **pygame** obtuvimos informacion de que clicks eran presionados y dentro de la clase visual.py se crearon los eventos que se deben manejar para el juego.
+
+Se crearon las clases Render (que hereda de **pygame.Surface**) y sus herederas RenderGrid y  RenderUnits
+
+La clase RenderPieces pese a no heredar de Render se creo para poder manejar las piezas del juego.
+
+Todas las clases de render se dedican a dibujar sobre la ventana creada por **pygame**.
+
+Para las piezas se creo una clase Piece la cual posee una posicion , un tipo y un color.
+
+Para las unidades se creo una clase Unit la cual posee un label, una imagen, una propiedad que indica el turno, una para saber si esta seleccionada y otra para saber si es el objetivo de un efecto.
 
 ## Bibliografía
 
