@@ -27,10 +27,12 @@ select_player('3', random_player, http_game_state, http_game_feedback, empty_pla
 % select_player(3, random_player, print_game_state, print_game_feedback, empty_player_extra_config).
 
 % INITIAL HIVE PIECES
-pieces_for_hive(c, [queen, cricket, cricket, cricket, beetle, beetle, spider, spider, ant, ant, ant], 'Classic').
+pieces_for_hive(c, [queen], 'Classic').
+% pieces_for_hive(c, [queen, cricket, cricket, cricket, beetle, beetle, spider, spider, ant, ant, ant], 'Classic').
 pieces_for_hive(e, Pieces, 'Extended') :- 
     pieces_for_hive(c, ClassicPieces, _),
-    concat_list(ClassicPieces, [mosquito, ladybug, pillbug], Pieces).
+    concat_list(ClassicPieces, [ant, pillbug], Pieces).
+    % concat_list(ClassicPieces, [mosquito, ladybug, pillbug], Pieces).
 pieces_for_hive(_, Pieces, 'Defaults to Classic') :-
     pieces_for_hive(c, Pieces, _).
 

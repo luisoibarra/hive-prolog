@@ -2,8 +2,8 @@
     concat_set_list/3, map/4, zip/3, unzip/3, zip_const/3, element_at/3,
     remove_at/3, remove_all/3, get_random_element/2, maxim/4, exchange_elements/4,
     unification_filter/3]).
-:- use_module('AI/minmax_utils').
-:- use_module('AI/utility_function').
+:- use_module('../AI/minmax_utils').
+:- use_module('../AI/utility_function').
 
 % list_difference(List1, List2, Result) List1-List2=Result
 list_difference([], _, []) :- !.

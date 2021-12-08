@@ -154,13 +154,13 @@ pillbug_translate(Piece, Board, PosXToMove, PosYToMove, PieceMoved, NewBoard) :-
             PosXToMove = NextX,
             PosYToMove = NextY
         ), AroundPieces),
-
+    
     findall(pos(NextX, NextY), (positions_next_to(PosX, PosY, NextX, NextY, _), not(is_place_taken(Board, NextX, NextY, Height))), FreePositions),
     tuple_combination(AroundPieces, FreePositions, OldPieceToMove, pos(NewX, NewY)),
     SlideHeight is Height + 1,
+    piece(PosXToMove, PosYToMove, Type, Extra) = OldPieceToMove,
     can_slide_into_height(Board, PosX, PosY, SlideHeight, _, _, NewX, NewY, _),
     remove_board_piece(Board, OldPieceToMove, PrevBoard),
-    piece(_, _, Type, Extra) = OldPieceToMove,
     build_piece(NewX, NewY, Type, Extra, PieceMoved),
     NewBoard = [PieceMoved|PrevBoard].
 
