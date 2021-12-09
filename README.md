@@ -43,7 +43,7 @@ Crear imagen de Docker:
 
 #### A tener en cuenta
 
-Una vez se tenga el visual y el servidor corriendo se debe seleccionar al menos un jugador Humano al iniciar el juego y verificar que el puerto `9001` no está siendo usado por otro programa en `127.0.0.1` ya que es por aquí por donde se hace la comunicación entre el visual y la lógica del juego.
+Una vez se tenga el visual y el servidor corriendo se debe seleccionar los tipos de jugadores con los cuales se desea jugar y verificar que el puerto `9001` no está siendo usado por otro programa en `127.0.0.1` ya que es por aquí por donde se hace la comunicación entre el visual y la lógica del juego.
 
 ## Implementación
 
