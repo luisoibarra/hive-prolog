@@ -34,6 +34,7 @@ ai_player(Game, GameConfig, Action) :-
 ai_player(Game, _, Action) :-
     game(_, Player, _) = Game,
     max_minimax_depth(MaxDepth),
+    write('Minimax in action ...'), nl, % DEBUG
     two_minimax(step(none, Game, none, continue), 0, Player, -100000000, 100000000,two_result_selection,next_step_generator,terminal_test,player_utility_function,MaxDepth,[Step,Vector]),
     write('AI Action: '), write(Step), write(' '), write(Vector), nl, % DEBUG
     step(Action, _, _, _) = Step.

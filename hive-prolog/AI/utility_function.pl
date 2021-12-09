@@ -256,7 +256,7 @@ normalize_score_function(State, Metrics, Score) :-
         call(F)
     ), Normalized),
 
-    write(Normalized),nl, % DEBUG
+    % write(Normalized),nl, % DEBUG
     sum_list(Normalized, Score).
     % sum_list(Normalized, Score). TODO Maybe is better to return the value with highest abs value? 
 
