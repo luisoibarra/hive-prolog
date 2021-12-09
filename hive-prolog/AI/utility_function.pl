@@ -51,8 +51,9 @@ priv_player_utility_function(State, UtilityPlayer, Score) :-
     MoveAllied),
     length(MoveAllied, MoveAlliedLength),
 
-    length(MoveablePieces, AllMovesLength), 
-    
+    length(MoveablePieces, PreAllMovesLength), 
+    AllMovesLength is max(PreAllMovesLength, 1), % Avoid 0 Division
+
     % write('pieces: '), write(MoveablePieces), nl, % DEBUG 
     % write('total: '), write(AllMovesLength), nl, 
     % write('allied: '), write(MoveAlliedLength), nl,
