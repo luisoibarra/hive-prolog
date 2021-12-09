@@ -1,6 +1,7 @@
 :- module(utility_function,[player_utility_function/3, piece_to_advantage/4, piece_to_danger/4]).
 :- use_module('../Run/run_game_utils').
 :- use_module('../Rules/end_game_rules').
+:- use_module('../Rules/move_piece_rules').
 :- use_module('../Utils/list_utils').
 :- use_module('../Utils/piece_utils').
 :- use_module('../Utils/board_utils').
@@ -26,13 +27,36 @@ priv_player_utility_function(State, _, Value) :-
 
 priv_player_utility_function(State, UtilityPlayer, Score) :-
     step(_, Game, _, _) = State,
-    all_next_game_steps(Game, Steps),
+    game(Board, _, _) = Game,
+    % all_next_game_steps(Game, Steps),
     
-    unification_filter(Steps, step(set_play(_,_,_),_,_,_), SetSteps),
-    length(SetSteps, SetStepsLength),
+    % unification_filter(Steps, step(set_play(_,_,_),_,_,_), SetSteps),
+    % length(SetSteps, SetStepsLength),
     
-    unification_filter(Steps, step(move_play(_,_,_,_,_),_,_,_), MoveSteps),
-    length(MoveSteps, MoveStepsLength),
+    % unification_filter(Steps, step(move_play(_,_,_,_,_),_,_,_), MoveSteps),
+    % length(MoveSteps, MoveStepsLength),
+
+    moveable_pieces(Game, MoveablePieces),
+    findall(X, (
+        member(X, MoveablePieces), 
+        piece(_, _, Player, _) = X, 
+        Player \= UtilityPlayer), 
+    MoveEnemies),
+    length(MoveEnemies, MoveEnemiesLength),
+
+    findall(X, (
+        member(X, MoveablePieces), 
+        piece(_, _, Player, _) = X, 
+        Player = UtilityPlayer), 
+    MoveAllied),
+    length(MoveAllied, MoveAlliedLength),
+
+    length(MoveablePieces, AllMovesLength), 
+    
+    % write('pieces: '), write(MoveablePieces), nl, % DEBUG 
+    % write('total: '), write(AllMovesLength), nl, 
+    % write('allied: '), write(MoveAlliedLength), nl,
+    % write('enemies: '), write(MoveEnemiesLength), nl,
 
     board_pieces_danger(State, UtilityPlayer, PiecesPlacedDanger),
     
@@ -44,8 +68,11 @@ priv_player_utility_function(State, UtilityPlayer, Score) :-
     
     normalize_score_function(State, 
         [
-            SetStepsLength, 
-            MoveStepsLength, 
+            % SetStepsLength, 
+            % MoveStepsLength, 
+            MoveEnemiesLength,
+            MoveAlliedLength,
+            AllMovesLength,
             PiecesPlacedDanger, 
             PiecesPlacedAdvantange,
             EnemyQueenThreat,
@@ -76,14 +103,14 @@ tie_game(State) :-
 % piece_danger_points(Bug, Danger) Returns the Danger given a Bug
 % max Danger allowed is 50
 % TODO Check Danger Values
-piece_danger_points(spider, 20) :- !.
-piece_danger_points(queen, 15) :- !.
+piece_danger_points(spider, 15) :- !.
+piece_danger_points(queen, 10) :- !.
 piece_danger_points(beetle, 30) :- !.
 piece_danger_points(cricket, 25) :- !.
 piece_danger_points(ant, 30) :- !.
-piece_danger_points(ladybug, 30) :- !.
+piece_danger_points(ladybug, 25) :- !.
 piece_danger_points(mosquito, 30) :- !.
-piece_danger_points(pillbug, 30) :- !.
+piece_danger_points(pillbug, 25) :- !.
 piece_danger_points(_, 10) :- !.
 
 % TODO Use Turn to add more advantage to pieces in different game stages
@@ -98,6 +125,16 @@ piece_to_danger(UtilityPlayer, Turn, Piece, Danger) :-
         piece_danger_points(Type, Danger)
     ).
 
+is_movable(Board, Piece) :-
+    move(Board, Piece, _, _, _, _, _), !.
+
+% moveable_pieces(Game, MoveablePieces) Returns the MoveablePieces from Game
+moveable_pieces(Game, MoveablePieces) :- 
+    game(Board, _, _) = Game,
+    findall(X, (
+        member(X, Board), 
+        is_movable(Board, X)), 
+    MoveablePieces).
 
 % board_pieces_danger(State, UtilityPlayer, PiecesPlacedDangers) Returns the Danger of the pieces placed on the board
 % PiecesPlacedDangers is a number between 0 and 50
@@ -180,8 +217,11 @@ allied_queen_threat(State, UtilityPlayer, AlliedQueenThreat) :-
 normalize_score_function(State, Metrics, Score) :- 
     
     Metrics = [
-        SetStepsLength, % Amount of piece enemies placements 0 <= x < ? Can be medium apprx 85 +-
-        MoveStepsLength, % Amount of piece enemies movements 0 <= x < ? Can be big apprx 100
+        % SetStepsLength, % Amount of piece enemies placements 0 <= x < ? Can be medium apprx 85 +-
+        % MoveStepsLength, % Amount of piece enemies movements 0 <= x < ? Can be big apprx 100
+        MoveEnemiesLength,
+        MoveAlliedLength,
+        AllMovesLength,
         PiecesPlacedDanger, % Danger level of placed enemy pieces 0 <= x <= 50
         PiecesPlacedAdvantange, % Andvantage level of placed allied pieces 0 <= x <= 50
         EnemyQueenThreat, % Enemy Queen Thread Level 0 <= x <= +-8
@@ -196,12 +236,16 @@ normalize_score_function(State, Metrics, Score) :-
     % game(Board, _, _) = Game,
     % write('Board '), write(Board), % DEBUG
     Params = [
-        [SetStepsLength,        -1/85, -1/25, 0, Turn, NormalizedSetStepsLength],
-        [MoveStepsLength,       1/100, -1/10,-1, Turn, NormalizedMoveStepsLength],
-        [PiecesPlacedDanger,    -1/50, -1/25, 0, Turn, NormalizedPiecesPlacedDanger],
-        [PiecesPlacedAdvantange, 1/50, -1/30, 0, Turn, NormalizedPiecesPlacedAdvantange],
-        [EnemyQueenThreat,       2/8,      0, 0, Turn, NormalizedEnemyQueenThreat],
-        [AlliedQueenThreat,     -2/8,      0, 0, Turn, NormalizedAlliedQueenThreat]        
+        % [SetStepsLength,        -1/85, -1/25, 0, Turn, NormalizedSetStepsLength],
+        % [MoveStepsLength,       1/100, -1/10,-1, Turn, NormalizedMoveStepsLength],
+        % [PiecesPlacedDanger,    -1/50, -1/25, 0, Turn, NormalizedPiecesPlacedDanger],
+        % [PiecesPlacedAdvantange, 1/50, -1/30, 0, Turn, NormalizedPiecesPlacedAdvantange],
+        [MoveEnemiesLength, -1/AllMovesLength, 0, 0, Turn, NormalizedMoveEnemiesLength],
+        [MoveAlliedLength,   1/AllMovesLength, 0, 0, Turn, NormalizedMoveAlliedLength],
+        [PiecesPlacedDanger,    -1/50,     -1/40, 0, Turn, NormalizedPiecesPlacedDanger],
+        [PiecesPlacedAdvantange, 2/50,     -1/30, 0, Turn, NormalizedPiecesPlacedAdvantange],
+        [EnemyQueenThreat,       2.5/8,        0, 0, Turn, NormalizedEnemyQueenThreat],
+        [AlliedQueenThreat,     -2.5/8,        0, 0, Turn, NormalizedAlliedQueenThreat]        
     ],
 
     findall(X, (
@@ -212,7 +256,7 @@ normalize_score_function(State, Metrics, Score) :-
         call(F)
     ), Normalized),
 
-    % write(Normalized),nl, % DEBUG
+    write(Normalized),nl, % DEBUG
     sum_list(Normalized, Score).
     % sum_list(Normalized, Score). TODO Maybe is better to return the value with highest abs value? 
 
@@ -224,10 +268,11 @@ normalize(Value, MultParam, ExpParam, SumValue, Turn, NormalizedResult) :-
     Mod is 3 ** Arg + SumValue,
     Mod2 is MultParam * Mod,
     RawNormalizedResult is Mod2 * Value,
-    (
-        RawNormalizedResult < 0,
-        NormalizedResult is max(RawNormalizedResult, -1)
-        ;
-        RawNormalizedResult >= 0,
-        NormalizedResult is min(RawNormalizedResult, 1)
-    ).
+    NormalizedResult = RawNormalizedResult.
+    % (
+    %     RawNormalizedResult < 0,
+    %     NormalizedResult is max(RawNormalizedResult, -1)
+    %     ;
+    %     RawNormalizedResult >= 0,
+    %     NormalizedResult is min(RawNormalizedResult, 1)
+    % ).

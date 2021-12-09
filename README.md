@@ -47,6 +47,8 @@ Una vez se tenga el visual y el servidor corriendo se debe seleccionar al menos 
 
 ## Implementación
 
+Las implementación del juego está basada en la orientación del proyecto y se usó como referencia el juego para móviles Android llamado *Hive: La Colmena*.
+
 El proyecto propuso diferentes dificultades:
 
 - Tener una forma extensible de comunicarse con el usuario en dependencia de la interfaz que se quiera usar consola, http u alguna otra.
@@ -54,9 +56,24 @@ El proyecto propuso diferentes dificultades:
 - Tener una manera extensible de representar a los jugadores independientemente de que si es humano o no.
 - Realizar un jugador inteligente autónomo que sea capaz de poder jugar contra un humano.
 
-Lo primero a tener en cuenta son las principales estructuras que se usaron en la implementación
+### Estructura del proyecto
+
+El proyecto se estructura en varias carpetas que tratan de separar la funcionalidad de sus archivos lo más posible. La estructura es la siguiente:
+
+- hive-prolog: Lógica relacionada con el juego en Prolog
+  - AI: Lógica relacionada con el jugador autónomo
+  - HTTP: Lógica relacionada con la interfaz HTTP implementada para la comunicación del juego con agentes externos
+  - Rules: Lógica relacionada con el colocado y moviemiento de piezas en el juego, además con las reglas generales del juego.
+  - Run: Lógica relacionada con el flujo del juego
+  - Utils: Múltiples cláusulas de utilidad usadas en varios scripts de Prolog en el proyecto
+
+- hive-python-visual: Visual para jugar Hive conectándose al servidor de Prolog
+  - hexmap: Lógica e implementación del mapa hexagonal
+  - assets: Recursos necesarios para el juego
 
 ### Estructuras
+
+Principales estructuras que se usaron en la implementación:
 
 1. Básicas
 
@@ -124,14 +141,12 @@ El flujo del juego empieza en la cláusula `init_game` en donde se configuran la
 
 ### Jugador Inteligente
 
-Para la creación del jugador inteligente se recurrió al uso del algoritmo minimax usando el método de poda `alpha-beta` este puede ser encotrado en `minimax.pl`. La función de decisión de la acción a tomar por este jugador es `ai_player` que se encuentra en `players.pl`.
+Para la creación del jugador inteligente se recurrió al uso del algoritmo minimax usando el método de poda `alpha-beta` este puede ser encotrado en `minimax.pl`. La función de decisión de la acción a tomar por este jugador es `ai_player` que se encuentra en `players.pl`. La profundidad de búsqueda del algoritmo minimax se encuentra restringida a 2 ya que este algoritmo tiene espacio de búsqueda que aumenta exponencial con respecto a la altura del árbol con un factor bastante elevado.
 
 Para la función de utilidad de dicho algoritmo se tuvieron en cuenta los siguientes criterios:
 
-- Cantidad de movimientos que se pueden hacer por jugador
-- Cantidad de fichas alrededor de la reina
-- Cantidad de fichas que se pueden mover
-- Cantidad de lugares en donde se puede poner fichas
+- Cantidad de fichas que se pueden mover por jugador
+- Cantidad de fichas alrededor de las reinas
 - Tipo de fichas en el tablero
 
 Estos criterios luego son normalizados y multiplicados por un peso que depende del turno en donde se encuentre el juego, de esta manera se pueden potenciar ciertos movimientos al principio o ya en el medio o largo juego. La función puede ser encontrada en `utility_function.pl`.

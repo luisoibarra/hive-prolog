@@ -38,7 +38,7 @@ pre_move_rules(Board, Piece) :-
 
 % post_move_rules(OldBoard, OldPiece, NewPiece, NewBoard) Rules that must be fulfilled after the piece is moved
 post_move_rules(OldBoard, OldPiece, NewPiece, NewBoard) :- 
-    % connected_board(NewBoard). % Single Hive Simplified
+    connected_board(NewBoard),
     single_hive_after(OldBoard, OldPiece, NewPiece).
 
 % move(Board, OldPiece, ExtraArgs, NewPosX, NewPosY, NewPiece, NewBoard) Return the NewBoard after the move is made.
