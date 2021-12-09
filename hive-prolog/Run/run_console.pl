@@ -13,13 +13,13 @@ select_player(t, console_human_player, http_game_state, http_game_feedback, http
 % TEST PLAYER
 select_player(0, http_player, http_game_state, http_game_feedback, http_player_extra_config).
 select_player(1, console_human_player, print_game_state, print_game_feedback, empty_player_extra_config).
-select_player(2, ai_player, http_game_state, http_game_feedback, empty_player_extra_config).
-select_player(3, random_player, http_game_state, http_game_feedback, empty_player_extra_config).
+select_player(2, ai_player, http_game_state, http_game_feedback, http_player_extra_config).
+select_player(3, random_player, http_game_state, http_game_feedback, http_player_extra_config).
 
 select_player('0', http_player, http_game_state, http_game_feedback, http_player_extra_config).
 select_player('1', console_human_player, print_game_state, print_game_feedback, empty_player_extra_config).
-select_player('2', ai_player, http_game_state, http_game_feedback, empty_player_extra_config).
-select_player('3', random_player, http_game_state, http_game_feedback, empty_player_extra_config).
+select_player('2', ai_player, http_game_state, http_game_feedback, http_player_extra_config).
+select_player('3', random_player, http_game_state, http_game_feedback, http_player_extra_config).
 
 
 % CONSOLE VERSIONS
