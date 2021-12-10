@@ -4,7 +4,7 @@
 % Type
 % ant.
 % queen.
-% cricket.
+% grasshopper.
 % spider.
 % beetle.
 % mosquito.

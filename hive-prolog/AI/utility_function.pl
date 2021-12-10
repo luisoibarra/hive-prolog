@@ -107,7 +107,7 @@ tie_game(State) :-
 piece_danger_points(spider, 15) :- !.
 piece_danger_points(queen, 10) :- !.
 piece_danger_points(beetle, 30) :- !.
-piece_danger_points(cricket, 25) :- !.
+piece_danger_points(grasshopper, 25) :- !.
 piece_danger_points(ant, 30) :- !.
 piece_danger_points(ladybug, 25) :- !.
 piece_danger_points(mosquito, 30) :- !.

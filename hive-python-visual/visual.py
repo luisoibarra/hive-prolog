@@ -53,7 +53,7 @@ ALL_WHITE_PIECES = []
 
 PIECES_ON_GRID = []
 
-# PIECES_IMAGES = [queen,spider,ant,beetle,cricket]
+# PIECES_IMAGES = [queen,spider,ant,beetle,grasshopper]
 
 CLICKED_PIECES_ON_HAND = []
 

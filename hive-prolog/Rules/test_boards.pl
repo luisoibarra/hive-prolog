@@ -22,11 +22,11 @@ test_boards([piece(2,2,white,[ant|_])], [piece(2,3,black,[ant|_]), piece(1,1,whi
 test_boards([piece(2,2,white,[queen,0|_]),piece(1,1,_,[_,0|_]),piece(1,2,_,[_,0|_])], [[piece(2,2,white,[queen,0|_]),[2,1]]], true) :- write(7).
 test_boards([piece(2,2,white,[queen,0|_]),piece(1,1,_,[_,0|_]),piece(2,1,_,[_,0|_])], [[piece(2,2,white,[queen,0|_]),[2,1]]], false) :- write(8).
 
-% Cricket Movement
-test_boards([piece(2,2,_,[cricket,0|_]),piece(3,2,_,[_,0|_]),piece(4,3,_,[_,0|_])], [[piece(2,2,_,[cricket,0|_]),[1,2]]], false) :- write(9).
-test_boards([piece(2,2,_,[cricket,0|_]),piece(3,2,_,[_,0|_]),piece(4,3,_,[_,0|_])], [[piece(2,2,_,[cricket,0|_]),[4,3]]], false) :- write(10).
-test_boards([piece(2,2,_,[cricket,0|_]),piece(3,2,_,[_,0|_]),piece(4,3,_,[_,0|_])], [[piece(2,2,_,[cricket,0|_]),[4,2]]], false) :- write(11).
-test_boards([piece(2,2,_,[cricket,0|_]),piece(3,2,_,[_,0|_]),piece(4,3,_,[_,0|_])], [[piece(2,2,_,[cricket,0|_]),[5,3]]], true) :- write(12).
+% Grasshopper Movement
+test_boards([piece(2,2,_,[grasshopper,0|_]),piece(3,2,_,[_,0|_]),piece(4,3,_,[_,0|_])], [[piece(2,2,_,[grasshopper,0|_]),[1,2]]], false) :- write(9).
+test_boards([piece(2,2,_,[grasshopper,0|_]),piece(3,2,_,[_,0|_]),piece(4,3,_,[_,0|_])], [[piece(2,2,_,[grasshopper,0|_]),[4,3]]], false) :- write(10).
+test_boards([piece(2,2,_,[grasshopper,0|_]),piece(3,2,_,[_,0|_]),piece(4,3,_,[_,0|_])], [[piece(2,2,_,[grasshopper,0|_]),[4,2]]], false) :- write(11).
+test_boards([piece(2,2,_,[grasshopper,0|_]),piece(3,2,_,[_,0|_]),piece(4,3,_,[_,0|_])], [[piece(2,2,_,[grasshopper,0|_]),[5,3]]], true) :- write(12).
 
 % Beetle Movement
 test_boards([piece(2,2,_,[queen, 0|_]),piece(3,2,_,[beetle, 0|_]),piece(2,3,_,[beetle, 0|_]),piece(4,3,_,[beetle, 0|_]),piece(4,2,_,[beetle, 0|_]),piece(3,1,_,[beetle, 0|_])], [[piece(2,3,_,[beetle, 0|_]),[3,2]]], true) :- write(13).

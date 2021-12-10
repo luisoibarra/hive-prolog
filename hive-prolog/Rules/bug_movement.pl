@@ -1,7 +1,7 @@
 :- module(bug_movement, [
         bug_movement_functor/2,
         queen_moves_position/7,
-        cricket_moves_position/7,
+        grasshopper_moves_position/7,
         beetle_moves_position/7,
         spider_moves_position/7,
         ant_moves_position/7,
@@ -16,7 +16,7 @@
 
 % Bugs movement
 bug_movement_functor(queen_moves_position, queen).
-bug_movement_functor(cricket_moves_position, cricket).
+bug_movement_functor(grasshopper_moves_position, grasshopper).
 bug_movement_functor(beetle_moves_position, beetle).
 bug_movement_functor(spider_moves_position, spider).
 bug_movement_functor(ant_moves_position, ant).
@@ -28,8 +28,8 @@ bug_movement_functor(pillbug_moves_position, pillbug).
 queen_moves_position(Board, Piece, [], NewPosX, NewPosY, NewPiece, NewBoard) :- 
     slide_one_step(Board, Piece, NewPosX, NewPosY, NewPiece, NewBoard).
 
-% Cricket Movement
-cricket_moves_position(Board, Piece, [], NewPosX, NewPosY, NewPiece, NewBoard) :-
+% Grasshopper Movement
+grasshopper_moves_position(Board, Piece, [], NewPosX, NewPosY, NewPiece, NewBoard) :-
   
     piece(PosX, PosY,Color,Extra) = Piece,
     first_empty_place_from(Board, PosX, PosY, _, Length, NewPosX, NewPosY),

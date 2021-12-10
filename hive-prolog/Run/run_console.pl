@@ -27,7 +27,7 @@ select_player('3', random_player, http_game_state, http_game_feedback, http_play
 % select_player(3, random_player, print_game_state, print_game_feedback, empty_player_extra_config).
 
 % INITIAL HIVE PIECES
-pieces_for_hive(c, [queen, cricket, cricket, cricket, beetle, beetle, spider, spider, ant, ant, ant], 'Classic').
+pieces_for_hive(c, [queen, grasshopper, grasshopper, grasshopper, beetle, beetle, spider, spider, ant, ant, ant], 'Classic').
 pieces_for_hive(e, Pieces, 'Extended') :- 
     pieces_for_hive(c, ClassicPieces, _),
     concat_list(ClassicPieces, [mosquito, ladybug, pillbug], Pieces).
@@ -106,7 +106,7 @@ init_game() :-
         ), 
         [player(white, [Player1Functor]), player(black,[Player2Functor])]).
 
-% game([piece(4,3,black,[queen,0]),piece(4,3,white,[beetle,1]),piece(3,2,white,[queen,0])],black,[[pieces_info(white,[cricket,cricket,pillbug,ladybug,ant,ant,beetle,spider,spider]),pieces_info(black,[cricket,cricket,pillbug,ladybug,ant,ant,beetle,beetle,spider,spider])],[],5]), game_config([feedback_info(white,print_game_state,print_game_feedback),feedback_info(black,print_game_state,print_game_feedback)],[extra_info(white,[]),extra_info(black,[])]), [player(white,[console_human_player]),player(black,[console_human_player])]
+% game([piece(4,3,black,[queen,0]),piece(4,3,white,[beetle,1]),piece(3,2,white,[queen,0])],black,[[pieces_info(white,[grasshopper,grasshopper,pillbug,ladybug,ant,ant,beetle,spider,spider]),pieces_info(black,[grasshopper,grasshopper,pillbug,ladybug,ant,ant,beetle,beetle,spider,spider])],[],5]), game_config([feedback_info(white,print_game_state,print_game_feedback),feedback_info(black,print_game_state,print_game_feedback)],[extra_info(white,[]),extra_info(black,[])]), [player(white,[console_human_player]),player(black,[console_human_player])]
 
 run_game(Game, GameConfig, Players) :- 
 
