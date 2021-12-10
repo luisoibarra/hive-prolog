@@ -13,11 +13,12 @@ Implementación del juego Hive en Prolog.
 - Tener las dependencias de Python descritas en el **requirements.txt**
 
 #### Opcional
+
 - Tener docker instalado en caso de no tener **SwiProlog** en la computadora
 
 ### Jugar
 
-#### Interfaz visual
+#### Requerimientos interfaz visual
 
 Los *requirements.txt* tienen que estar cumplidos, lo que se puede hacer ejecutando **install_requirements.sh**.
 
@@ -77,51 +78,51 @@ Principales estructuras que se usaron en la implementación:
 
 1. Básicas
 
-  - piece(PosX, PosY, PlayerOwner, \[PieceType,Height\])
-    - PosX, PosY: Coordenadas en el grid hexagonal
-    - PlayerOwner: white, black, etc.
-    - PieceType: queen, beetle, spider, cricket, etc.
-    - Height: Altura de la  pieza en el tablero
-  - pieces_info(PlayerOwner, PiecesTypesLeftToSet)
-    - PlayerOwner: white, black, etc.
-    - PiecesTypesLeftToSet: Lista de tipos de piezas, ej: \[queen, spider\]
-  - game(Board,CurrentTurnPlayer,\[PlayersPiecesToSet,GameHistory,CurrentTurn\])
-    - Board: Lista de `piece`
-    - CurrentTurnPlayer: white, black, etc.
-    - PlayersPiecesToSet: Lista de `pieces_info`
-    - CurrentTurn: entero indicando el turno
+- piece(PosX, PosY, PlayerOwner, \[PieceType,Height\])
+  - PosX, PosY: Coordenadas en el grid hexagonal
+  - PlayerOwner: white, black, etc.
+  - PieceType: queen, beetle, spider, grasshopper, etc.
+  - Height: Altura de la  pieza en el tablero
+- pieces_info(PlayerOwner, PiecesTypesLeftToSet)
+  - PlayerOwner: white, black, etc.
+  - PiecesTypesLeftToSet: Lista de tipos de piezas, ej: \[queen, spider\]
+- game(Board,CurrentTurnPlayer,\[PlayersPiecesToSet,GameHistory,CurrentTurn\])
+  - Board: Lista de `piece`
+  - CurrentTurnPlayer: white, black, etc.
+  - PlayersPiecesToSet: Lista de `pieces_info`
+  - CurrentTurn: entero indicando el turno
 
 2. Acciones hechas por jugadores
 
-  - set_play(PositionSelectedPieceToSet, PosX, PosY)
-    - PositionSelectedPieceToSet: Index en PiecesTypesLeftToSet de `pieces_info` de la ficha que se quiere poner
-    - PosX, PosY: Posición de la ficha
-  - move_play(PosX, PosY, NewPosX, NewPosY, ExtraArgs)
-    - PosX, PosY: Posición de la ficha en el tablero a mover
-    - NewPosX, NewPosY: Nueva posición de la ficha
-    - ExtraArgs: Argumentos para cualquier otro tipo de jugada
+- set_play(PositionSelectedPieceToSet, PosX, PosY)
+  - PositionSelectedPieceToSet: Índice en PiecesTypesLeftToSet de `pieces_info` de la ficha que se quiere poner
+  - PosX, PosY: Posición de la ficha
+- move_play(PosX, PosY, NewPosX, NewPosY, ExtraArgs)
+  - PosX, PosY: Posición de la ficha en el tablero a mover
+  - NewPosX, NewPosY: Nueva posición de la ficha
+  - ExtraArgs: Argumentos para cualquier otro tipo de jugada
 
 3. Flujo de juego
 
-  - step(Action, Game, Feedback, Status)
-    - Action: Movimiento que se hizo en el paso ej: `set_play`, `move_play`.
-    - Game: Instancia del `game` generada en el paso.
-    - Feedback: String con un mensaje sobre el estado del paso
-    - Status: Indica el estado del paso ej: invalid, continue, over, tie.
-  - feedback_info(PlayerColor, StartGameStateUserFeedback, EndGameStateUserFeedback)
-    - StartGameStateUserFeedback: Functor a llamar para mostrar y actualizar el estado del juego en el cliente
-    - EndGameStateUserFeedback: Functor a llamar para mostrar y actualizar el estado del juego luego de que se haya hecho una jugada
+- step(Action, Game, Feedback, Status)
+  - Action: Movimiento que se hizo en el paso ej: `set_play`, `move_play`.
+  - Game: Instancia del `game` generada en el paso.
+  - Feedback: String con un mensaje sobre el estado del paso
+  - Status: Indica el estado del paso ej: invalid, continue, over, tie.
+- feedback_info(PlayerColor, StartGameStateUserFeedback, EndGameStateUserFeedback)
+  - StartGameStateUserFeedback: Functor a llamar para mostrar y actualizar el estado del juego en el cliente
+  - EndGameStateUserFeedback: Functor a llamar para mostrar y actualizar el estado del juego luego de que se haya hecho una jugada
 
 4. Configuración
 
-  - player_info(CurrentPlayer, \[PlayerFunctor\])
-    - CurrentPlayer: white, black, etc.
-    - PlayerFunctor: Functor a una función que devuelve la acción del jugador
-  - game_config(FeedbackPlayerInfoList, ExtraPlayerInfoList)
-    - FeedbackPlayerInfoList: Lista que contiene `feedback_info` con los functors a llamar para la actualización del estado de los usuarios
-    - ExtraPlayerInfoList: Lista que contiene `extra_info` sobre la configuración de los usuarios.
-  - extra_info(Player, ExtraConfigInfo)
-    - ExtraConfigInfo: Lista que contiene información adicional sobre el jugador necesaria para hacer los updates. Por ejemplo se usa para guardar la dirección de los jugadores HTTP conteniendo un `http_player_config(Host, Port, BasePath)`.
+- player_info(CurrentPlayer, \[PlayerFunctor\])
+  - CurrentPlayer: white, black, etc.
+  - PlayerFunctor: Functor a una función que devuelve la acción del jugador
+- game_config(FeedbackPlayerInfoList, ExtraPlayerInfoList)
+  - FeedbackPlayerInfoList: Lista que contiene `feedback_info` con los functors a llamar para la actualización del estado de los usuarios
+  - ExtraPlayerInfoList: Lista que contiene `extra_info` sobre la configuración de los usuarios.
+- extra_info(Player, ExtraConfigInfo)
+  - ExtraConfigInfo: Lista que contiene información adicional sobre el jugador necesaria para hacer los updates. Por ejemplo se usa para guardar la dirección de los jugadores HTTP conteniendo un `http_player_config(Host, Port, BasePath)`.
 
 ### Interfaz extensible
 
@@ -129,15 +130,19 @@ Este problema fue resuelto mediante el uso de functors. En la configuración por
 
 La interacción del jugador con la interfaz también es modelada mediante functors, lo cual permite abstraer la acción que se quiere hacer de cómo se hace, permitiendo una gran versatilidad. Las acciones que hacen los jugadores al interactar con la interfaz son las de mostrar el estado actual del juego y mostrar el resultado luego de un movimiento. Esta asignación de jugador a acción se puede ver en `run_console.pl` en los hechos *select_player*, los cuales tienen asignados los functors que realizarán las acciones correspondientes, aquí se crearon 3 tipos de jugadores: *Human*, *AI* y *Random*.
 
-Una vez se tiene toda esta configuración se tiene un mismo código para correr el juego independientemente de cuál sea esta, permitiendo poder agregar o cambiar solamente los functors y manteniendo la lógica del flujo del juego.
+Una vez se tiene toda esta configuración se tiene un mismo código para correr el juego independientemente de cuál sea esta, permitiendo poder agregar o cambiar solamente los functors y manteniendo la lógica del flujo del juego. Por ejemplo es muy sencillo cambiar para jugar en consola en vez de por la interfaz al solo necesitar asignarle los functors indicados a los jugadores.
 
 ### Lógica del juego
 
-Básicamente el juego consiste en dos acciones posibles, poner una pieza y mover una pieza. Estas acciones se expresan mediante las cláusulas `add_piece` en `add_piece_rules.pl` y `move` en `move_piece_rules.pl` respectivamente. Las otras reglas más generales se van manteniendo a medida de que se hacen las jugadas, tales como la conectitud del tablero y la existencia de una reina del color que desea mover entre otras. Al estar estas acciones en solo dos cláusulas permite que agregar más reglas relacionadas con ellas sean tarea sencilla y también provee una manera simple de añadir los diferentes tipos de bichos presentes en el juego. Los nuevos bichos se pueden agregar al definir cómo se mueven y agregar el correspondiente `bug_movement_functor` en `bug_movement.pl`.
+Básicamente el juego consiste en dos acciones posibles, poner una pieza y mover una pieza. Estas acciones se expresan mediante las cláusulas `add_piece` en `add_piece_rules.pl` y `move` en `move_piece_rules.pl` respectivamente. Las otras reglas más generales se van manteniendo a medida de que se hacen las jugadas, tales como la conectitud del tablero y la existencia de una reina del color que desea mover entre otras. Al estar estas acciones en solo dos cláusulas permite que agregar más reglas relacionadas con ellas sean tarea sencilla. 
+
+Los bichos se pueden agregar al definir cómo se mueven y agregar el correspondiente `bug_movement_functor` en `bug_movement.pl`.
 
 ### Flujo del juego
 
-El flujo del juego empieza en la cláusula `init_game` en donde se configuran las características del juego como el tipo de juego que se va a jugar y el tipo de jugadores que se va a elegir. Una vez elegido esto se genera un ciclo por un llamado recursivo de cola de la cláusula `run_game`. En esta cláusula ocurre todo lo relacionado con las acciones de los jugadores, la actualización de la interfaz con la representación actual del juego, etc.
+El flujo del juego empieza en la cláusula `init_game` en donde se configuran las características del juego como el tipo de juego que se va a jugar y el tipo de jugadores que se va a elegir. Una vez elegido esto se genera un ciclo por un llamado recursivo de cola de la cláusula `run_game`. En esta cláusula ocurre todo lo relacionado con las acciones de los jugadores, la actualización de la interfaz con la representación actual del juego, etc. 
+
+En caso de que el jugador al que le toque jugar no tenga opciones posibles, el turno se pasa al próximo jugador. En caso de que ninguno tenga opciones posibles quedará en empate el juego mediante la regla de que no pueden haber más de 3 posiciones del tablero iguales por juego.  
 
 ### Jugador Inteligente
 
@@ -151,13 +156,14 @@ Para la función de utilidad de dicho algoritmo se tuvieron en cuenta los siguie
 
 Estos criterios luego son normalizados y multiplicados por un peso que depende del turno en donde se encuentre el juego, de esta manera se pueden potenciar ciertos movimientos al principio o ya en el medio o largo juego. La función puede ser encontrada en `utility_function.pl`.
 
+Para la generación de jugadas se usó el mismo procedimiento usado para mover las piezas que usa un jugador humano. Gracias a las características de Prolog fue posible usar las mismas cláusulas usadas por el jugador humano para generar las posibles jugadas del jugador autónomo y random. Para esto se definió una cláusula que definía parcialmente la cláusula `make_a_play`, la cual triunfa si su primer argumento es una action válida dado la instancia del juego, para así generar todas las posibles jugadas dada la instancia `game` actual. Esto se puede observar en el archivo `ai_utils.pl`.
+
 ### Test
 
 A medida que se aumentó la complejidad del proyecto se hicieron pequeños scripts para probar las diferentes mecánicas del juego que se estaban implementando:
 
 - `test_boards.pl`: Probar movimientos y el añadido de piezas. Para correrlos cargar el archivo y ejecutar `run_board_test().`
 - `test_games.pl`: Simulaciones de juegos con todas las reglas. Para correrlos cargar el archivo y ejecutar `run_game_tests().`
-
 
 ### Interfaz HTTP Prolog
 
@@ -289,7 +295,7 @@ Cuerpos del POST:
 
 ### Interfaz visual
 
-La interfaz visual se creó mediante la unión de los paquetes **FastAPI** y **pygame**. Con el primero se crearon los endpoints y los modelos necesarios para la comunicación con la lógica del juego respetando la interfaz explicada anteriormente. Con el segundo se crearon los visuales necesarios para representar el juego así como la interacción entre el usuario y el juego a través de clicks. 
+La interfaz visual se creó mediante la unión de los paquetes **FastAPI** y **pygame**. Con el primero se crearon los endpoints y los modelos necesarios para la comunicación con la lógica del juego respetando la interfaz explicada anteriormente. Con el segundo se crearon los visuales necesarios para representar el juego así como la interacción entre el usuario y el juego a través de clicks.
 
 Se adaptó la idea de un tablero hexagonal público de pygame ajustando las coordenadas correctas para nuestro tablero hexagonal. De ahí proviene el código de la carpeta hexmap.
 
@@ -324,8 +330,9 @@ El movimiento especial se aplica sobre los pillbugs o sobre los mosquitos adyace
 
 - En caso de trabarse el juego probar realizar una jugada cualquiera.
 - En caso de que al dar click en una opción esta no se seleccione probar darle click de nuevo.
+- Si desea reiniciar el juego aborte el servidor de Prolog y vuélvalo a poner **main.**, luego haga cualquier acción en el visual.
 
 ## Bibliografía
 
-- https://www.redblobgames.com/grids/hexagons/ Se usará para las posiciones de los hexágonos estilo offset coordinates odd-q de la página .
+- <https://www.redblobgames.com/grids/hexagons/> Se usaron para las posiciones de los hexágonos estilo offset coordinates odd-q de la página .
 - Artificial Inteligence: A Modern Approach, Capítulo 5 pág 161
